@@ -8,6 +8,7 @@ import Svg exposing (..)
 import Svg.Attributes as SvgAttr
 import String
 
+bla bla bla
 
 -- MODEL
 
