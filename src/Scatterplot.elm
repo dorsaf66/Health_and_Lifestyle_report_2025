@@ -10,7 +10,6 @@ import Svg exposing (..)
 import Svg.Attributes as SA
 
 
-
 type alias DataPoint =
     { schritte : Int
     , wasserzufuhr : Float
@@ -22,14 +21,12 @@ type alias DataPoint =
     }
 
 
-
 gesundheitszustandDecoder : Decoder String
 gesundheitszustandDecoder =
     Decode.oneOf
         [ Decode.string
         , Decode.int |> Decode.map String.fromInt
         ]
-
 
 
 dataPointDecoder : Decoder DataPoint
@@ -42,7 +39,6 @@ dataPointDecoder =
         (Decode.field "gesundheitszustand" gesundheitszustandDecoder)
         (Decode.field "healthScore" Decode.float)
         (Decode.field "geschlecht" Decode.string)
-
 
 
 type alias Model =
@@ -61,14 +57,13 @@ init _ =
     ( { dataPoints = []
       , error = Nothing
       , showPlot = True
-      , xAxis = "schritte"
+      , xAxis = "schritte"  -- "wasserzufuhr" entfernt, daher "schritte" als Standard
       , yAxis = "wasserzufuhr"
       , showMen = True
       , showWomen = True
       }
     , loadData
     )
-
 
 
 loadData : Cmd Msg
@@ -79,7 +74,6 @@ loadData =
         }
 
 
-
 type Msg
     = DataLoaded (Result Http.Error (List DataPoint))
     | TogglePlot
@@ -87,7 +81,6 @@ type Msg
     | SetYAxis String
     | ToggleMen
     | ToggleWomen
-
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -117,7 +110,6 @@ update msg model =
             ( { model | showWomen = not model.showWomen }, Cmd.none )
 
 
-
 httpErrorToString : Http.Error -> String
 httpErrorToString err =
     case err of
@@ -126,7 +118,6 @@ httpErrorToString err =
         Http.NetworkError -> "Netzwerkfehler"
         Http.BadStatus status -> "HTTP Fehler: Status " ++ String.fromInt status
         Http.BadBody msg -> "Ungültiger Body: " ++ msg
-
 
 
 view : Model -> Html Msg
@@ -169,28 +160,27 @@ view model =
 axisOptions : String -> List (Html Msg)
 axisOptions selectedAxis =
     [ option [ value "schritte", selected (selectedAxis == "schritte") ] [ Html.text "Schritte pro Tag" ]
-    , option [ value "wasserzufuhr", selected (selectedAxis == "wasserzufuhr") ] [ Html.text "Wasserzufuhr (Liter)" ]
+    -- Wasserzufuhr und Health Score entfernt:
+    -- , option [ value "wasserzufuhr", selected (selectedAxis == "wasserzufuhr") ] [ Html.text "Wasserzufuhr (Liter)" ]
     , option [ value "schlafdauer", selected (selectedAxis == "schlafdauer") ] [ Html.text "Schlafdauer" ]
     , option [ value "kalorienverbrauch", selected (selectedAxis == "kalorienverbrauch") ] [ Html.text "Kalorienverbrauch" ]
     , option [ value "gesundheitszustand", selected (selectedAxis == "gesundheitszustand") ] [ Html.text "Gesundheitszustand" ]
-    , option [ value "healthScore", selected (selectedAxis == "healthScore") ] [ Html.text "Health Score" ]
+    -- , option [ value "healthScore", selected (selectedAxis == "healthScore") ] [ Html.text "Health Score" ]
     ]
 
-
--- WERT AUSLESEN
 
 getValue : String -> DataPoint -> Float
 getValue axis dp =
     case axis of
         "schritte" -> toFloat dp.schritte
-        "wasserzufuhr" -> dp.wasserzufuhr
+        -- "wasserzufuhr" entfernt
         "schlafdauer" -> dp.schlafdauer
         "kalorienverbrauch" -> dp.kalorienverbrauch
-        "healthScore" -> dp.healthScore
+        "gesundheitszustand" -> -- Versuch Gesundheitszustand als Zahl zu nehmen (hier 0)
+            0
+        -- "healthScore" entfernt
         _ -> 0
 
-
--- SCALE
 
 scale : Float -> Float -> Float -> Float -> Float -> Float
 scale domainMin domainMax rangeMin rangeMax value =
@@ -213,8 +203,6 @@ clamp minVal maxVal val =
     else
         val
 
-
--- SCATTERPLOT
 
 scatterPlot : Model -> Html Msg
 scatterPlot model =
@@ -282,7 +270,7 @@ scatterPlot model =
                 [ SA.x (String.fromInt (width // 2))
                 , SA.y (String.fromInt (height - 10))
                 , SA.textAnchor "middle"
-                , SA.fontSize "24"   -- größer gemacht
+                , SA.fontSize "24"
                 ]
                 [ Svg.text (axisLabel model.xAxis) ]
 
@@ -290,7 +278,7 @@ scatterPlot model =
             text_
                 [ SA.transform ("translate(15," ++ String.fromInt (height // 2) ++ ") rotate(-90)")
                 , SA.textAnchor "middle"
-                , SA.fontSize "24"   -- größer gemacht
+                , SA.fontSize "24"
                 ]
                 [ Svg.text (axisLabel model.yAxis) ]
     in
@@ -306,15 +294,13 @@ axisLabel : String -> String
 axisLabel axis =
     case axis of
         "schritte" -> "Schritte pro Tag"
-        "wasserzufuhr" -> "Wasserzufuhr (Liter)"
+        -- "wasserzufuhr" entfernt
         "schlafdauer" -> "Schlafdauer"
         "kalorienverbrauch" -> "Kalorienverbrauch"
         "gesundheitszustand" -> "Gesundheitszustand"
-        "healthScore" -> "Health Score"
+        -- "healthScore" entfernt
         _ -> ""
 
-
--- MAIN
 
 main =
     Browser.element
