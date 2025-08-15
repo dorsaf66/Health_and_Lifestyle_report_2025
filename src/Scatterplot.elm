@@ -2,13 +2,17 @@ module Scatterplot exposing (main)
 
 import Browser
 import Html exposing (Html, button, div, input, label, option, select)
+import Html as Html
 import Html.Attributes as HA exposing (value, selected, type_, checked)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as Decode exposing (Decoder)
 import Svg exposing (..)
+import Svg as Svg
 import Svg.Attributes as SA
 
+
+-- DATENTYPEN
 
 type alias DataPoint =
     { schritte : Int
@@ -57,8 +61,8 @@ init _ =
     ( { dataPoints = []
       , error = Nothing
       , showPlot = True
-      , xAxis = "schritte"  -- "wasserzufuhr" entfernt, daher "schritte" als Standard
-      , yAxis = "wasserzufuhr"
+      , xAxis = "schritte"
+      , yAxis = "kalorienverbrauch"
       , showMen = True
       , showWomen = True
       }
@@ -74,6 +78,8 @@ loadData =
         }
 
 
+-- NACHRICHTEN
+
 type Msg
     = DataLoaded (Result Http.Error (List DataPoint))
     | TogglePlot
@@ -82,6 +88,8 @@ type Msg
     | ToggleMen
     | ToggleWomen
 
+
+-- UPDATE
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -120,18 +128,20 @@ httpErrorToString err =
         Http.BadBody msg -> "Ungültiger Body: " ++ msg
 
 
+-- VIEW
+
 view : Model -> Html Msg
 view model =
     div []
         [ div []
             [ div [ HA.style "font-size" "20px", HA.style "font-weight" "bold" ] [ Html.text "X-Achse: " ]
             , select [ onInput SetXAxis ]
-                (axisOptions model.xAxis)
+                (xAxisOptions model.xAxis)
             ]
         , div []
             [ div [ HA.style "font-size" "20px", HA.style "font-weight" "bold" ] [ Html.text "Y-Achse: " ]
             , select [ onInput SetYAxis ]
-                (axisOptions model.yAxis)
+                (yAxisOptions model.yAxis)
             ]
         , div []
             [ label []
@@ -157,29 +167,185 @@ view model =
         ]
 
 
-axisOptions : String -> List (Html Msg)
-axisOptions selectedAxis =
+
+xAxisOptions : String -> List (Html Msg)
+xAxisOptions selectedAxis =
     [ option [ value "schritte", selected (selectedAxis == "schritte") ] [ Html.text "Schritte pro Tag" ]
-    -- Wasserzufuhr und Health Score entfernt:
-    -- , option [ value "wasserzufuhr", selected (selectedAxis == "wasserzufuhr") ] [ Html.text "Wasserzufuhr (Liter)" ]
-    , option [ value "schlafdauer", selected (selectedAxis == "schlafdauer") ] [ Html.text "Schlafdauer" ]
-    , option [ value "kalorienverbrauch", selected (selectedAxis == "kalorienverbrauch") ] [ Html.text "Kalorienverbrauch" ]
-    , option [ value "gesundheitszustand", selected (selectedAxis == "gesundheitszustand") ] [ Html.text "Gesundheitszustand" ]
-    -- , option [ value "healthScore", selected (selectedAxis == "healthScore") ] [ Html.text "Health Score" ]
+    , option [ value "wasserzufuhr", selected (selectedAxis == "wasserzufuhr") ] [ Html.text "Wasserzufuhr (Liter)" ]
+    , option [ value "schlafdauer", selected (selectedAxis == "schlafdauer") ] [ Html.text "Schlafdauer (Stunden)" ]
     ]
+
+
+yAxisOptions : String -> List (Html Msg)
+yAxisOptions selectedAxis =
+    [ option [ value "kalorienverbrauch", selected (selectedAxis == "kalorienverbrauch") ] [ Html.text "Kalorienverbrauch" ]
+    , option [ value "gesundheitszustand", selected (selectedAxis == "gesundheitszustand") ] [ Html.text "Gesundheitszustand" ]
+    , option [ value "healthScore", selected (selectedAxis == "healthScore") ] [ Html.text "Health Score" ]
+    ]
+
+
+-- WERT-UMRECHNUNG
+
+gesundheitszustandToFloat : String -> Float
+gesundheitszustandToFloat str =
+    case String.toLower str of
+        "schlecht" -> 1
+        "mittel" -> 2
+        "gut" -> 3
+        _ -> 0
 
 
 getValue : String -> DataPoint -> Float
 getValue axis dp =
     case axis of
         "schritte" -> toFloat dp.schritte
-        -- "wasserzufuhr" entfernt
+        "wasserzufuhr" -> dp.wasserzufuhr
         "schlafdauer" -> dp.schlafdauer
         "kalorienverbrauch" -> dp.kalorienverbrauch
-        "gesundheitszustand" -> -- Versuch Gesundheitszustand als Zahl zu nehmen (hier 0)
-            0
-        -- "healthScore" entfernt
+        "gesundheitszustand" -> gesundheitszustandToFloat dp.gesundheitszustand
+        "healthScore" -> dp.healthScore
         _ -> 0
+
+
+-- PLOT-ZEICHNUNG
+
+scatterPlot : Model -> Html Msg
+scatterPlot model =
+    let
+        width = 1200
+        height = 700
+        margin = 70
+
+        filteredData =
+            List.filter
+                (\dp ->
+                    (model.showMen && dp.geschlecht == "m") ||
+                    (model.showWomen && dp.geschlecht == "w")
+                )
+                model.dataPoints
+
+        xs = List.map (getValue model.xAxis) filteredData
+        ys = List.map (getValue model.yAxis) filteredData
+
+        xMin = List.minimum xs |> Maybe.withDefault 0
+        xMax = List.maximum xs |> Maybe.withDefault 1
+        yMin = List.minimum ys |> Maybe.withDefault 0
+        yMax = List.maximum ys |> Maybe.withDefault 1
+
+        scaleX val = scale xMin xMax (toFloat margin) (toFloat (width - margin)) val
+        scaleY val = scale yMin yMax (toFloat (height - margin)) (toFloat margin) val
+
+        points =
+            List.map
+                (\dp ->
+                    let
+                        x = scaleX (getValue model.xAxis dp)
+                        y = scaleY (getValue model.yAxis dp)
+                        color = if dp.geschlecht == "m" then "blue" else "red"
+                    in
+                    Svg.circle
+                        [ SA.cx (String.fromFloat x)
+                        , SA.cy (String.fromFloat y)
+                        , SA.r "3"
+                        , SA.fill color
+                        ]
+                        []
+                )
+                filteredData
+
+        xTicks =
+            axisTicks xMin xMax 5
+                |> List.map (\val -> tickLabel val (scaleX val) (toFloat (height - margin + 20)) (String.fromFloat (round1 val)))
+
+        yTicks =
+            case model.yAxis of
+                "gesundheitszustand" ->
+                    [ (1, "schlecht"), (2, "mittel"), (3, "gut") ]
+                        |> List.map (\(val, lbl) -> tickLabelY (scaleY val) lbl)
+
+                "healthScore" ->
+                    List.range 0 10
+                        |> List.map (\i -> tickLabelY (scaleY (toFloat (i * 10))) (String.fromInt (i * 10)))
+
+                _ ->
+                    axisTicks yMin yMax 5
+                        |> List.map (\val -> tickLabelY (scaleY val) (String.fromFloat (round1 val)))
+
+        xAxisLine =
+            Svg.line
+                [ SA.x1 (String.fromInt margin)
+                , SA.y1 (String.fromInt (height - margin))
+                , SA.x2 (String.fromInt (width - margin))
+                , SA.y2 (String.fromInt (height - margin))
+                , SA.stroke "black"
+                ]
+                []
+
+        yAxisLine =
+            Svg.line
+                [ SA.x1 (String.fromInt margin)
+                , SA.y1 (String.fromInt margin)
+                , SA.x2 (String.fromInt margin)
+                , SA.y2 (String.fromInt (height - margin))
+                , SA.stroke "black"
+                ]
+                []
+
+        xAxisLabel =
+            Svg.text_
+                [ SA.x (String.fromInt (width // 2))
+                , SA.y (String.fromInt (height - 10))
+                , SA.textAnchor "middle"
+                , SA.fontSize "20"
+                ]
+                [ Svg.text (axisLabel model.xAxis) ]
+
+        yAxisLabel =
+            Svg.text_
+                [ SA.transform ("translate(20," ++ String.fromInt (height // 2) ++ ") rotate(-90)")
+                , SA.textAnchor "middle"
+                , SA.fontSize "20"
+                ]
+                [ Svg.text (axisLabel model.yAxis) ]
+    in
+    Svg.svg
+        [ SA.width (String.fromInt width)
+        , SA.height (String.fromInt height)
+        , SA.style "border:1px solid black"
+        ]
+        ([ xAxisLine, yAxisLine, xAxisLabel, yAxisLabel ] ++ xTicks ++ yTicks ++ points)
+
+
+-- HELFER
+
+axisTicks : Float -> Float -> Int -> List Float
+axisTicks minVal maxVal count =
+    let
+        step = (maxVal - minVal) / toFloat count
+    in
+    List.map (\i -> minVal + step * toFloat i) (List.range 0 count)
+
+
+tickLabel : Float -> Float -> Float -> String -> Svg.Svg Msg
+tickLabel val x y lbl =
+    Svg.text_
+        [ SA.x (String.fromFloat x)
+        , SA.y (String.fromFloat y)
+        , SA.textAnchor "middle"
+        , SA.fontSize "14"
+        ]
+        [ Svg.text lbl ]
+
+
+tickLabelY : Float -> String -> Svg.Svg Msg
+tickLabelY y lbl =
+    Svg.text_
+        [ SA.x "65"
+        , SA.y (String.fromFloat y)
+        , SA.textAnchor "end"
+        , SA.fontSize "14"
+        ]
+        [ Svg.text lbl ]
 
 
 scale : Float -> Float -> Float -> Float -> Float -> Float
@@ -204,103 +370,24 @@ clamp minVal maxVal val =
         val
 
 
-scatterPlot : Model -> Html Msg
-scatterPlot model =
-    let
-        width = 900
-        height = 400
-        margin = 50
-
-        filteredData =
-            List.filter
-                (\dp ->
-                    (model.showMen && dp.geschlecht == "m") ||
-                    (model.showWomen && dp.geschlecht == "w")
-                )
-                model.dataPoints
-
-        xs = List.map (getValue model.xAxis) filteredData
-        ys = List.map (getValue model.yAxis) filteredData
-
-        xMin = List.minimum xs |> Maybe.withDefault 0
-        xMax = List.maximum xs |> Maybe.withDefault 100
-        yMin = List.minimum ys |> Maybe.withDefault 0
-        yMax = List.maximum ys |> Maybe.withDefault 100
-
-        points =
-            List.map
-                (\dp ->
-                    let
-                        x = scale xMin xMax margin (toFloat (width - margin)) (getValue model.xAxis dp)
-                        y = scale yMin yMax (toFloat (height - margin)) margin (getValue model.yAxis dp)
-                        color = if dp.geschlecht == "m" then "blue" else "red"
-                    in
-                    circle
-                        [ SA.cx (String.fromFloat x)
-                        , SA.cy (String.fromFloat y)
-                        , SA.r "3"
-                        , SA.fill color
-                        ]
-                        []
-                )
-                filteredData
-
-        xAxisLine =
-            line
-                [ SA.x1 (String.fromInt margin)
-                , SA.y1 (String.fromInt (height - margin))
-                , SA.x2 (String.fromInt (width - margin))
-                , SA.y2 (String.fromInt (height - margin))
-                , SA.stroke "black"
-                ]
-                []
-
-        yAxisLine =
-            line
-                [ SA.x1 (String.fromInt margin)
-                , SA.y1 (String.fromInt margin)
-                , SA.x2 (String.fromInt margin)
-                , SA.y2 (String.fromInt (height - margin))
-                , SA.stroke "black"
-                ]
-                []
-
-        xAxisLabel =
-            text_
-                [ SA.x (String.fromInt (width // 2))
-                , SA.y (String.fromInt (height - 10))
-                , SA.textAnchor "middle"
-                , SA.fontSize "24"
-                ]
-                [ Svg.text (axisLabel model.xAxis) ]
-
-        yAxisLabel =
-            text_
-                [ SA.transform ("translate(15," ++ String.fromInt (height // 2) ++ ") rotate(-90)")
-                , SA.textAnchor "middle"
-                , SA.fontSize "24"
-                ]
-                [ Svg.text (axisLabel model.yAxis) ]
-    in
-    Svg.svg
-        [ SA.width (String.fromInt width)
-        , SA.height (String.fromInt height)
-        , SA.style "border:1px solid black"
-        ]
-        ([ xAxisLine, yAxisLine, xAxisLabel, yAxisLabel ] ++ points)
+round1 : Float -> Float
+round1 num =
+    (toFloat (round (num * 10))) / 10
 
 
 axisLabel : String -> String
 axisLabel axis =
     case axis of
         "schritte" -> "Schritte pro Tag"
-        -- "wasserzufuhr" entfernt
-        "schlafdauer" -> "Schlafdauer"
+        "wasserzufuhr" -> "Wasserzufuhr (Liter)"
+        "schlafdauer" -> "Schlafdauer (Stunden)"
         "kalorienverbrauch" -> "Kalorienverbrauch"
         "gesundheitszustand" -> "Gesundheitszustand"
-        -- "healthScore" entfernt
+        "healthScore" -> "Health Score"
         _ -> ""
 
+
+-- MAIN
 
 main =
     Browser.element
