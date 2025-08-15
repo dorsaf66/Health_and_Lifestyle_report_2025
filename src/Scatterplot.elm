@@ -11,6 +11,15 @@ import Svg exposing (..)
 import Svg as Svg
 import Svg.Attributes as SA
 
+import Csv exposing (parse)
+import Http
+import Html exposing (Html, button, div, option, select, text)
+import Html.Attributes as HtmlAttr
+import Html.Events as HtmlEvents
+import Svg exposing (..)
+import Svg.Attributes as SvgAttr
+import String
+import Json.Decode exposing (int)
 
 -- DATENTYPEN
 
@@ -56,7 +65,78 @@ type alias Model =
     }
 
 
-init : () -> ( Model, Cmd Msg )
+type alias Person = 
+    { id : Int
+    , age : Int
+    , gender : String
+    , heightCm : Int
+    , weightKg : Int
+    , bmi : Float
+    , dailySteps : Int
+    , caloriesIntake : Int
+    , hoursOfSleep : Float
+    , heartRate : Int
+    , bloodPresure : String
+    , exerciseHours : Float
+    , smoker : String
+    , alcoholConsumption : Int
+    , diabetic : String
+    , heartDisease : String 
+    }
+
+rowToPerson : List String -> Maybe Person
+rowToPerson row =
+    case row of
+        idStr :: ageStr :: genderStr :: heightStr :: weightStr :: bmiStr :: dailyStepsStr :: caloriesIntakeStr :: hoursOfSleepStr :: heartRateStr :: bloodPresureStr :: exerciseHoursStr :: smokerStr :: alcoholConsumptionStr :: diabeticStr :: heartDiseaseStr :: [] ->
+            case ( String.toInt idStr
+                 , String.toInt ageStr
+                 , String.toInt heightStr
+                 , String.toInt weightStr
+                 , String.toFloat bmiStr
+                 , String.toInt dailyStepsStr
+                 , String.toInt caloriesIntakeStr
+                 , String.toFloat hoursOfSleepStr
+                 , String.toInt heartRateStr
+                 , String.toFloat exerciseHoursStr
+                 , String.toInt alcoholConsumptionStr
+                 ) of
+                ( Just id
+                , Just age
+                , Just heightCm
+                , Just weightKg
+                , Just bmi
+                , Just dailySteps
+                , Just caloriesIntake
+                , Just hoursOfSleep
+                , Just heartRate
+                , Just exerciseHours
+                , Just alcoholConsumption
+                ) ->
+                    Just
+                        { id = id
+                        , age = age
+                        , gender = genderStr
+                        , heightCm = heightCm
+                        , weightKg = weightKg
+                        , bmi = bmi
+                        , dailySteps = dailySteps
+                        , caloriesIntake = caloriesIntake
+                        , hoursOfSleep = hoursOfSleep
+                        , heartRate = heartRate
+                        , bloodPresure = bloodPresureStr
+                        , exerciseHours = exerciseHours
+                        , smoker = smokerStr
+                        , alcoholConsumption = alcoholConsumption
+                        , diabetic = diabeticStr
+                        , heartDisease = heartDiseaseStr
+                        }
+                _ ->
+                    Nothing
+        _ ->
+            Nothing
+
+
+init : () -> ( Model, Cmd Msg, Cmd Msg )
 init _ =
     ( { dataPoints = []
       , error = Nothing
@@ -76,6 +156,44 @@ loadData =
         { url = "/data/health_activity_data.json"
         , expect = Http.expectJson DataLoaded (Decode.list dataPointDecoder)
         }
+    , loadCsv
+    , Cmd.none
+    )
+
+
+loadCsv : Cmd Msg
+loadCsv =
+    -- Beispiel für HTTP-Request:
+    Http.get
+        { url = "data/health_activity_data.csv"
+        , expect = Http.expectString CsvLoaded
+        }
+
+
+
+sampleData : List DataPoint
+sampleData =
+    [ { schritte = 5000, wasserzufuhr = 2, schlafdauer = 7, kalorienverbrauch = 2200, gesundheitszustand = 3, healthScore = 75, stressLevel = 2, altersgruppe = "30-40", geschlecht = "m" }
+    , { schritte = 8000, wasserzufuhr = 1.5, schlafdauer = 6, kalorienverbrauch = 2500, gesundheitszustand = 4, healthScore = 80, stressLevel = 3, altersgruppe = "20-30", geschlecht = "w" }
+    , { schritte = 4000, wasserzufuhr = 2.5, schlafdauer = 8, kalorienverbrauch = 2000, gesundheitszustand = 2, healthScore = 60, stressLevel = 1, altersgruppe = "40-50", geschlecht = "m" }
+    , { schritte = 7000, wasserzufuhr = 2.2, schlafdauer = 7, kalorienverbrauch = 2300, gesundheitszustand = 4, healthScore = 78, stressLevel = 2, altersgruppe = "30-40", geschlecht = "w" }
+    , { schritte = 6000, wasserzufuhr = 1.8, schlafdauer = 6.5, kalorienverbrauch = 2100, gesundheitszustand = 3, healthScore = 70, stressLevel = 2, altersgruppe = "40-50", geschlecht = "m" }
+    , { schritte = 9000, wasserzufuhr = 1.4, schlafdauer = 5.5, kalorienverbrauch = 2600, gesundheitszustand = 5, healthScore = 85, stressLevel = 3, altersgruppe = "20-30", geschlecht = "w" }
+    , { schritte = 3500, wasserzufuhr = 2.8, schlafdauer = 8, kalorienverbrauch = 1900, gesundheitszustand = 2, healthScore = 58, stressLevel = 1, altersgruppe = "50-60", geschlecht = "m" }
+    , { schritte = 4500, wasserzufuhr = 2, schlafdauer = 7.5, kalorienverbrauch = 2050, gesundheitszustand = 3, healthScore = 65, stressLevel = 2, altersgruppe = "30-40", geschlecht = "w" }
+    , { schritte = 8500, wasserzufuhr = 1.6, schlafdauer = 6, kalorienverbrauch = 2550, gesundheitszustand = 4, healthScore = 82, stressLevel = 3, altersgruppe = "20-30", geschlecht = "m" }
+    , { schritte = 4000, wasserzufuhr = 2.4, schlafdauer = 7, kalorienverbrauch = 1950, gesundheitszustand = 2, healthScore = 60, stressLevel = 1, altersgruppe = "40-50", geschlecht = "w" }
+    , { schritte = 7800, wasserzufuhr = 1.7, schlafdauer = 6.5, kalorienverbrauch = 2400, gesundheitszustand = 4, healthScore = 77, stressLevel = 2, altersgruppe = "30-40", geschlecht = "m" }
+    , { schritte = 5200, wasserzufuhr = 2.1, schlafdauer = 7.2, kalorienverbrauch = 2150, gesundheitszustand = 3, healthScore = 69, stressLevel = 2, altersgruppe = "50-60", geschlecht = "w" }
+    , { schritte = 9200, wasserzufuhr = 1.3, schlafdauer = 5.8, kalorienverbrauch = 2700, gesundheitszustand = 5, healthScore = 88, stressLevel = 3, altersgruppe = "20-30", geschlecht = "m" }
+    , { schritte = 3000, wasserzufuhr = 2.7, schlafdauer = 8.5, kalorienverbrauch = 1800, gesundheitszustand = 2, healthScore = 55, stressLevel = 1, altersgruppe = "60-70", geschlecht = "w" }
+    , { schritte = 6500, wasserzufuhr = 2, schlafdauer = 7, kalorienverbrauch = 2250, gesundheitszustand = 3, healthScore = 72, stressLevel = 2, altersgruppe = "40-50", geschlecht = "m" }
+    , { schritte = 8300, wasserzufuhr = 1.5, schlafdauer = 6.2, kalorienverbrauch = 2500, gesundheitszustand = 4, healthScore = 80, stressLevel = 3, altersgruppe = "30-40", geschlecht = "w" }
+    , { schritte = 4700, wasserzufuhr = 2.3, schlafdauer = 7.3, kalorienverbrauch = 2100, gesundheitszustand = 3, healthScore = 66, stressLevel = 2, altersgruppe = "50-60", geschlecht = "m" }
+    , { schritte = 7800, wasserzufuhr = 1.6, schlafdauer = 6.1, kalorienverbrauch = 2450, gesundheitszustand = 4, healthScore = 79, stressLevel = 3, altersgruppe = "20-30", geschlecht = "w" }
+    , { schritte = 3900, wasserzufuhr = 2.5, schlafdauer = 7.8, kalorienverbrauch = 2000, gesundheitszustand = 2, healthScore = 61, stressLevel = 1, altersgruppe = "40-50", geschlecht = "m" }
+    , { schritte = 6000, wasserzufuhr = 1.9, schlafdauer = 6.7, kalorienverbrauch = 2200, gesundheitszustand = 3, healthScore = 73, stressLevel = 2, altersgruppe = "30-40", geschlecht = "w" }
+    ]
 
 
 -- NACHRICHTEN
@@ -91,6 +209,14 @@ type Msg
 
 -- UPDATE
 
+type Msg
+    = ChangeX String
+    | ChangeY String
+    | TogglePlot
+    | CsvLoaded (Result Http.Error String)
+
+
+>>>>>>> main
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -126,6 +252,26 @@ httpErrorToString err =
         Http.NetworkError -> "Netzwerkfehler"
         Http.BadStatus status -> "HTTP Fehler: Status " ++ String.fromInt status
         Http.BadBody msg -> "Ungültiger Body: " ++ msg
+        CsvLoaded (Ok csvString) ->
+            let
+                csv = parse csvString
+            in
+                case csv of
+                    Csv.Ok rows ->
+                        let
+                            -- Überspringe die Header-Zeile
+                            dataRows = List.drop 1 rows
+                            persons = List.filterMap rowToPerson dataRows
+                        in
+                            -- persons ist jetzt eine Liste von Person-Records
+                            ( { model | data = persons }, Cmd.none )
+                    Csv.Err err ->
+                        -- Fehlerbehandlung für CSV-Parsing-Fehler
+                        ( model, Cmd.none )
+
+        CsvLoaded (Err httpError) ->
+            -- Fehlerbehandlung für HTTP-Fehler
+            ( model, Cmd.none )
 
 
 -- VIEW
@@ -386,6 +532,8 @@ axisLabel axis =
         "healthScore" -> "Health Score"
         _ -> ""
 
+        _ ->
+            "gray"
 
 -- MAIN
 
