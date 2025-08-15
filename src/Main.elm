@@ -1,7 +1,8 @@
-module Scatterplot exposing (main)
+module Main exposing (main)
 
 import Browser
-import Csv exposing (parse)
+import Csv.Parser exposing (parse)
+-- import Csv.Decode as Decode exposing (Decoder)
 import Http
 import Html exposing (Html, button, div, option, select, text)
 import Html.Attributes as HtmlAttr
@@ -25,15 +26,6 @@ type alias DataPoint =
     , geschlecht : String
     }
 
-
-type alias Model =
-    { data : List DataPoint
-    , selectedX : String
-    , selectedY : String
-    , showPlot : Bool
-    }
-
-
 type alias Person = 
     { id : Int
     , age : Int
@@ -53,67 +45,62 @@ type alias Person =
     , heartDisease : String 
     }
 
+type alias Model =
+    { data : List Person
+    , selectedX : String
+    , selectedY : String
+    , showPlot : Bool
+    }
+
+
 rowToPerson : List String -> Maybe Person
 rowToPerson row =
     case row of
         idStr :: ageStr :: genderStr :: heightStr :: weightStr :: bmiStr :: dailyStepsStr :: caloriesIntakeStr :: hoursOfSleepStr :: heartRateStr :: bloodPresureStr :: exerciseHoursStr :: smokerStr :: alcoholConsumptionStr :: diabeticStr :: heartDiseaseStr :: [] ->
-            case ( String.toInt idStr
-                 , String.toInt ageStr
-                 , String.toInt heightStr
-                 , String.toInt weightStr
-                 , String.toFloat bmiStr
-                 , String.toInt dailyStepsStr
-                 , String.toInt caloriesIntakeStr
-                 , String.toFloat hoursOfSleepStr
-                 , String.toInt heartRateStr
-                 , String.toFloat exerciseHoursStr
-                 , String.toInt alcoholConsumptionStr
-                 ) of
-                ( Just id
-                , Just age
-                , Just heightCm
-                , Just weightKg
-                , Just bmi
-                , Just dailySteps
-                , Just caloriesIntake
-                , Just hoursOfSleep
-                , Just heartRate
-                , Just exerciseHours
-                , Just alcoholConsumption
-                ) ->
-                    Just
-                        { id = id
-                        , age = age
-                        , gender = genderStr
-                        , heightCm = heightCm
-                        , weightKg = weightKg
-                        , bmi = bmi
-                        , dailySteps = dailySteps
-                        , caloriesIntake = caloriesIntake
-                        , hoursOfSleep = hoursOfSleep
-                        , heartRate = heartRate
-                        , bloodPresure = bloodPresureStr
-                        , exerciseHours = exerciseHours
-                        , smoker = smokerStr
-                        , alcoholConsumption = alcoholConsumption
-                        , diabetic = diabeticStr
-                        , heartDisease = heartDiseaseStr
-                        }
-                _ ->
-                    Nothing
+            -- case ( String.toInt idStr
+            --     , String.toInt ageStr
+            --     , String.toInt heightStr
+            --     , String.toInt weightStr
+            --     , String.toFloat bmiStr
+            --     , String.toInt dailyStepsStr
+            --     , String.toInt caloriesIntakeStr
+            --     , String.toFloat hoursOfSleepStr
+            --     , String.toInt heartRateStr
+            --     , String.toFloat exerciseHoursStr
+            --     , String.toInt alcoholConsumptionStr ) of
+            --    ( Just id, Just age, Just heightCm, Just weightKg, Just bmi, Just dailySteps, Just caloriesIntake, Just hoursOfSleep, Just heartRate, Just exerciseHours, Just alcoholConsumption ) ->
+                Just
+                    { id = idStr |> String.toInt |> Maybe.withDefault 0
+                    , age = ageStr |> String.toInt |> Maybe.withDefault 0
+                    , gender = genderStr
+                    , heightCm = heightStr |> String.toInt |> Maybe.withDefault 0
+                    , weightKg = weightStr |> String.toInt |> Maybe.withDefault 0
+                    , bmi = bmiStr |> String.toFloat |> Maybe.withDefault 0
+                    , dailySteps = dailyStepsStr |> String.toInt |> Maybe.withDefault 0
+                    , caloriesIntake = caloriesIntakeStr |> String.toInt |> Maybe.withDefault 0
+                    , hoursOfSleep = hoursOfSleepStr |> String.toFloat |> Maybe.withDefault 0
+                    , heartRate = heartRateStr |> String.toInt |> Maybe.withDefault 0
+                    , bloodPresure = bloodPresureStr
+                    , exerciseHours = exerciseHoursStr |> String.toFloat |> Maybe.withDefault 0
+                    , smoker = smokerStr
+                    , alcoholConsumption = alcoholConsumptionStr |> String.toInt |> Maybe.withDefault 0
+                    , diabetic = diabeticStr
+                    , heartDisease = heartDiseaseStr
+                    }
+                -- _ ->
+                --     Nothing
         _ ->
             Nothing
 
 
-init : () -> ( Model, Cmd Msg, Cmd Msg )
+init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { data = sampleData
+    ( { data = []
       , selectedX = "Schritte"
-      , selectedY = "Kalorienverbrauch"
+      , selectedY = "Kalorienaufnahme"
       , showPlot = True
       }
     , loadCsv
-    , Cmd.none
     )
 
 
@@ -121,35 +108,19 @@ loadCsv : Cmd Msg
 loadCsv =
     -- Beispiel für HTTP-Request:
     Http.get
-        { url = "data/health_activity_data.csv"
+        { url = "data/health_activity_data.csv" 
         , expect = Http.expectString CsvLoaded
         }
 
 
 
-sampleData : List DataPoint
+sampleData : List Person
 sampleData =
-    [ { schritte = 5000, wasserzufuhr = 2, schlafdauer = 7, kalorienverbrauch = 2200, gesundheitszustand = 3, healthScore = 75, stressLevel = 2, altersgruppe = "30-40", geschlecht = "m" }
-    , { schritte = 8000, wasserzufuhr = 1.5, schlafdauer = 6, kalorienverbrauch = 2500, gesundheitszustand = 4, healthScore = 80, stressLevel = 3, altersgruppe = "20-30", geschlecht = "w" }
-    , { schritte = 4000, wasserzufuhr = 2.5, schlafdauer = 8, kalorienverbrauch = 2000, gesundheitszustand = 2, healthScore = 60, stressLevel = 1, altersgruppe = "40-50", geschlecht = "m" }
-    , { schritte = 7000, wasserzufuhr = 2.2, schlafdauer = 7, kalorienverbrauch = 2300, gesundheitszustand = 4, healthScore = 78, stressLevel = 2, altersgruppe = "30-40", geschlecht = "w" }
-    , { schritte = 6000, wasserzufuhr = 1.8, schlafdauer = 6.5, kalorienverbrauch = 2100, gesundheitszustand = 3, healthScore = 70, stressLevel = 2, altersgruppe = "40-50", geschlecht = "m" }
-    , { schritte = 9000, wasserzufuhr = 1.4, schlafdauer = 5.5, kalorienverbrauch = 2600, gesundheitszustand = 5, healthScore = 85, stressLevel = 3, altersgruppe = "20-30", geschlecht = "w" }
-    , { schritte = 3500, wasserzufuhr = 2.8, schlafdauer = 8, kalorienverbrauch = 1900, gesundheitszustand = 2, healthScore = 58, stressLevel = 1, altersgruppe = "50-60", geschlecht = "m" }
-    , { schritte = 4500, wasserzufuhr = 2, schlafdauer = 7.5, kalorienverbrauch = 2050, gesundheitszustand = 3, healthScore = 65, stressLevel = 2, altersgruppe = "30-40", geschlecht = "w" }
-    , { schritte = 8500, wasserzufuhr = 1.6, schlafdauer = 6, kalorienverbrauch = 2550, gesundheitszustand = 4, healthScore = 82, stressLevel = 3, altersgruppe = "20-30", geschlecht = "m" }
-    , { schritte = 4000, wasserzufuhr = 2.4, schlafdauer = 7, kalorienverbrauch = 1950, gesundheitszustand = 2, healthScore = 60, stressLevel = 1, altersgruppe = "40-50", geschlecht = "w" }
-    , { schritte = 7800, wasserzufuhr = 1.7, schlafdauer = 6.5, kalorienverbrauch = 2400, gesundheitszustand = 4, healthScore = 77, stressLevel = 2, altersgruppe = "30-40", geschlecht = "m" }
-    , { schritte = 5200, wasserzufuhr = 2.1, schlafdauer = 7.2, kalorienverbrauch = 2150, gesundheitszustand = 3, healthScore = 69, stressLevel = 2, altersgruppe = "50-60", geschlecht = "w" }
-    , { schritte = 9200, wasserzufuhr = 1.3, schlafdauer = 5.8, kalorienverbrauch = 2700, gesundheitszustand = 5, healthScore = 88, stressLevel = 3, altersgruppe = "20-30", geschlecht = "m" }
-    , { schritte = 3000, wasserzufuhr = 2.7, schlafdauer = 8.5, kalorienverbrauch = 1800, gesundheitszustand = 2, healthScore = 55, stressLevel = 1, altersgruppe = "60-70", geschlecht = "w" }
-    , { schritte = 6500, wasserzufuhr = 2, schlafdauer = 7, kalorienverbrauch = 2250, gesundheitszustand = 3, healthScore = 72, stressLevel = 2, altersgruppe = "40-50", geschlecht = "m" }
-    , { schritte = 8300, wasserzufuhr = 1.5, schlafdauer = 6.2, kalorienverbrauch = 2500, gesundheitszustand = 4, healthScore = 80, stressLevel = 3, altersgruppe = "30-40", geschlecht = "w" }
-    , { schritte = 4700, wasserzufuhr = 2.3, schlafdauer = 7.3, kalorienverbrauch = 2100, gesundheitszustand = 3, healthScore = 66, stressLevel = 2, altersgruppe = "50-60", geschlecht = "m" }
-    , { schritte = 7800, wasserzufuhr = 1.6, schlafdauer = 6.1, kalorienverbrauch = 2450, gesundheitszustand = 4, healthScore = 79, stressLevel = 3, altersgruppe = "20-30", geschlecht = "w" }
-    , { schritte = 3900, wasserzufuhr = 2.5, schlafdauer = 7.8, kalorienverbrauch = 2000, gesundheitszustand = 2, healthScore = 61, stressLevel = 1, altersgruppe = "40-50", geschlecht = "m" }
-    , { schritte = 6000, wasserzufuhr = 1.9, schlafdauer = 6.7, kalorienverbrauch = 2200, gesundheitszustand = 3, healthScore = 73, stressLevel = 2, altersgruppe = "30-40", geschlecht = "w" }
-    ]
+    -- [ { schritte = 5000, wasserzufuhr = 2, schlafdauer = 7, kalorienverbrauch = 2200, gesundheitszustand = 3, healthScore = 75, stressLevel = 2, altersgruppe = "30-40", geschlecht = "m" }
+   [ { age = 50, alcoholConsumption = 0, bloodPresure = "60/100", bmi = 80.5, caloriesIntake = 500, dailySteps = 1000, diabetic = "no", exerciseHours = 3.6, gender = "f", heartDisease = "no", heartRate = 70, heightCm = 170, hoursOfSleep = 7.5, id = 1, smoker = "no", weightKg = 75}
+    , { age = 30, alcoholConsumption = 2, bloodPresure = "60/100", bmi = 120, caloriesIntake = 700, dailySteps = 5000, diabetic = "no", exerciseHours = 5.2, gender = "m", heartDisease = "no", heartRate = 62, heightCm = 190, hoursOfSleep = 7.3, id = 1, smoker = "no", weightKg = 86}
+   , { age = 60, alcoholConsumption = 5, bloodPresure = "60/100", bmi = 75, caloriesIntake = 1000, dailySteps = 800, diabetic = "yes", exerciseHours = 0.0, gender = "f", heartDisease = "yes", heartRate = 60, heightCm = 160, hoursOfSleep = 8.1, id = 1, smoker = "no", weightKg = 73}
+   ]
 
 
 
@@ -176,10 +147,11 @@ update msg model =
 
         CsvLoaded (Ok csvString) ->
             let
-                csv = parse csvString
+                -- csv = Decode.decodeCsv csvString
+                csv = parse { fieldSeparator = ','} csvString
             in
                 case csv of
-                    Csv.Ok rows ->
+                    Ok rows ->
                         let
                             -- Überspringe die Header-Zeile
                             dataRows = List.drop 1 rows
@@ -187,13 +159,15 @@ update msg model =
                         in
                             -- persons ist jetzt eine Liste von Person-Records
                             ( { model | data = persons }, Cmd.none )
-                    Csv.Err err ->
+                    Err err ->
                         -- Fehlerbehandlung für CSV-Parsing-Fehler
-                        ( model, Cmd.none )
+
+                        ( { model | data = sampleData }, Cmd.none )
 
         CsvLoaded (Err httpError) ->
             -- Fehlerbehandlung für HTTP-Fehler
-            ( model, Cmd.none )
+            Debug.log "HTTP-Fehler aufgetreten"     -- wird das angezeigt?
+            ( { model | data = sampleData }, Cmd.none )
 
 
 -- VIEW
@@ -223,43 +197,47 @@ view model =
 axisSelectX : String -> Html Msg
 axisSelectX selected =
     select [ HtmlEvents.onInput ChangeX ]
-        [ option [ HtmlAttr.value "Schritte", HtmlAttr.selected (selected == "Schritte") ] [ Html.text "Schritte" ]
-        , option [ HtmlAttr.value "Wasserzufuhr", HtmlAttr.selected (selected == "Wasserzufuhr") ] [ Html.text "Wasserzufuhr" ]
+        [ option [ HtmlAttr.value "Schritte", HtmlAttr.selected (selected == "Schritte") ] [ Html.text "Schritte" ] 
+        , option [ HtmlAttr.value "Alkoholkonsum pro Woche", HtmlAttr.selected (selected == "Alkoholkonsum pro Woche") ] [ Html.text "Alkoholkonsum pro Woche" ]
         , option [ HtmlAttr.value "Schlafdauer", HtmlAttr.selected (selected == "Schlafdauer") ] [ Html.text "Schlafdauer" ]
+        , option [ HtmlAttr.value "Herzfrequenz", HtmlAttr.selected (selected == "Herzfrequenz") ] [ Html.text "Herzfrequenz" ]
         ]
 
 
 axisSelectY : String -> Html Msg
 axisSelectY selected =
     select [ HtmlEvents.onInput ChangeY ]
-        [ option [ HtmlAttr.value "Kalorienverbrauch", HtmlAttr.selected (selected == "Kalorienverbrauch") ] [ Html.text "Kalorienverbrauch" ]
-        , option [ HtmlAttr.value "Gesundheitszustand", HtmlAttr.selected (selected == "Gesundheitszustand") ] [ Html.text "Gesundheitszustand" ]
-        , option [ HtmlAttr.value "Health Score", HtmlAttr.selected (selected == "Health Score") ] [ Html.text "Health Score" ]
+        [ option [ HtmlAttr.value "Kalorienaufnahme", HtmlAttr.selected (selected == "Kalorienaufnahme") ] [ Html.text "Kalorienaufnahme" ]
+        , option [ HtmlAttr.value "BMI", HtmlAttr.selected (selected == "BMI") ] [ Html.text "BMI" ]
+        , option [ HtmlAttr.value "Trainingsstunden pro Woche", HtmlAttr.selected (selected == "Trainingsstunden pro Woche") ] [ Html.text "Trainingsstunden pro Woche" ]
         ]
 
 
 -- Hilfsfunktion zum dynamischen Zugriff auf Werte je Achse
 
-getValueForAxis : DataPoint -> String -> Float
+getValueForAxis : Person -> String -> Float
 getValueForAxis dp axis =
     case axis of
         "Schritte" ->
-            dp.schritte
+            toFloat dp.dailySteps
 
-        "Wasserzufuhr" ->
-            dp.wasserzufuhr
+        "Alkoholkonsum pro Woche" ->
+            toFloat dp.alcoholConsumption
 
         "Schlafdauer" ->
-            dp.schlafdauer
+            dp.hoursOfSleep
 
-        "Kalorienverbrauch" ->
-            dp.kalorienverbrauch
+        "Kalorienaufnahme" ->
+            toFloat dp.caloriesIntake
 
-        "Gesundheitszustand" ->
-            dp.gesundheitszustand
+        "BMI" ->
+            dp.bmi
 
-        "Health Score" ->
-            dp.healthScore
+        "Trainingsstunden pro Woche" ->
+            dp.exerciseHours
+
+        "Herzfrequenz" ->
+            toFloat dp.heartRate
 
         _ ->
             0
@@ -355,14 +333,14 @@ scatterPlotView model =
                         [ SvgAttr.cx (String.fromFloat (scaleX (getValueForAxis dp model.selectedX)))
                         , SvgAttr.cy (String.fromFloat (scaleY (getValueForAxis dp model.selectedY)))
                         , SvgAttr.r "6"
-                        , SvgAttr.fill (colorByGender dp.geschlecht)
-                        , SvgAttr.stroke (colorByStress dp.stressLevel)
+                        , SvgAttr.fill (colorByGender dp.gender)
+                        , SvgAttr.stroke (colorByStress dp.heartRate)
                         , SvgAttr.strokeWidth "2"
                         , SvgAttr.opacity "0.8"
-                        , SvgAttr.title ("Stress: " ++ String.fromInt dp.stressLevel ++ ", Alter: " ++ dp.altersgruppe)
+                        , SvgAttr.title ("Herzfrequenz: " ++ String.fromInt dp.heartRate ++ ", Alter: " ++ String.fromInt dp.age)
                         ]
                         []
-                )
+                ) 
                 model.data
     in
     Svg.svg
