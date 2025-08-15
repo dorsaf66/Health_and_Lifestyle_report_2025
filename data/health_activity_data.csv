@@ -1,5 +1,4 @@
-ID,Age,Gender,Height_cm,Weight_kg,BMI,Daily_Steps,Calorie
-s_Intake,Hours_of_Sleep,Heart_Rate,Blood_Pressure,Exercise_Hours_per_Week,Smoker,Alcohol_Consumption_per_Week,Diabetic,Heart_Disease
+ID,Age,Gender,Height_cm,Weight_kg,BMI,Daily_Steps,Calories_Intake,Hours_of_Sleep,Heart_Rate,Blood_Pressure,Exercise_Hours_per_Week,Smoker,Alcohol_Consumption_per_Week,Diabetic,Heart_Disease
 1,56,Male,164,81,30.72,5134,1796,8.6,102,137/72,8.1,No,7,No,No
 2,69,Male,156,82,20.86,12803,1650,4.5,103,129/65,3.7,No,7,No,No
 3,46,Female,158,65,30.93,16408,1756,4.3,74,127/68,3.2,Yes,0,No,No
