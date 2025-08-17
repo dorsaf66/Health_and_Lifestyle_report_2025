@@ -163,25 +163,25 @@ view : Model -> Html Msg
 view model =
     div [ HtmlAttr.style "font-family" "Arial, sans-serif", HtmlAttr.style "margin" "20px" ]
         [ div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ Html.text "X-Achse: "
+            [ Html.text "X-ACHSE: "
             , axisSelectX model.selectedX
             ]
         , div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ Html.text "Y-Achse: "
+            [ Html.text "Y-ACHSE: "
             , axisSelectY model.selectedY
             ]
         , div [ HtmlAttr.style "margin" "10px 0" ]
             [ button [ HtmlEvents.onClick TogglePlot ]
-                [ Html.text (if model.showPlot then "Plot verbergen" else "Plot anzeigen") ]
+                [ Html.text (if model.showPlot then "PLOT VERBERGEN" else "PLOT ANZEIGEN") ]
             ]
-        , div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ labelCheckbox "Männer" model.showMale ToggleMale
-            , labelCheckbox "Frauen" model.showFemale ToggleFemale
+        , div [ HtmlAttr.style "margin-bottom" "10px", HtmlAttr.style "padding-left" "20px" ]
+            [ labelCheckbox "MÄNNER" model.showMale ToggleMale
+            , labelCheckbox "FRAUEN" model.showFemale ToggleFemale
             ]
-        , div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ labelCheckbox "Raucher" model.showSmoker ToggleSmoker
-            , labelCheckbox "Diabetiker" model.showDiabetic ToggleDiabetic
-            , labelCheckbox "Herzkrankheit" model.showHeartDisease ToggleHeartDisease
+        , div [ HtmlAttr.style "margin-bottom" "10px", HtmlAttr.style "padding-left" "20px" ]
+            [ labelCheckbox "RAUCHER" model.showSmoker ToggleSmoker
+            , labelCheckbox "DIABETIKER" model.showDiabetic ToggleDiabetic
+            , labelCheckbox "HERZKRANKHEIT" model.showHeartDisease ToggleHeartDisease
             ]
         , if model.showPlot then
             scatterPlotView model
@@ -201,19 +201,19 @@ labelCheckbox labelText checked toMsg =
 axisSelectX : String -> Html Msg
 axisSelectX selected =
     select [ HtmlEvents.onInput ChangeX ]
-        [ option [ HtmlAttr.value "Schritte", HtmlAttr.selected (selected == "Schritte") ] [ Html.text "Schritte" ]
-        , option [ HtmlAttr.value "Alkoholkonsum pro Woche", HtmlAttr.selected (selected == "Alkoholkonsum pro Woche") ] [ Html.text "Alkoholkonsum pro Woche" ]
-        , option [ HtmlAttr.value "Schlafdauer", HtmlAttr.selected (selected == "Schlafdauer") ] [ Html.text "Schlafdauer" ]
-        , option [ HtmlAttr.value "Herzfrequenz", HtmlAttr.selected (selected == "Herzfrequenz") ] [ Html.text "Herzfrequenz" ]
+        [ option [ HtmlAttr.value "Schritte", HtmlAttr.selected (selected == "Schritte"), HtmlAttr.style "background-color" (if selected == "Schritte" then "#87CEEB" else "white") ] [ Html.text "SCHRITTE" ]
+        , option [ HtmlAttr.value "Alkoholkonsum pro Woche", HtmlAttr.selected (selected == "Alkoholkonsum pro Woche"), HtmlAttr.style "background-color" (if selected == "Alkoholkonsum pro Woche" then "#87CEEB" else "white") ] [ Html.text "ALKOHOLKONSUM PRO WOCHE" ]
+        , option [ HtmlAttr.value "Schlafdauer", HtmlAttr.selected (selected == "Schlafdauer"), HtmlAttr.style "background-color" (if selected == "Schlafdauer" then "#87CEEB" else "white") ] [ Html.text "SCHLAFDAUER" ]
+        , option [ HtmlAttr.value "Herzfrequenz", HtmlAttr.selected (selected == "Herzfrequenz"), HtmlAttr.style "background-color" (if selected == "Herzfrequenz" then "#87CEEB" else "white") ] [ Html.text "HERZFREQUENZ" ]
         ]
 
 
 axisSelectY : String -> Html Msg
 axisSelectY selected =
     select [ HtmlEvents.onInput ChangeY ]
-        [ option [ HtmlAttr.value "Kalorienaufnahme", HtmlAttr.selected (selected == "Kalorienaufnahme") ] [ Html.text "Kalorienaufnahme" ]
-        , option [ HtmlAttr.value "BMI", HtmlAttr.selected (selected == "BMI") ] [ Html.text "BMI" ]
-        , option [ HtmlAttr.value "Trainingsstunden pro Woche", HtmlAttr.selected (selected == "Trainingsstunden pro Woche") ] [ Html.text "Trainingsstunden pro Woche" ]
+        [ option [ HtmlAttr.value "Kalorienaufnahme", HtmlAttr.selected (selected == "Kalorienaufnahme"), HtmlAttr.style "background-color" (if selected == "Kalorienaufnahme" then "#87CEEB" else "white") ] [ Html.text "KALORIENAUFNAHME" ]
+        , option [ HtmlAttr.value "BMI", HtmlAttr.selected (selected == "BMI"), HtmlAttr.style "background-color" (if selected == "BMI" then "#87CEEB" else "white") ] [ Html.text "BMI" ]
+        , option [ HtmlAttr.value "Trainingsstunden pro Woche", HtmlAttr.selected (selected == "Trainingsstunden pro Woche"), HtmlAttr.style "background-color" (if selected == "Trainingsstunden pro Woche" then "#87CEEB" else "white") ] [ Html.text "TRAININGSSTUNDEN PRO WOCHE" ]
         ]
 
 
@@ -278,58 +278,98 @@ scatterPlotView model =
         minY = 0
         maxY = List.maximum ys |> Maybe.withDefault 1
 
-        scaleX x = padding + ((x - minX) / (maxX - minX)) * (width - 2 * padding)
-        scaleY y = height - padding - ((y - minY) / (maxY - minY)) * (height - 2 * padding)
+        -- Umbenannte Variablen, um Shadowing zu vermeiden
+        plotPaddingLeft = 60
+        plotPadding = 40
+        plotWidth = 800
+        plotHeight = 500
+
+        scaleX x = plotPaddingLeft + ((x - minX) / (maxX - minX)) * (plotWidth - plotPaddingLeft - plotPadding)
+        scaleY y = plotHeight - plotPadding - ((y - minY) / (maxY - minY)) * (plotHeight - 2 * plotPadding)
 
         color dp =
             if dp.gender == "Male" then "#2D68C4"
-            else if dp.gender == "Female" then "#BE4E71"
+            else if dp.gender == "Female" then "#DE5D83"
             else "gray"
 
         xTicks = ticksForAxis model.selectedX
         yTicks = ticksForAxis model.selectedY
 
         tickLineX v =
-            Svg.line [ SvgAttr.x1 (String.fromFloat (scaleX v)), SvgAttr.y1 (String.fromFloat (height - padding)), SvgAttr.x2 (String.fromFloat (scaleX v)), SvgAttr.y2 (String.fromFloat (height - padding + 5)), SvgAttr.stroke "black" ] []
+            Svg.line [ SvgAttr.x1 (String.fromFloat (scaleX v)), SvgAttr.y1 (String.fromFloat (plotHeight - plotPadding)), SvgAttr.x2 (String.fromFloat (scaleX v)), SvgAttr.y2 (String.fromFloat (plotHeight - plotPadding + 5)), SvgAttr.stroke "black" ] []
 
         tickLineY v =
-            Svg.line [ SvgAttr.x1 (String.fromFloat (padding - 5)), SvgAttr.y1 (String.fromFloat (scaleY v)), SvgAttr.x2 (String.fromFloat padding), SvgAttr.y2 (String.fromFloat (scaleY v)), SvgAttr.stroke "black" ] []
+            Svg.line [ SvgAttr.x1 (String.fromFloat (plotPaddingLeft - 5)), SvgAttr.y1 (String.fromFloat (scaleY v)), SvgAttr.x2 (String.fromFloat plotPaddingLeft), SvgAttr.y2 (String.fromFloat (scaleY v)), SvgAttr.stroke "black" ] []
 
-        tickTextX v =
-            Svg.text_ [ SvgAttr.x (String.fromFloat (scaleX v)), SvgAttr.y (String.fromFloat (height - padding + 20)), SvgAttr.textAnchor "middle" ] [ Svg.text (String.fromFloat v) ]
+        tickLabelX v =
+            Svg.text_ [ SvgAttr.x (String.fromFloat (scaleX v)), SvgAttr.y (String.fromFloat (plotHeight - plotPadding + 20)), SvgAttr.textAnchor "middle" ] [ Svg.text (String.fromFloat v) ]
 
-        tickTextY v =
-            Svg.text_ [ SvgAttr.x (String.fromFloat (padding - 10)), SvgAttr.y (String.fromFloat (scaleY v + 4)), SvgAttr.textAnchor "end" ] [ Svg.text (String.fromFloat v) ]
+        tickLabelY v =
+            Svg.text_ [ SvgAttr.x (String.fromFloat (plotPaddingLeft - 10)), SvgAttr.y (String.fromFloat (scaleY v + 5)), SvgAttr.textAnchor "end" ] [ Svg.text (String.fromFloat v) ]
+
+        xAxis =
+            Svg.line
+                [ SvgAttr.x1 (String.fromFloat plotPaddingLeft)
+                , SvgAttr.y1 (String.fromFloat (plotHeight - plotPadding))
+                , SvgAttr.x2 (String.fromFloat (plotWidth - plotPadding))
+                , SvgAttr.y2 (String.fromFloat (plotHeight - plotPadding))
+                , SvgAttr.stroke "black"
+                , SvgAttr.strokeWidth "2"
+                ]
+                []
+
+        yAxis =
+            Svg.line
+                [ SvgAttr.x1 (String.fromFloat plotPaddingLeft)
+                , SvgAttr.y1 (String.fromFloat (plotHeight - plotPadding))
+                , SvgAttr.x2 (String.fromFloat plotPaddingLeft)
+                , SvgAttr.y2 (String.fromFloat plotPadding)
+                , SvgAttr.stroke "black"
+                , SvgAttr.strokeWidth "2"
+                ]
+                []
+
+        xLabel =
+            Svg.text_
+                [ SvgAttr.x (String.fromFloat (plotWidth / 2))
+                , SvgAttr.y (String.fromFloat (plotHeight - 10))
+                , SvgAttr.textAnchor "middle"
+                , SvgAttr.fontSize "16"
+                , SvgAttr.fontWeight "bold"
+                ]
+                [ Svg.text model.selectedX ]
+
+        yLabel =
+            Svg.text_
+                [ SvgAttr.x "20"
+                , SvgAttr.y (String.fromFloat (plotHeight / 2))
+                , SvgAttr.transform ("rotate(-90 20 " ++ String.fromFloat (plotHeight / 2) ++ ")")
+                , SvgAttr.textAnchor "middle"
+                , SvgAttr.fontSize "16"
+                , SvgAttr.fontWeight "bold"
+                ]
+                [ Svg.text model.selectedY ]
     in
-    Svg.svg [ SvgAttr.width (String.fromFloat width), SvgAttr.height (String.fromFloat height) ]
-        (Svg.line [ SvgAttr.x1 (String.fromFloat padding), SvgAttr.y1 (String.fromFloat padding), SvgAttr.x2 (String.fromFloat padding), SvgAttr.y2 (String.fromFloat (height - padding)), SvgAttr.stroke "black" ] []
-        :: Svg.line [ SvgAttr.x1 (String.fromFloat padding), SvgAttr.y1 (String.fromFloat (height - padding)), SvgAttr.x2 (String.fromFloat (width - padding)), SvgAttr.y2 (String.fromFloat (height - padding)), SvgAttr.stroke "black" ] []
-        :: (List.map tickLineX xTicks ++ List.map tickTextX xTicks)
-        ++ (List.map tickLineY yTicks ++ List.map tickTextY yTicks)
-        ++ [ -- Achsen Labels
-            Svg.text_ [ SvgAttr.x (String.fromFloat (width / 2)), SvgAttr.y (String.fromFloat (height - 10)), SvgAttr.textAnchor "middle" ] [ Svg.text model.selectedX ]
-          , Svg.text_ [ SvgAttr.x (String.fromFloat (-height / 2)), SvgAttr.y "10", SvgAttr.transform "rotate(-90)", SvgAttr.textAnchor "middle" ] [ Svg.text model.selectedY ]
-           ]
-        ++ List.map
-            (\dp ->
-                Svg.circle
-                    [ SvgAttr.cx (String.fromFloat (scaleX (getValueForAxis dp model.selectedX)))
-                    , SvgAttr.cy (String.fromFloat (scaleY (getValueForAxis dp model.selectedY)))
-                    , SvgAttr.r "4"
-                    , SvgAttr.fill (color dp)
-                    ]
-                    []
+    Html.div []
+        [ Svg.svg [ SvgAttr.width (String.fromFloat plotWidth), SvgAttr.height (String.fromFloat plotHeight) ]
+            (List.map (\dp -> Svg.circle [ SvgAttr.cx (String.fromFloat (scaleX (getValueForAxis dp model.selectedX))), SvgAttr.cy (String.fromFloat (scaleY (getValueForAxis dp model.selectedY))), SvgAttr.r "5", SvgAttr.fill (color dp) ] []) filteredData
+                ++ [ xAxis, yAxis, xLabel, yLabel ]
+                ++ List.map tickLineX xTicks
+                ++ List.map tickLineY yTicks
+                ++ List.map tickLabelX xTicks
+                ++ List.map tickLabelY yTicks
             )
-            filteredData
-        )
+        ]
+
 
 
 -- MAIN
 
+main : Program () Model Msg
 main =
     Browser.element
         { init = init
         , update = update
-        , subscriptions = \_ -> Sub.none
         , view = view
+        , subscriptions = \_ -> Sub.none
         }
