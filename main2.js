@@ -6934,34 +6934,34 @@ var $author$project$Main$axisSelectX = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Alkoholkonsum pro Woche'),
-						$elm$html$Html$Attributes$selected(selected === 'Alkoholkonsum pro Woche')
+						$elm$html$Html$Attributes$value('Alkoholkonsum (pro Woche)'),
+						$elm$html$Html$Attributes$selected(selected === 'Alkoholkonsum (pro Woche)')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Alkoholkonsum pro Woche')
+						$elm$html$Html$text('Alkoholkonsum (pro Woche)')
 					])),
 				A2(
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Schlafdauer'),
-						$elm$html$Html$Attributes$selected(selected === 'Schlafdauer')
+						$elm$html$Html$Attributes$value('Trainingsstunden (pro Woche)'),
+						$elm$html$Html$Attributes$selected(selected === 'Trainingsstunden (pro Woche)')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Schlafdauer')
+						$elm$html$Html$text('Trainingsstunden (pro Woche)')
 					])),
 				A2(
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Herzfrequenz'),
-						$elm$html$Html$Attributes$selected(selected === 'Herzfrequenz')
+						$elm$html$Html$Attributes$value('Kalorienaufnahme'),
+						$elm$html$Html$Attributes$selected(selected === 'Kalorienaufnahme')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Herzfrequenz')
+						$elm$html$Html$text('Kalorienaufnahme')
 					]))
 			]));
 };
@@ -6981,12 +6981,12 @@ var $author$project$Main$axisSelectY = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Kalorienaufnahme'),
-						$elm$html$Html$Attributes$selected(selected === 'Kalorienaufnahme')
+						$elm$html$Html$Attributes$value('Schlafdauer'),
+						$elm$html$Html$Attributes$selected(selected === 'Schlafdauer')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Kalorienaufnahme')
+						$elm$html$Html$text('Schlafdauer')
 					])),
 				A2(
 				$elm$html$Html$option,
@@ -7003,12 +7003,12 @@ var $author$project$Main$axisSelectY = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Trainingsstunden pro Woche'),
-						$elm$html$Html$Attributes$selected(selected === 'Trainingsstunden pro Woche')
+						$elm$html$Html$Attributes$value('Herzfrequenz'),
+						$elm$html$Html$Attributes$selected(selected === 'Herzfrequenz')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Trainingsstunden pro Woche')
+						$elm$html$Html$text('Herzfrequenz')
 					]))
 			]));
 };
@@ -7064,7 +7064,7 @@ var $author$project$Main$getValueForAxis = F2(
 		switch (axis) {
 			case 'Schritte':
 				return dp.dailySteps;
-			case 'Alkoholkonsum pro Woche':
+			case 'Alkoholkonsum (pro Woche)':
 				return dp.alcoholConsumption;
 			case 'Schlafdauer':
 				return dp.hoursOfSleep;
@@ -7072,7 +7072,7 @@ var $author$project$Main$getValueForAxis = F2(
 				return dp.caloriesIntake;
 			case 'BMI':
 				return dp.bmi;
-			case 'Trainingsstunden pro Woche':
+			case 'Trainingsstunden (pro Woche)':
 				return dp.exerciseHours;
 			case 'Herzfrequenz':
 				return dp.heartRate;

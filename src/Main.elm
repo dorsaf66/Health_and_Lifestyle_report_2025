@@ -2,7 +2,6 @@ module Main exposing (main)
 
 import Browser
 import Csv.Parser exposing (parse)
--- import Csv.Decode as Decode exposing (Decoder)
 import Http
 import Html exposing (Html, button, div, option, select, text)
 import Html.Attributes as HtmlAttr
@@ -13,18 +12,6 @@ import String
 import Json.Decode exposing (int)
 
 -- MODEL
-
-type alias DataPoint =
-    { schritte : Float
-    , wasserzufuhr : Float
-    , schlafdauer : Float
-    , kalorienverbrauch : Float
-    , gesundheitszustand : Float
-    , healthScore : Float
-    , stressLevel : Int
-    , altersgruppe : String
-    , geschlecht : String
-    }
 
 type alias Person = 
     { id : Int
@@ -57,38 +44,24 @@ rowToPerson : List String -> Maybe Person
 rowToPerson row =
     case row of
         idStr :: ageStr :: genderStr :: heightStr :: weightStr :: bmiStr :: dailyStepsStr :: caloriesIntakeStr :: hoursOfSleepStr :: heartRateStr :: bloodPresureStr :: exerciseHoursStr :: smokerStr :: alcoholConsumptionStr :: diabeticStr :: heartDiseaseStr :: [] ->
-            -- case ( String.toInt idStr
-            --     , String.toInt ageStr
-            --     , String.toInt heightStr
-            --     , String.toInt weightStr
-            --     , String.toFloat bmiStr
-            --     , String.toInt dailyStepsStr
-            --     , String.toInt caloriesIntakeStr
-            --     , String.toFloat hoursOfSleepStr
-            --     , String.toInt heartRateStr
-            --     , String.toFloat exerciseHoursStr
-            --     , String.toInt alcoholConsumptionStr ) of
-            --    ( Just id, Just age, Just heightCm, Just weightKg, Just bmi, Just dailySteps, Just caloriesIntake, Just hoursOfSleep, Just heartRate, Just exerciseHours, Just alcoholConsumption ) ->
-                Just
-                    { id = idStr |> String.toInt |> Maybe.withDefault 0
-                    , age = ageStr |> String.toInt |> Maybe.withDefault 0
-                    , gender = genderStr
-                    , heightCm = heightStr |> String.toInt |> Maybe.withDefault 0
-                    , weightKg = weightStr |> String.toInt |> Maybe.withDefault 0
-                    , bmi = bmiStr |> String.toFloat |> Maybe.withDefault 0
-                    , dailySteps = dailyStepsStr |> String.toInt |> Maybe.withDefault 0
-                    , caloriesIntake = caloriesIntakeStr |> String.toInt |> Maybe.withDefault 0
-                    , hoursOfSleep = hoursOfSleepStr |> String.toFloat |> Maybe.withDefault 0
-                    , heartRate = heartRateStr |> String.toInt |> Maybe.withDefault 0
-                    , bloodPresure = bloodPresureStr
-                    , exerciseHours = exerciseHoursStr |> String.toFloat |> Maybe.withDefault 0
-                    , smoker = smokerStr
-                    , alcoholConsumption = alcoholConsumptionStr |> String.toInt |> Maybe.withDefault 0
-                    , diabetic = diabeticStr
-                    , heartDisease = heartDiseaseStr
-                    }
-                -- _ ->
-                --     Nothing
+            Just
+                { id = idStr |> String.toInt |> Maybe.withDefault 0
+                , age = ageStr |> String.toInt |> Maybe.withDefault 0
+                , gender = genderStr
+                , heightCm = heightStr |> String.toInt |> Maybe.withDefault 0
+                , weightKg = weightStr |> String.toInt |> Maybe.withDefault 0
+                , bmi = bmiStr |> String.toFloat |> Maybe.withDefault 0
+                , dailySteps = dailyStepsStr |> String.toInt |> Maybe.withDefault 0
+                , caloriesIntake = caloriesIntakeStr |> String.toInt |> Maybe.withDefault 0
+                , hoursOfSleep = hoursOfSleepStr |> String.toFloat |> Maybe.withDefault 0
+                , heartRate = heartRateStr |> String.toInt |> Maybe.withDefault 0
+                , bloodPresure = bloodPresureStr
+                , exerciseHours = exerciseHoursStr |> String.toFloat |> Maybe.withDefault 0
+                , smoker = smokerStr
+                , alcoholConsumption = alcoholConsumptionStr |> String.toInt |> Maybe.withDefault 0
+                , diabetic = diabeticStr
+                , heartDisease = heartDiseaseStr
+                }
         _ ->
             Nothing
 
@@ -116,11 +89,10 @@ loadCsv =
 
 sampleData : List Person
 sampleData =
-    -- [ { schritte = 5000, wasserzufuhr = 2, schlafdauer = 7, kalorienverbrauch = 2200, gesundheitszustand = 3, healthScore = 75, stressLevel = 2, altersgruppe = "30-40", geschlecht = "m" }
-   [ { age = 50, alcoholConsumption = 0, bloodPresure = "60/100", bmi = 80.5, caloriesIntake = 500, dailySteps = 1000, diabetic = "no", exerciseHours = 3.6, gender = "f", heartDisease = "no", heartRate = 70, heightCm = 170, hoursOfSleep = 7.5, id = 1, smoker = "no", weightKg = 75}
+    [ { age = 50, alcoholConsumption = 0, bloodPresure = "60/100", bmi = 80.5, caloriesIntake = 500, dailySteps = 1000, diabetic = "no", exerciseHours = 3.6, gender = "f", heartDisease = "no", heartRate = 70, heightCm = 170, hoursOfSleep = 7.5, id = 1, smoker = "no", weightKg = 75}
     , { age = 30, alcoholConsumption = 2, bloodPresure = "60/100", bmi = 120, caloriesIntake = 700, dailySteps = 5000, diabetic = "no", exerciseHours = 5.2, gender = "m", heartDisease = "no", heartRate = 62, heightCm = 190, hoursOfSleep = 7.3, id = 1, smoker = "no", weightKg = 86}
-   , { age = 60, alcoholConsumption = 5, bloodPresure = "60/100", bmi = 75, caloriesIntake = 1000, dailySteps = 800, diabetic = "yes", exerciseHours = 0.0, gender = "f", heartDisease = "yes", heartRate = 60, heightCm = 160, hoursOfSleep = 8.1, id = 1, smoker = "no", weightKg = 73}
-   ]
+    , { age = 60, alcoholConsumption = 5, bloodPresure = "60/100", bmi = 75, caloriesIntake = 1000, dailySteps = 800, diabetic = "yes", exerciseHours = 0.0, gender = "f", heartDisease = "yes", heartRate = 60, heightCm = 160, hoursOfSleep = 8.1, id = 1, smoker = "no", weightKg = 73}
+    ]
 
 
 
@@ -198,18 +170,18 @@ axisSelectX : String -> Html Msg
 axisSelectX selected =
     select [ HtmlEvents.onInput ChangeX ]
         [ option [ HtmlAttr.value "Schritte", HtmlAttr.selected (selected == "Schritte") ] [ Html.text "Schritte" ] 
-        , option [ HtmlAttr.value "Alkoholkonsum pro Woche", HtmlAttr.selected (selected == "Alkoholkonsum pro Woche") ] [ Html.text "Alkoholkonsum pro Woche" ]
-        , option [ HtmlAttr.value "Schlafdauer", HtmlAttr.selected (selected == "Schlafdauer") ] [ Html.text "Schlafdauer" ]
-        , option [ HtmlAttr.value "Herzfrequenz", HtmlAttr.selected (selected == "Herzfrequenz") ] [ Html.text "Herzfrequenz" ]
+        , option [ HtmlAttr.value "Alkoholkonsum (pro Woche)", HtmlAttr.selected (selected == "Alkoholkonsum (pro Woche)") ] [ Html.text "Alkoholkonsum (pro Woche)" ]
+        , option [ HtmlAttr.value "Trainingsstunden (pro Woche)", HtmlAttr.selected (selected == "Trainingsstunden (pro Woche)") ] [ Html.text "Trainingsstunden (pro Woche)" ]
+        , option [ HtmlAttr.value "Kalorienaufnahme", HtmlAttr.selected (selected == "Kalorienaufnahme") ] [ Html.text "Kalorienaufnahme" ]
         ]
 
 
 axisSelectY : String -> Html Msg
 axisSelectY selected =
     select [ HtmlEvents.onInput ChangeY ]
-        [ option [ HtmlAttr.value "Kalorienaufnahme", HtmlAttr.selected (selected == "Kalorienaufnahme") ] [ Html.text "Kalorienaufnahme" ]
+        [ option [ HtmlAttr.value "Schlafdauer", HtmlAttr.selected (selected == "Schlafdauer") ] [ Html.text "Schlafdauer" ]
         , option [ HtmlAttr.value "BMI", HtmlAttr.selected (selected == "BMI") ] [ Html.text "BMI" ]
-        , option [ HtmlAttr.value "Trainingsstunden pro Woche", HtmlAttr.selected (selected == "Trainingsstunden pro Woche") ] [ Html.text "Trainingsstunden pro Woche" ]
+        , option [ HtmlAttr.value "Herzfrequenz", HtmlAttr.selected (selected == "Herzfrequenz") ] [ Html.text "Herzfrequenz" ]
         ]
 
 
@@ -221,7 +193,7 @@ getValueForAxis dp axis =
         "Schritte" ->
             toFloat dp.dailySteps
 
-        "Alkoholkonsum pro Woche" ->
+        "Alkoholkonsum (pro Woche)" ->
             toFloat dp.alcoholConsumption
 
         "Schlafdauer" ->
@@ -233,7 +205,7 @@ getValueForAxis dp axis =
         "BMI" ->
             dp.bmi
 
-        "Trainingsstunden pro Woche" ->
+        "Trainingsstunden (pro Woche)" ->
             dp.exerciseHours
 
         "Herzfrequenz" ->
