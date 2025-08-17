@@ -6955,7 +6955,7 @@ var $author$project$Main$axisSelectX = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Schritte'),
+						$elm$html$Html$Attributes$value('Schritte pro Tag'),
 						$elm$html$Html$Attributes$selected(selected === 'Schritte'),
 						A2(
 						$elm$html$Html$Attributes$style,
@@ -6985,7 +6985,7 @@ var $author$project$Main$axisSelectX = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Schlafdauer'),
+						$elm$html$Html$Attributes$value('Schlafdauer pro Stunde'),
 						$elm$html$Html$Attributes$selected(selected === 'Schlafdauer'),
 						A2(
 						$elm$html$Html$Attributes$style,
@@ -7226,7 +7226,7 @@ var $author$project$Main$scatterPlotView = function (model) {
 	var yTicks = $author$project$Main$ticksForAxis(model.selectedY);
 	var xTicks = $author$project$Main$ticksForAxis(model.selectedX);
 	var plotWidth = 800;
-	var plotPaddingLeft = 60;
+	var plotPaddingLeft = 80;
 	var plotPadding = 40;
 	var plotHeight = 500;
 	var xAxis = A2(
