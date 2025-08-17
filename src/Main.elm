@@ -40,6 +40,9 @@ type alias Model =
     , showPlot : Bool
     , showMale : Bool
     , showFemale : Bool
+    , showSmoker : Bool
+    , showDiabetic : Bool
+    , showHeartDisease : Bool
     }
 
 
@@ -78,6 +81,9 @@ init _ =
       , showPlot = True
       , showMale = True
       , showFemale = True
+      , showSmoker = False
+      , showDiabetic = False
+      , showHeartDisease = False
       }
     , loadCsv
     )
@@ -100,6 +106,9 @@ type Msg
     | CsvLoaded (Result Http.Error String)
     | ToggleMale Bool
     | ToggleFemale Bool
+    | ToggleSmoker Bool
+    | ToggleDiabetic Bool
+    | ToggleHeartDisease Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -119,6 +128,15 @@ update msg model =
 
         ToggleFemale val ->
             ( { model | showFemale = val }, Cmd.none )
+
+        ToggleSmoker val ->
+            ( { model | showSmoker = val }, Cmd.none )
+
+        ToggleDiabetic val ->
+            ( { model | showDiabetic = val }, Cmd.none )
+
+        ToggleHeartDisease val ->
+            ( { model | showHeartDisease = val }, Cmd.none )
 
         CsvLoaded (Ok csvString) ->
             let
@@ -168,6 +186,20 @@ view model =
             , label [ HtmlAttr.style "margin-left" "15px" ]
                 [ input [ HtmlAttr.type_ "checkbox", HtmlAttr.checked model.showFemale, HtmlEvents.onCheck ToggleFemale ] []
                 , Html.text " Frauen"
+                ]
+            ]
+        , div [ HtmlAttr.style "margin-bottom" "10px" ]
+            [ label []
+                [ input [ HtmlAttr.type_ "checkbox", HtmlAttr.checked model.showSmoker, HtmlEvents.onCheck ToggleSmoker ] []
+                , Html.text " Smoker"
+                ]
+            , label [ HtmlAttr.style "margin-left" "15px" ]
+                [ input [ HtmlAttr.type_ "checkbox", HtmlAttr.checked model.showDiabetic, HtmlEvents.onCheck ToggleDiabetic ] []
+                , Html.text " Diabetic"
+                ]
+            , label [ HtmlAttr.style "margin-left" "15px" ]
+                [ input [ HtmlAttr.type_ "checkbox", HtmlAttr.checked model.showHeartDisease, HtmlEvents.onCheck ToggleHeartDisease ] []
+                , Html.text " Heart Disease"
                 ]
             ]
         , if model.showPlot then
@@ -242,14 +274,18 @@ padding : Float
 padding =
     40
 
+
 scatterPlotView : Model -> Html Msg
 scatterPlotView model =
     let
         filteredData =
             List.filter
                 (\p ->
-                    (model.showMale && String.toLower p.gender == "male")
-                        || (model.showFemale && String.toLower p.gender == "female")
+                    ((model.showMale && String.toLower p.gender == "male")
+                        || (model.showFemale && String.toLower p.gender == "female"))
+                        && (if model.showSmoker then String.toLower p.smoker == "yes" || String.toLower p.smoker == "ja" || String.toLower p.smoker == "yes" else True)
+                        && (if model.showDiabetic then String.toLower p.diabetic == "yes" || String.toLower p.diabetic == "ja" else True)
+                        && (if model.showHeartDisease then String.toLower p.heartDisease == "yes" || String.toLower p.heartDisease == "ja" else True)
                 )
                 model.data
 
@@ -277,7 +313,6 @@ scatterPlotView model =
                 )
                 filteredData
 
-        -- Achsenlinien
         xAxis =
             line
                 [ SvgAttr.x1 (String.fromFloat padding)

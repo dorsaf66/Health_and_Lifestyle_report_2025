@@ -6123,7 +6123,7 @@ var $author$project$Main$loadCsv = $elm$http$Http$get(
 	});
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{data: _List_Nil, selectedX: 'Schritte', selectedY: 'Kalorienaufnahme', showFemale: true, showMale: true, showPlot: true},
+		{data: _List_Nil, selectedX: 'Schritte', selectedY: 'Kalorienaufnahme', showDiabetic: false, showFemale: true, showHeartDisease: false, showMale: true, showPlot: true, showSmoker: false},
 		$author$project$Main$loadCsv);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -6818,6 +6818,27 @@ var $author$project$Main$update = F2(
 						model,
 						{showFemale: val}),
 					$elm$core$Platform$Cmd$none);
+			case 'ToggleSmoker':
+				var val = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{showSmoker: val}),
+					$elm$core$Platform$Cmd$none);
+			case 'ToggleDiabetic':
+				var val = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{showDiabetic: val}),
+					$elm$core$Platform$Cmd$none);
+			case 'ToggleHeartDisease':
+				var val = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{showHeartDisease: val}),
+					$elm$core$Platform$Cmd$none);
 			default:
 				if (msg.a.$ === 'Ok') {
 					var csvString = msg.a.a;
@@ -6844,13 +6865,22 @@ var $author$project$Main$update = F2(
 				}
 		}
 	});
+var $author$project$Main$ToggleDiabetic = function (a) {
+	return {$: 'ToggleDiabetic', a: a};
+};
 var $author$project$Main$ToggleFemale = function (a) {
 	return {$: 'ToggleFemale', a: a};
+};
+var $author$project$Main$ToggleHeartDisease = function (a) {
+	return {$: 'ToggleHeartDisease', a: a};
 };
 var $author$project$Main$ToggleMale = function (a) {
 	return {$: 'ToggleMale', a: a};
 };
 var $author$project$Main$TogglePlot = {$: 'TogglePlot'};
+var $author$project$Main$ToggleSmoker = function (a) {
+	return {$: 'ToggleSmoker', a: a};
+};
 var $author$project$Main$ChangeX = function (a) {
 	return {$: 'ChangeX', a: a};
 };
@@ -7208,7 +7238,7 @@ var $author$project$Main$scatterPlotView = function (model) {
 	var filteredData = A2(
 		$elm$core$List$filter,
 		function (p) {
-			return (model.showMale && ($elm$core$String$toLower(p.gender) === 'male')) || (model.showFemale && ($elm$core$String$toLower(p.gender) === 'female'));
+			return ((model.showMale && ($elm$core$String$toLower(p.gender) === 'male')) || (model.showFemale && ($elm$core$String$toLower(p.gender) === 'female'))) && ((model.showSmoker ? (($elm$core$String$toLower(p.smoker) === 'yes') || (($elm$core$String$toLower(p.smoker) === 'ja') || ($elm$core$String$toLower(p.smoker) === 'yes'))) : true) && ((model.showDiabetic ? (($elm$core$String$toLower(p.diabetic) === 'yes') || ($elm$core$String$toLower(p.diabetic) === 'ja')) : true) && (model.showHeartDisease ? (($elm$core$String$toLower(p.heartDisease) === 'yes') || ($elm$core$String$toLower(p.heartDisease) === 'ja')) : true)));
 		},
 		model.data);
 	var allYValues = A2(
@@ -7397,6 +7427,69 @@ var $author$project$Main$view = function (model) {
 									]),
 								_List_Nil),
 								$elm$html$Html$text(' Frauen')
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Attributes$checked(model.showSmoker),
+										$elm$html$Html$Events$onCheck($author$project$Main$ToggleSmoker)
+									]),
+								_List_Nil),
+								$elm$html$Html$text(' Smoker')
+							])),
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'margin-left', '15px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Attributes$checked(model.showDiabetic),
+										$elm$html$Html$Events$onCheck($author$project$Main$ToggleDiabetic)
+									]),
+								_List_Nil),
+								$elm$html$Html$text(' Diabetic')
+							])),
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'margin-left', '15px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Attributes$checked(model.showHeartDisease),
+										$elm$html$Html$Events$onCheck($author$project$Main$ToggleHeartDisease)
+									]),
+								_List_Nil),
+								$elm$html$Html$text(' Heart Disease')
 							]))
 					])),
 				model.showPlot ? $author$project$Main$scatterPlotView(model) : $elm$html$Html$text('')
