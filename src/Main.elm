@@ -163,7 +163,7 @@ view : Model -> Html Msg
 view model =
     div [ HtmlAttr.style "font-family" "Arial, sans-serif", HtmlAttr.style "margin" "20px" ]
         [ div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ Html.text "X-Achselolo: "
+            [ Html.text "X-Achse: "
             , axisSelectX model.selectedX
             ]
         , div [ HtmlAttr.style "margin-bottom" "10px" ]
@@ -241,7 +241,7 @@ height : Float
 height = 600
 
 padding : Float
-padding = 50
+padding = 65
 
 
 ticksForAxis : String -> List Float
@@ -282,8 +282,8 @@ scatterPlotView model =
         scaleY y = height - padding - ((y - minY) / (maxY - minY)) * (height - 2 * padding)
 
         color dp =
-            if dp.gender == "Male" then "blue"
-            else if dp.gender == "Female" then "red"
+            if dp.gender == "Male" then "#2D68C4"
+            else if dp.gender == "Female" then "#BE4E71"
             else "gray"
 
         xTicks = ticksForAxis model.selectedX
@@ -307,8 +307,8 @@ scatterPlotView model =
         :: (List.map tickLineX xTicks ++ List.map tickTextX xTicks)
         ++ (List.map tickLineY yTicks ++ List.map tickTextY yTicks)
         ++ [ -- Achsen Labels
-            Svg.text_ [ SvgAttr.x (String.fromFloat (width/2)), SvgAttr.y (String.fromFloat (height - 10)), SvgAttr.textAnchor "middle" ] [ Svg.text model.selectedX ],
-            Svg.text_ [ SvgAttr.x "15", SvgAttr.y (String.fromFloat (height/2)), SvgAttr.textAnchor "middle", SvgAttr.transform ("rotate(-90 15," ++ String.fromFloat (height/2) ++ ")") ] [ Svg.text model.selectedY ]
+            Svg.text_ [ SvgAttr.x (String.fromFloat (width / 2)), SvgAttr.y (String.fromFloat (height - 10)), SvgAttr.textAnchor "middle" ] [ Svg.text model.selectedX ]
+          , Svg.text_ [ SvgAttr.x (String.fromFloat (-height / 2)), SvgAttr.y "10", SvgAttr.transform "rotate(-90)", SvgAttr.textAnchor "middle" ] [ Svg.text model.selectedY ]
            ]
         ++ List.map
             (\dp ->

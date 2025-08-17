@@ -7151,7 +7151,10 @@ var $elm$core$List$maximum = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Main$padding = 50;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Main$padding = 65;
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
@@ -7306,7 +7309,7 @@ var $author$project$Main$scatterPlotView = function (model) {
 				]));
 	};
 	var color = function (dp) {
-		return (dp.gender === 'Male') ? 'blue' : ((dp.gender === 'Female') ? 'red' : 'gray');
+		return (dp.gender === 'Male') ? '#2D68C4' : ((dp.gender === 'Female') ? '#BE4E71' : 'gray');
 	};
 	return A2(
 		$elm$svg$Svg$svg,
@@ -7380,12 +7383,11 @@ var $author$project$Main$scatterPlotView = function (model) {
 									$elm$svg$Svg$text_,
 									_List_fromArray(
 										[
-											$elm$svg$Svg$Attributes$x('15'),
-											$elm$svg$Svg$Attributes$y(
-											$elm$core$String$fromFloat($author$project$Main$height / 2)),
-											$elm$svg$Svg$Attributes$textAnchor('middle'),
-											$elm$svg$Svg$Attributes$transform(
-											'rotate(-90 15,' + ($elm$core$String$fromFloat($author$project$Main$height / 2) + ')'))
+											$elm$svg$Svg$Attributes$x(
+											$elm$core$String$fromFloat((-$author$project$Main$height) / 2)),
+											$elm$svg$Svg$Attributes$y('10'),
+											$elm$svg$Svg$Attributes$transform('rotate(-90)'),
+											$elm$svg$Svg$Attributes$textAnchor('middle')
 										]),
 									_List_fromArray(
 										[
@@ -7433,7 +7435,7 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('X-Achselolo: '),
+						$elm$html$Html$text('X-Achse: '),
 						$author$project$Main$axisSelectX(model.selectedX)
 					])),
 				A2(
