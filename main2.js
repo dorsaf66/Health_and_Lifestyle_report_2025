@@ -6955,7 +6955,7 @@ var $author$project$Main$axisSelectX = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Schritte pro Tag'),
+						$elm$html$Html$Attributes$value('Schritte'),
 						$elm$html$Html$Attributes$selected(selected === 'Schritte'),
 						A2(
 						$elm$html$Html$Attributes$style,
@@ -6985,7 +6985,7 @@ var $author$project$Main$axisSelectX = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Schlafdauer pro Stunde'),
+						$elm$html$Html$Attributes$value('Schlafdauer'),
 						$elm$html$Html$Attributes$selected(selected === 'Schlafdauer'),
 						A2(
 						$elm$html$Html$Attributes$style,
@@ -7472,7 +7472,7 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('X-ACHSE: '),
+						$elm$html$Html$text('X-ACHSEtoto: '),
 						$author$project$Main$axisSelectX(model.selectedX)
 					])),
 				A2(

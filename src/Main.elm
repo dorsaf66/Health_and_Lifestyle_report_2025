@@ -201,9 +201,9 @@ labelCheckbox labelText checked toMsg =
 axisSelectX : String -> Html Msg
 axisSelectX selected =
     select [ HtmlEvents.onInput ChangeX ]
-        [ option [ HtmlAttr.value "Schritte pro Tag", HtmlAttr.selected (selected == "Schritte"), HtmlAttr.style "background-color" (if selected == "Schritte" then "#87CEEB" else "white") ] [ Html.text "SCHRITTE" ]
+        [ option [ HtmlAttr.value "Schritte", HtmlAttr.selected (selected == "Schritte"), HtmlAttr.style "background-color" (if selected == "Schritte" then "#87CEEB" else "white") ] [ Html.text "SCHRITTE" ]
         , option [ HtmlAttr.value "Alkoholkonsum pro Woche", HtmlAttr.selected (selected == "Alkoholkonsum pro Woche"), HtmlAttr.style "background-color" (if selected == "Alkoholkonsum pro Woche" then "#87CEEB" else "white") ] [ Html.text "ALKOHOLKONSUM PRO WOCHE" ]
-        , option [ HtmlAttr.value "Schlafdauer pro Stunde", HtmlAttr.selected (selected == "Schlafdauer"), HtmlAttr.style "background-color" (if selected == "Schlafdauer" then "#87CEEB" else "white") ] [ Html.text "SCHLAFDAUER" ]
+        , option [ HtmlAttr.value "Schlafdauer", HtmlAttr.selected (selected == "Schlafdauer"), HtmlAttr.style "background-color" (if selected == "Schlafdauer" then "#87CEEB" else "white") ] [ Html.text "SCHLAFDAUER" ]
         , option [ HtmlAttr.value "Herzfrequenz", HtmlAttr.selected (selected == "Herzfrequenz"), HtmlAttr.style "background-color" (if selected == "Herzfrequenz" then "#87CEEB" else "white") ] [ Html.text "HERZFREQUENZ" ]
         ]
 
