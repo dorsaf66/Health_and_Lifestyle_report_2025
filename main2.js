@@ -6123,7 +6123,7 @@ var $author$project$Main$loadCsv = $elm$http$Http$get(
 	});
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{data: _List_Nil, selectedX: 'Schritte', selectedY: 'Kalorienaufnahme', showPlot: true},
+		{data: _List_Nil, selectedX: 'Schritte', selectedY: 'Kalorienaufnahme', showFemale: true, showMale: true, showPlot: true},
 		$author$project$Main$loadCsv);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -6149,7 +6149,6 @@ var $elm$core$List$drop = F2(
 			}
 		}
 	});
-var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Basics$not = _Basics_not;
@@ -6782,12 +6781,6 @@ var $author$project$Main$rowToPerson = function (row) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Main$sampleData = _List_fromArray(
-	[
-		{age: 50, alcoholConsumption: 0, bloodPresure: '60/100', bmi: 80.5, caloriesIntake: 500, dailySteps: 1000, diabetic: 'no', exerciseHours: 3.6, gender: 'f', heartDisease: 'no', heartRate: 70, heightCm: 170, hoursOfSleep: 7.5, id: 1, smoker: 'no', weightKg: 75},
-		{age: 30, alcoholConsumption: 2, bloodPresure: '60/100', bmi: 120, caloriesIntake: 700, dailySteps: 5000, diabetic: 'no', exerciseHours: 5.2, gender: 'm', heartDisease: 'no', heartRate: 62, heightCm: 190, hoursOfSleep: 7.3, id: 1, smoker: 'no', weightKg: 86},
-		{age: 60, alcoholConsumption: 5, bloodPresure: '60/100', bmi: 75, caloriesIntake: 1000, dailySteps: 800, diabetic: 'yes', exerciseHours: 0.0, gender: 'f', heartDisease: 'yes', heartRate: 60, heightCm: 160, hoursOfSleep: 8.1, id: 1, smoker: 'no', weightKg: 73}
-	]);
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6811,6 +6804,20 @@ var $author$project$Main$update = F2(
 						model,
 						{showPlot: !model.showPlot}),
 					$elm$core$Platform$Cmd$none);
+			case 'ToggleMale':
+				var val = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{showMale: val}),
+					$elm$core$Platform$Cmd$none);
+			case 'ToggleFemale':
+				var val = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{showFemale: val}),
+					$elm$core$Platform$Cmd$none);
 			default:
 				if (msg.a.$ === 'Ok') {
 					var csvString = msg.a.a;
@@ -6830,26 +6837,19 @@ var $author$project$Main$update = F2(
 								{data: persons}),
 							$elm$core$Platform$Cmd$none);
 					} else {
-						var err = csv.a;
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{data: $author$project$Main$sampleData}),
-							$elm$core$Platform$Cmd$none);
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					}
 				} else {
-					var httpError = msg.a.a;
-					return A2(
-						$elm$core$Debug$log,
-						'HTTP-Fehler aufgetreten',
-						_Utils_Tuple2(
-							_Utils_update(
-								model,
-								{data: $author$project$Main$sampleData}),
-							$elm$core$Platform$Cmd$none));
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
 		}
 	});
+var $author$project$Main$ToggleFemale = function (a) {
+	return {$: 'ToggleFemale', a: a};
+};
+var $author$project$Main$ToggleMale = function (a) {
+	return {$: 'ToggleMale', a: a};
+};
 var $author$project$Main$TogglePlot = {$: 'TogglePlot'};
 var $author$project$Main$ChangeX = function (a) {
 	return {$: 'ChangeX', a: a};
@@ -7013,7 +7013,10 @@ var $author$project$Main$axisSelectY = function (selected) {
 			]));
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -7024,6 +7027,18 @@ var $elm$html$Html$Events$on = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$Normal(decoder));
 	});
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $elm$html$Html$Events$targetChecked = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'checked']),
+	$elm$json$Json$Decode$bool);
+var $elm$html$Html$Events$onCheck = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'change',
+		A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetChecked));
+};
 var $elm$html$Html$Events$onClick = function (msg) {
 	return A2(
 		$elm$html$Html$Events$on,
@@ -7032,23 +7047,13 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$core$String$toLower = _String_toLower;
 var $author$project$Main$colorByGender = function (g) {
-	switch (g) {
-		case 'm':
-			return 'steelblue';
-		case 'w':
-			return 'orange';
-		default:
-			return 'gray';
-	}
-};
-var $author$project$Main$colorByStress = function (stress) {
-	switch (stress) {
-		case 1:
-			return 'green';
-		case 2:
-			return 'yellow';
-		case 3:
+	var _v0 = $elm$core$String$toLower(g);
+	switch (_v0) {
+		case 'male':
+			return 'blue';
+		case 'female':
 			return 'red';
 		default:
 			return 'gray';
@@ -7057,6 +7062,17 @@ var $author$project$Main$colorByStress = function (stress) {
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
 var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $author$project$Main$getValueForAxis = F2(
@@ -7107,7 +7123,6 @@ var $elm$core$List$minimum = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $elm$svg$Svg$Attributes$opacity = _VirtualDom_attribute('opacity');
 var $author$project$Main$padding = 40;
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
@@ -7117,7 +7132,6 @@ var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$textAnchor = _VirtualDom_attribute('text-anchor');
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $elm$svg$Svg$Attributes$title = _VirtualDom_attribute('title');
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $author$project$Main$width = 600;
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
@@ -7135,10 +7149,10 @@ var $author$project$Main$scatterPlotView = function (model) {
 				$elm$svg$Svg$Attributes$x('15'),
 				$elm$svg$Svg$Attributes$y(
 				$elm$core$String$fromFloat($author$project$Main$height / 2)),
-				$elm$svg$Svg$Attributes$textAnchor('middle'),
-				$elm$svg$Svg$Attributes$fontSize('14'),
 				$elm$svg$Svg$Attributes$transform(
-				'rotate(-90 15 ' + ($elm$core$String$fromFloat($author$project$Main$height / 2) + ')'))
+				'rotate(-90 15,' + ($elm$core$String$fromFloat($author$project$Main$height / 2) + ')')),
+				$elm$svg$Svg$Attributes$textAnchor('middle'),
+				$elm$svg$Svg$Attributes$fontSize('14')
 			]),
 		_List_fromArray(
 			[
@@ -7191,12 +7205,18 @@ var $author$project$Main$scatterPlotView = function (model) {
 				$elm$svg$Svg$Attributes$strokeWidth('2')
 			]),
 		_List_Nil);
+	var filteredData = A2(
+		$elm$core$List$filter,
+		function (p) {
+			return (model.showMale && ($elm$core$String$toLower(p.gender) === 'male')) || (model.showFemale && ($elm$core$String$toLower(p.gender) === 'female'));
+		},
+		model.data);
 	var allYValues = A2(
 		$elm$core$List$map,
 		function (dp) {
 			return A2($author$project$Main$getValueForAxis, dp, model.selectedY);
 		},
-		model.data);
+		filteredData);
 	var maxY = A2(
 		$elm$core$Maybe$withDefault,
 		1,
@@ -7213,7 +7233,7 @@ var $author$project$Main$scatterPlotView = function (model) {
 		function (dp) {
 			return A2($author$project$Main$getValueForAxis, dp, model.selectedX);
 		},
-		model.data);
+		filteredData);
 	var maxX = A2(
 		$elm$core$Maybe$withDefault,
 		1,
@@ -7240,19 +7260,13 @@ var $author$project$Main$scatterPlotView = function (model) {
 						$elm$core$String$fromFloat(
 							scaleY(
 								A2($author$project$Main$getValueForAxis, dp, model.selectedY)))),
-						$elm$svg$Svg$Attributes$r('6'),
+						$elm$svg$Svg$Attributes$r('5'),
 						$elm$svg$Svg$Attributes$fill(
-						$author$project$Main$colorByGender(dp.gender)),
-						$elm$svg$Svg$Attributes$stroke(
-						$author$project$Main$colorByStress(dp.heartRate)),
-						$elm$svg$Svg$Attributes$strokeWidth('2'),
-						$elm$svg$Svg$Attributes$opacity('0.8'),
-						$elm$svg$Svg$Attributes$title(
-						'Herzfrequenz: ' + ($elm$core$String$fromInt(dp.heartRate) + (', Alter: ' + $elm$core$String$fromInt(dp.age))))
+						$author$project$Main$colorByGender(dp.gender))
 					]),
 				_List_Nil);
 		},
-		model.data);
+		filteredData);
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
@@ -7263,34 +7277,63 @@ var $author$project$Main$scatterPlotView = function (model) {
 				$elm$core$String$fromFloat($author$project$Main$height)),
 				$elm$svg$Svg$Attributes$style('border: 1px solid black; background: white;')
 			]),
-		_Utils_ap(
-			_List_fromArray(
-				[xAxis, yAxis, xLabel, yLabel]),
-			points));
+		A2(
+			$elm$core$List$cons,
+			xAxis,
+			A2(
+				$elm$core$List$cons,
+				yAxis,
+				A2(
+					$elm$core$List$cons,
+					xLabel,
+					A2($elm$core$List$cons, yLabel, points)))));
 };
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'font-family', 'Arial, sans-serif'),
+				A2($elm$html$Html$Attributes$style, 'margin', '20px')
+			]),
 		_List_fromArray(
 			[
 				A2(
 				$elm$html$Html$div,
-				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('X-Achse: '),
-						$author$project$Main$axisSelectX(model.selectedX)
+						A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('X-Achse: '),
+								$author$project$Main$axisSelectX(model.selectedX)
+							]))
 					])),
 				A2(
 				$elm$html$Html$div,
-				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Y-Achse: '),
-						$author$project$Main$axisSelectY(model.selectedY)
+						A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Y-Achse: '),
+								$author$project$Main$axisSelectY(model.selectedY)
+							]))
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -7310,6 +7353,50 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$text(
 								model.showPlot ? 'Plot verbergen' : 'Plot anzeigen')
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$label,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Attributes$checked(model.showMale),
+										$elm$html$Html$Events$onCheck($author$project$Main$ToggleMale)
+									]),
+								_List_Nil),
+								$elm$html$Html$text(' Männer')
+							])),
+						A2(
+						$elm$html$Html$label,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'margin-left', '15px')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$type_('checkbox'),
+										$elm$html$Html$Attributes$checked(model.showFemale),
+										$elm$html$Html$Events$onCheck($author$project$Main$ToggleFemale)
+									]),
+								_List_Nil),
+								$elm$html$Html$text(' Frauen')
 							]))
 					])),
 				model.showPlot ? $author$project$Main$scatterPlotView(model) : $elm$html$Html$text('')
