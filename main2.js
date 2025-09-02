@@ -7164,10 +7164,10 @@ var $author$project$Main$ticksForAxis = function (axis) {
 		case 'Schritte':
 			return _List_fromArray(
 				[0, 5000, 10000, 15000, 20000]);
-		case 'Alkoholkonsum pro Woche':
+		case 'Alkoholkonsum (pro Woche)':
 			return _List_fromArray(
 				[0, 2, 4, 6, 8, 10]);
-		case 'Trainingsstunden pro Woche':
+		case 'Trainingsstunden (pro Woche)':
 			return _List_fromArray(
 				[0, 2, 4, 6, 8, 10]);
 		case 'Kalorienaufnahme':
@@ -7224,7 +7224,7 @@ var $author$project$Main$scatterPlotView = function (model) {
 				$elm$svg$Svg$Attributes$x(
 				$elm$core$String$fromFloat(plotWidth / 2)),
 				$elm$svg$Svg$Attributes$y(
-				$elm$core$String$fromFloat(plotHeight - 10)),
+				$elm$core$String$fromFloat(plotHeight)),
 				$elm$svg$Svg$Attributes$textAnchor('middle'),
 				$elm$svg$Svg$Attributes$fontSize('16'),
 				$elm$svg$Svg$Attributes$fontWeight('bold')

@@ -333,7 +333,7 @@ scatterPlotView model =
         xLabel =
             Svg.text_
                 [ SvgAttr.x (String.fromFloat (plotWidth / 2))
-                , SvgAttr.y (String.fromFloat (plotHeight - 10))
+                , SvgAttr.y (String.fromFloat (plotHeight))
                 , SvgAttr.textAnchor "middle"
                 , SvgAttr.fontSize "16"
                 , SvgAttr.fontWeight "bold"
