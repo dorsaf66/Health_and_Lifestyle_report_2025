@@ -6119,11 +6119,11 @@ var $elm$http$Http$get = function (r) {
 var $author$project$Main$loadCsv = $elm$http$Http$get(
 	{
 		expect: $elm$http$Http$expectString($author$project$Main$CsvLoaded),
-		url: 'data/health_activity_data.csv'
+		url: 'data/Sleep_health_and_lifestyle_dataset.csv'
 	});
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{data: _List_Nil, selectedX: 'Schritte', selectedY: 'Kalorienaufnahme', showDiabetic: false, showFemale: true, showHeartDisease: false, showMale: true, showPlot: true, showSmoker: false},
+		{data: _List_Nil, selectedX: 'Stresslevel', selectedY: 'Schlafdauer', showFemale: true, showMale: true, showPlot: true},
 		$author$project$Main$loadCsv);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -6693,89 +6693,71 @@ var $elm$core$Maybe$withDefault = F2(
 		}
 	});
 var $author$project$Main$rowToPerson = function (row) {
-	if ((((((((((((((((row.b && row.b.b) && row.b.b.b) && row.b.b.b.b) && row.b.b.b.b.b) && row.b.b.b.b.b.b) && row.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b) && (!row.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b.b)) {
+	if (((((((((((((row.b && row.b.b) && row.b.b.b) && row.b.b.b.b) && row.b.b.b.b.b) && row.b.b.b.b.b.b) && row.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b.b) && (!row.b.b.b.b.b.b.b.b.b.b.b.b.b.b)) {
 		var idStr = row.a;
 		var _v1 = row.b;
-		var ageStr = _v1.a;
+		var genderStr = _v1.a;
 		var _v2 = _v1.b;
-		var genderStr = _v2.a;
+		var ageStr = _v2.a;
 		var _v3 = _v2.b;
-		var heightStr = _v3.a;
+		var occupationStr = _v3.a;
 		var _v4 = _v3.b;
-		var weightStr = _v4.a;
+		var sleepDurationStr = _v4.a;
 		var _v5 = _v4.b;
-		var bmiStr = _v5.a;
+		var sleepQualityStr = _v5.a;
 		var _v6 = _v5.b;
-		var dailyStepsStr = _v6.a;
+		var physicalActivityLevelStr = _v6.a;
 		var _v7 = _v6.b;
-		var caloriesIntakeStr = _v7.a;
+		var stressLevelStr = _v7.a;
 		var _v8 = _v7.b;
-		var hoursOfSleepStr = _v8.a;
+		var bmiStr = _v8.a;
 		var _v9 = _v8.b;
-		var heartRateStr = _v9.a;
+		var bloodPressureStr = _v9.a;
 		var _v10 = _v9.b;
-		var bloodPressureStr = _v10.a;
+		var heartRateStr = _v10.a;
 		var _v11 = _v10.b;
-		var exerciseHoursStr = _v11.a;
+		var dailyStepsStr = _v11.a;
 		var _v12 = _v11.b;
-		var smokerStr = _v12.a;
-		var _v13 = _v12.b;
-		var alcoholConsumptionStr = _v13.a;
-		var _v14 = _v13.b;
-		var diabeticStr = _v14.a;
-		var _v15 = _v14.b;
-		var heartDiseaseStr = _v15.a;
+		var sleepDisorderStr = _v12.a;
 		return $elm$core$Maybe$Just(
 			{
 				age: A2(
 					$elm$core$Maybe$withDefault,
 					0,
 					$elm$core$String$toInt(ageStr)),
-				alcoholConsumption: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(alcoholConsumptionStr)),
 				bloodPressure: bloodPressureStr,
-				bmi: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toFloat(bmiStr)),
-				caloriesIntake: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(caloriesIntakeStr)),
+				bmi: bmiStr,
 				dailySteps: A2(
 					$elm$core$Maybe$withDefault,
 					0,
 					$elm$core$String$toInt(dailyStepsStr)),
-				diabetic: diabeticStr,
-				exerciseHours: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toFloat(exerciseHoursStr)),
 				gender: genderStr,
-				heartDisease: heartDiseaseStr,
 				heartRate: A2(
 					$elm$core$Maybe$withDefault,
 					0,
 					$elm$core$String$toInt(heartRateStr)),
-				heightCm: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(heightStr)),
-				hoursOfSleep: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toFloat(hoursOfSleepStr)),
 				id: A2(
 					$elm$core$Maybe$withDefault,
 					0,
 					$elm$core$String$toInt(idStr)),
-				smoker: smokerStr,
-				weightKg: A2(
+				occupation: occupationStr,
+				physicalActivityLevel: A2(
 					$elm$core$Maybe$withDefault,
 					0,
-					$elm$core$String$toInt(weightStr))
+					$elm$core$String$toInt(physicalActivityLevelStr)),
+				sleepDisorder: sleepDisorderStr,
+				sleepDuration: A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$String$toFloat(sleepDurationStr)),
+				sleepQuality: A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$String$toInt(sleepQualityStr)),
+				stressLevel: A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$String$toInt(stressLevelStr))
 			});
 	} else {
 		return $elm$core$Maybe$Nothing;
@@ -6818,27 +6800,6 @@ var $author$project$Main$update = F2(
 						model,
 						{showFemale: val}),
 					$elm$core$Platform$Cmd$none);
-			case 'ToggleSmoker':
-				var val = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{showSmoker: val}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleDiabetic':
-				var val = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{showDiabetic: val}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleHeartDisease':
-				var val = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{showHeartDisease: val}),
-					$elm$core$Platform$Cmd$none);
 			default:
 				if (msg.a.$ === 'Ok') {
 					var csvString = msg.a.a;
@@ -6865,22 +6826,13 @@ var $author$project$Main$update = F2(
 				}
 		}
 	});
-var $author$project$Main$ToggleDiabetic = function (a) {
-	return {$: 'ToggleDiabetic', a: a};
-};
 var $author$project$Main$ToggleFemale = function (a) {
 	return {$: 'ToggleFemale', a: a};
-};
-var $author$project$Main$ToggleHeartDisease = function (a) {
-	return {$: 'ToggleHeartDisease', a: a};
 };
 var $author$project$Main$ToggleMale = function (a) {
 	return {$: 'ToggleMale', a: a};
 };
 var $author$project$Main$TogglePlot = {$: 'TogglePlot'};
-var $author$project$Main$ToggleSmoker = function (a) {
-	return {$: 'ToggleSmoker', a: a};
-};
 var $author$project$Main$ChangeX = function (a) {
 	return {$: 'ChangeX', a: a};
 };
@@ -6953,45 +6905,23 @@ var $author$project$Main$axisSelectX = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Schritte'),
-						$elm$html$Html$Attributes$selected(selected === 'Schritte')
+						$elm$html$Html$Attributes$value('Schlafdauer'),
+						$elm$html$Html$Attributes$selected(selected === 'Schlafdauer')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Schritte')
+						$elm$html$Html$text('Schlafdauer')
 					])),
 				A2(
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Alkoholkonsum (pro Woche)'),
-						$elm$html$Html$Attributes$selected(selected === 'Alkoholkonsum (pro Woche)')
+						$elm$html$Html$Attributes$value('Schritte (pro Tag)'),
+						$elm$html$Html$Attributes$selected(selected === 'Schritte (pro Tag)')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Alkoholkonsum (pro Woche)')
-					])),
-				A2(
-				$elm$html$Html$option,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$value('Trainingsstunden (pro Woche)'),
-						$elm$html$Html$Attributes$selected(selected === 'Trainingsstunden (pro Woche)')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Trainingsstunden (pro Woche)')
-					])),
-				A2(
-				$elm$html$Html$option,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$value('Kalorienaufnahme'),
-						$elm$html$Html$Attributes$selected(selected === 'Kalorienaufnahme')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Kalorienaufnahme')
+						$elm$html$Html$text('Schritte (pro Tag)')
 					]))
 			]));
 };
@@ -7011,23 +6941,12 @@ var $author$project$Main$axisSelectY = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Schlafdauer'),
-						$elm$html$Html$Attributes$selected(selected === 'Schlafdauer')
+						$elm$html$Html$Attributes$value('Stresslevel'),
+						$elm$html$Html$Attributes$selected(selected === 'Stresslevel')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Schlafdauer')
-					])),
-				A2(
-				$elm$html$Html$option,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$value('BMI'),
-						$elm$html$Html$Attributes$selected(selected === 'BMI')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('BMI')
+						$elm$html$Html$text('Stresslevel')
 					])),
 				A2(
 				$elm$html$Html$option,
@@ -7122,18 +7041,12 @@ var $elm$core$String$fromFloat = _String_fromNumber;
 var $author$project$Main$getValueForAxis = F2(
 	function (dp, axis) {
 		switch (axis) {
-			case 'Schritte':
-				return dp.dailySteps;
-			case 'Alkoholkonsum (pro Woche)':
-				return dp.alcoholConsumption;
 			case 'Schlafdauer':
-				return dp.hoursOfSleep;
-			case 'Kalorienaufnahme':
-				return dp.caloriesIntake;
-			case 'BMI':
-				return dp.bmi;
-			case 'Trainingsstunden (pro Woche)':
-				return dp.exerciseHours;
+				return dp.sleepDuration;
+			case 'Stresslevel':
+				return dp.stressLevel;
+			case 'Schritte (pro Tag)':
+				return dp.dailySteps;
 			case 'Herzfrequenz':
 				return dp.heartRate;
 			default:
@@ -7161,6 +7074,9 @@ var $elm$svg$Svg$Attributes$textAnchor = _VirtualDom_attribute('text-anchor');
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $author$project$Main$ticksForAxis = function (axis) {
 	switch (axis) {
+		case 'Stresslevel':
+			return _List_fromArray(
+				[0, 2, 4, 6, 8, 10]);
 		case 'Schritte':
 			return _List_fromArray(
 				[0, 5000, 10000, 15000, 20000]);
@@ -7182,6 +7098,9 @@ var $author$project$Main$ticksForAxis = function (axis) {
 		case 'Herzfrequenz':
 			return _List_fromArray(
 				[0, 40, 80, 100, 140]);
+		case 'Alter':
+			return _List_fromArray(
+				[0, 20, 40, 60, 80, 100]);
 		default:
 			return _List_Nil;
 	}
@@ -7271,7 +7190,7 @@ var $author$project$Main$scatterPlotView = function (model) {
 	var filteredData = A2(
 		$elm$core$List$filter,
 		function (dp) {
-			return ((model.showMale && (dp.gender === 'Male')) || (model.showFemale && (dp.gender === 'Female'))) && (((!model.showSmoker) || (dp.smoker === 'Yes')) && (((!model.showDiabetic) || (dp.diabetic === 'Yes')) && ((!model.showHeartDisease) || (dp.heartDisease === 'Yes'))));
+			return (model.showMale && (dp.gender === 'Male')) || (model.showFemale && (dp.gender === 'Female'));
 		},
 		model.data);
 	var xs = A2(
@@ -7489,19 +7408,6 @@ var $author$project$Main$view = function (model) {
 					[
 						A3($author$project$Main$labelCheckbox, 'MÄNNER', model.showMale, $author$project$Main$ToggleMale),
 						A3($author$project$Main$labelCheckbox, 'FRAUEN', model.showFemale, $author$project$Main$ToggleFemale)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px'),
-						A2($elm$html$Html$Attributes$style, 'padding-left', '20px')
-					]),
-				_List_fromArray(
-					[
-						A3($author$project$Main$labelCheckbox, 'RAUCHER', model.showSmoker, $author$project$Main$ToggleSmoker),
-						A3($author$project$Main$labelCheckbox, 'DIABETIKER', model.showDiabetic, $author$project$Main$ToggleDiabetic),
-						A3($author$project$Main$labelCheckbox, 'HERZKRANKHEIT', model.showHeartDisease, $author$project$Main$ToggleHeartDisease)
 					])),
 				model.showPlot ? $author$project$Main$scatterPlotView(model) : $elm$html$Html$text('')
 			]));

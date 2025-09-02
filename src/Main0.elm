@@ -1,4 +1,4 @@
-module Main exposing (..)
+module Main0 exposing (main)
 
 import Browser
 import Csv.Parser exposing (parse)
@@ -15,18 +15,21 @@ import String
 
 type alias Person =
     { id : Int
-    , gender : String
     , age : Int
-    , occupation : String
-    , sleepDuration : Float
-    , sleepQuality : Int
-    , physicalActivityLevel : Int
-    , stressLevel : Int
-    , bmi : String
-    , bloodPressure : String
-    , heartRate : Int
+    , gender : String
+    , heightCm : Int
+    , weightKg : Int
+    , bmi : Float
     , dailySteps : Int
-    , sleepDisorder : String
+    , caloriesIntake : Int
+    , hoursOfSleep : Float
+    , heartRate : Int
+    , bloodPressure : String
+    , exerciseHours : Float
+    , smoker : String
+    , alcoholConsumption : Int
+    , diabetic : String
+    , heartDisease : String
     }
 
 
@@ -37,6 +40,9 @@ type alias Model =
     , showPlot : Bool
     , showMale : Bool
     , showFemale : Bool
+    , showSmoker : Bool
+    , showDiabetic : Bool
+    , showHeartDisease : Bool
     }
 
 
@@ -45,21 +51,24 @@ type alias Model =
 rowToPerson : List String -> Maybe Person
 rowToPerson row =
     case row of
-        idStr :: genderStr :: ageStr :: occupationStr :: sleepDurationStr :: sleepQualityStr :: physicalActivityLevelStr :: stressLevelStr :: bmiStr :: bloodPressureStr :: heartRateStr  :: dailyStepsStr :: sleepDisorderStr :: [] ->
+        idStr :: ageStr :: genderStr :: heightStr :: weightStr :: bmiStr :: dailyStepsStr :: caloriesIntakeStr :: hoursOfSleepStr :: heartRateStr :: bloodPressureStr :: exerciseHoursStr :: smokerStr :: alcoholConsumptionStr :: diabeticStr :: heartDiseaseStr :: [] ->
             Just
                 { id = String.toInt idStr |> Maybe.withDefault 0
-                , gender = genderStr
                 , age = String.toInt ageStr |> Maybe.withDefault 0
-                , occupation = occupationStr
-                , sleepDuration = String.toFloat sleepDurationStr |> Maybe.withDefault 0
-                , sleepQuality = String.toInt sleepQualityStr |> Maybe.withDefault 0
-                , physicalActivityLevel = String.toInt physicalActivityLevelStr |> Maybe.withDefault 0
-                , stressLevel = String.toInt stressLevelStr |> Maybe.withDefault 0
-                , bmi = bmiStr
-                , bloodPressure = bloodPressureStr
-                , heartRate = String.toInt heartRateStr |> Maybe.withDefault 0
+                , gender = genderStr
+                , heightCm = String.toInt heightStr |> Maybe.withDefault 0
+                , weightKg = String.toInt weightStr |> Maybe.withDefault 0
+                , bmi = String.toFloat bmiStr |> Maybe.withDefault 0
                 , dailySteps = String.toInt dailyStepsStr |> Maybe.withDefault 0
-                , sleepDisorder = sleepDisorderStr
+                , caloriesIntake = String.toInt caloriesIntakeStr |> Maybe.withDefault 0
+                , hoursOfSleep = String.toFloat hoursOfSleepStr |> Maybe.withDefault 0
+                , heartRate = String.toInt heartRateStr |> Maybe.withDefault 0
+                , bloodPressure = bloodPressureStr
+                , exerciseHours = String.toFloat exerciseHoursStr |> Maybe.withDefault 0
+                , smoker = smokerStr
+                , alcoholConsumption = String.toInt alcoholConsumptionStr |> Maybe.withDefault 0
+                , diabetic = diabeticStr
+                , heartDisease = heartDiseaseStr
                 }
         _ ->
             Nothing
@@ -70,11 +79,14 @@ rowToPerson row =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { data = []
-      , selectedX = "Stresslevel"
-      , selectedY = "Schlafdauer"
+      , selectedX = "Schritte"
+      , selectedY = "Kalorienaufnahme"
       , showPlot = True
       , showMale = True
       , showFemale = True
+      , showSmoker = False
+      , showDiabetic = False
+      , showHeartDisease = False
       }
     , loadCsv
     )
@@ -83,7 +95,7 @@ init _ =
 loadCsv : Cmd Msg
 loadCsv =
     Http.get
-        { url = "data/Sleep_health_and_lifestyle_dataset.csv"
+        { url = "data/health_activity_data.csv"
         , expect = Http.expectString CsvLoaded
         }
 
@@ -98,6 +110,9 @@ type Msg
     | CsvLoaded (Result Http.Error String)
     | ToggleMale Bool
     | ToggleFemale Bool
+    | ToggleSmoker Bool
+    | ToggleDiabetic Bool
+    | ToggleHeartDisease Bool
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -117,6 +132,15 @@ update msg model =
 
         ToggleFemale val ->
             ( { model | showFemale = val }, Cmd.none )
+
+        ToggleSmoker val ->
+            ( { model | showSmoker = val }, Cmd.none )
+
+        ToggleDiabetic val ->
+            ( { model | showDiabetic = val }, Cmd.none )
+
+        ToggleHeartDisease val ->
+            ( { model | showHeartDisease = val }, Cmd.none )
 
         CsvLoaded (Ok csvString) ->
             case parse { fieldSeparator = ',' } csvString of
@@ -155,6 +179,11 @@ view model =
             [ labelCheckbox "MÄNNER" model.showMale ToggleMale
             , labelCheckbox "FRAUEN" model.showFemale ToggleFemale
             ]
+        , div [ HtmlAttr.style "margin-bottom" "10px", HtmlAttr.style "padding-left" "20px" ]
+            [ labelCheckbox "RAUCHER" model.showSmoker ToggleSmoker
+            , labelCheckbox "DIABETIKER" model.showDiabetic ToggleDiabetic
+            , labelCheckbox "HERZKRANKHEIT" model.showHeartDisease ToggleHeartDisease
+            ]
         , if model.showPlot then
             scatterPlotView model
           else
@@ -173,20 +202,20 @@ labelCheckbox labelText checked toMsg =
 axisSelectX : String -> Html Msg
 axisSelectX selected =
     select [ HtmlEvents.onInput ChangeX ]
-        [ option [ HtmlAttr.value "Schlafdauer", HtmlAttr.selected (selected == "Schlafdauer") ] [ Html.text "Schlafdauer" ]
-        , option [ HtmlAttr.value "Schritte", HtmlAttr.selected (selected == "Schritte") ] [ Html.text "Schritte" ]
-        -- , option [ HtmlAttr.value "Trainingsstunden (pro Woche)", HtmlAttr.selected (selected == "Trainingsstunden (pro Woche)") ] [ Html.text "Trainingsstunden (pro Woche)" ]
-        -- , option [ HtmlAttr.value "Kalorienaufnahme", HtmlAttr.selected (selected == "Kalorienaufnahme") ] [ Html.text "Kalorienaufnahme" ]
-        -- , option [ HtmlAttr.value "Alter", HtmlAttr.selected (selected == "Alter") ] [ Html.text "Alter" ]
+        [ option [ HtmlAttr.value "Schritte", HtmlAttr.selected (selected == "Schritte") ] [ Html.text "Schritte" ] 
+        , option [ HtmlAttr.value "Alkoholkonsum (pro Woche)", HtmlAttr.selected (selected == "Alkoholkonsum (pro Woche)") ] [ Html.text "Alkoholkonsum (pro Woche)" ]
+        , option [ HtmlAttr.value "Trainingsstunden (pro Woche)", HtmlAttr.selected (selected == "Trainingsstunden (pro Woche)") ] [ Html.text "Trainingsstunden (pro Woche)" ]
+        , option [ HtmlAttr.value "Kalorienaufnahme", HtmlAttr.selected (selected == "Kalorienaufnahme") ] [ Html.text "Kalorienaufnahme" ]
+        , option [ HtmlAttr.value "Alter", HtmlAttr.selected (selected == "Alter") ] [ Html.text "Alter" ]
         ]
 
 
 axisSelectY : String -> Html Msg
 axisSelectY selected =
     select [ HtmlEvents.onInput ChangeY ]
-        [ option [ HtmlAttr.value "Stresslevel", HtmlAttr.selected (selected == "Stresslevel") ] [ Html.text "Stresslevel" ]
+        [ option [ HtmlAttr.value "Schlafdauer", HtmlAttr.selected (selected == "Schlafdauer") ] [ Html.text "Schlafdauer" ]
+        , option [ HtmlAttr.value "BMI", HtmlAttr.selected (selected == "BMI") ] [ Html.text "BMI" ]
         , option [ HtmlAttr.value "Herzfrequenz", HtmlAttr.selected (selected == "Herzfrequenz") ] [ Html.text "Herzfrequenz" ]
-        -- , option [ HtmlAttr.value "Herzfrequenz", HtmlAttr.selected (selected == "Herzfrequenz") ] [ Html.text "Herzfrequenz" ]
         ]
 
 
@@ -195,13 +224,14 @@ axisSelectY selected =
 getValueForAxis : Person -> String -> Float
 getValueForAxis dp axis =
     case axis of
-        "Schlafdauer" -> dp.sleepDuration
-        "Stresslevel" -> toFloat dp.stressLevel
         "Schritte" -> toFloat dp.dailySteps
-        -- "BMI" -> dp.bmi
-        -- "Trainingsstunden (pro Woche)" -> dp.exerciseHours
+        "Alkoholkonsum (pro Woche)" -> toFloat dp.alcoholConsumption
+        "Schlafdauer" -> dp.hoursOfSleep
+        "Kalorienaufnahme" -> toFloat dp.caloriesIntake
+        "BMI" -> dp.bmi
+        "Trainingsstunden (pro Woche)" -> dp.exerciseHours
         "Herzfrequenz" -> toFloat dp.heartRate
-        -- "Alter" -> toFloat dp.age
+        "Alter" -> toFloat dp.age
         _ -> 0
 
 
@@ -220,7 +250,6 @@ padding = 65
 ticksForAxis : String -> List Float
 ticksForAxis axis =
     case axis of
-        "Stresslevel" -> [ 0, 2, 4, 6, 8, 10 ]
         "Schritte" -> [ 0, 5000, 10000, 15000, 20000 ]
         "Alkoholkonsum (pro Woche)" -> [ 0, 2, 4, 6, 8, 10 ]
         "Trainingsstunden (pro Woche)" -> [ 0, 2, 4, 6, 8, 10 ]
@@ -239,6 +268,9 @@ scatterPlotView model =
             List.filter
                 (\dp ->
                     ((model.showMale && dp.gender == "Male") || (model.showFemale && dp.gender == "Female"))
+                        && (not model.showSmoker || dp.smoker == "Yes")
+                        && (not model.showDiabetic || dp.diabetic == "Yes")
+                        && (not model.showHeartDisease || dp.heartDisease == "Yes")
                 )
                 model.data
 
