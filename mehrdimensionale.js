@@ -5334,7 +5334,8 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$CsvLoaded = function (a) {
+var $author$project$Mehrdimensionale$initModel = {error: $elm$core$Maybe$Nothing, people: _List_Nil};
+var $author$project$Mehrdimensionale$CsvLoaded = function (a) {
 	return {$: 'CsvLoaded', a: a};
 };
 var $elm$http$Http$BadStatus_ = F2(
@@ -6116,573 +6117,22 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
-var $author$project$Main$loadCsv = $elm$http$Http$get(
+var $author$project$Mehrdimensionale$loadCsv = $elm$http$Http$get(
 	{
-		expect: $elm$http$Http$expectString($author$project$Main$CsvLoaded),
+		expect: $elm$http$Http$expectString($author$project$Mehrdimensionale$CsvLoaded),
 		url: 'data/Sleep_health_and_lifestyle_dataset.csv'
 	});
-var $author$project$Main$init = function (_v0) {
-	return _Utils_Tuple2(
-		{data: _List_Nil, selectedX: 'Stresslevel', selectedY: 'Schlafdauer', showFemale: true, showMale: true, showPlot: true},
-		$author$project$Main$loadCsv);
+var $author$project$Mehrdimensionale$init = function (_v0) {
+	return _Utils_Tuple2($author$project$Mehrdimensionale$initModel, $author$project$Mehrdimensionale$loadCsv);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
-			} else {
-				if (!list.b) {
-					return list;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
-				}
-			}
-		}
-	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $elm$core$Basics$not = _Basics_not;
-var $BrianHicks$elm_csv$Csv$Parser$AdditionalCharactersAfterClosingQuote = function (a) {
-	return {$: 'AdditionalCharactersAfterClosingQuote', a: a};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
 };
-var $BrianHicks$elm_csv$Csv$Parser$SourceEndedWithoutClosingQuote = function (a) {
-	return {$: 'SourceEndedWithoutClosingQuote', a: a};
-};
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
-var $elm$core$Basics$ge = _Utils_ge;
-var $BrianHicks$elm_csv$Csv$Parser$parse = F2(
-	function (config, source) {
-		var finalLength = $elm$core$String$length(source);
-		var parseQuotedField = F4(
-			function (isFieldSeparator, soFar, startOffset, endOffset) {
-				parseQuotedField:
-				while (true) {
-					if ((endOffset - finalLength) >= 0) {
-						return $elm$core$Result$Err($BrianHicks$elm_csv$Csv$Parser$SourceEndedWithoutClosingQuote);
-					} else {
-						if (A3($elm$core$String$slice, endOffset, endOffset + 1, source) === '\"') {
-							var segment = A3($elm$core$String$slice, startOffset, endOffset, source);
-							if (((endOffset + 1) - finalLength) >= 0) {
-								return $elm$core$Result$Ok(
-									_Utils_Tuple3(
-										_Utils_ap(soFar, segment),
-										endOffset + 1,
-										false));
-							} else {
-								var next = A3($elm$core$String$slice, endOffset + 1, endOffset + 2, source);
-								if (next === '\"') {
-									var newPos = endOffset + 2;
-									var $temp$isFieldSeparator = isFieldSeparator,
-										$temp$soFar = soFar + (segment + '\"'),
-										$temp$startOffset = newPos,
-										$temp$endOffset = newPos;
-									isFieldSeparator = $temp$isFieldSeparator;
-									soFar = $temp$soFar;
-									startOffset = $temp$startOffset;
-									endOffset = $temp$endOffset;
-									continue parseQuotedField;
-								} else {
-									if (isFieldSeparator(next)) {
-										return $elm$core$Result$Ok(
-											_Utils_Tuple3(
-												_Utils_ap(soFar, segment),
-												endOffset + 2,
-												false));
-									} else {
-										if (next === '\n') {
-											return $elm$core$Result$Ok(
-												_Utils_Tuple3(
-													_Utils_ap(soFar, segment),
-													endOffset + 2,
-													true));
-										} else {
-											if ((next === '\u000D') && (A3($elm$core$String$slice, endOffset + 2, endOffset + 3, source) === '\n')) {
-												return $elm$core$Result$Ok(
-													_Utils_Tuple3(
-														_Utils_ap(soFar, segment),
-														endOffset + 3,
-														true));
-											} else {
-												return $elm$core$Result$Err($BrianHicks$elm_csv$Csv$Parser$AdditionalCharactersAfterClosingQuote);
-											}
-										}
-									}
-								}
-							}
-						} else {
-							var $temp$isFieldSeparator = isFieldSeparator,
-								$temp$soFar = soFar,
-								$temp$startOffset = startOffset,
-								$temp$endOffset = endOffset + 1;
-							isFieldSeparator = $temp$isFieldSeparator;
-							soFar = $temp$soFar;
-							startOffset = $temp$startOffset;
-							endOffset = $temp$endOffset;
-							continue parseQuotedField;
-						}
-					}
-				}
-			});
-		var parseComma = F4(
-			function (row, rows, startOffset, endOffset) {
-				parseComma:
-				while (true) {
-					if ((endOffset - finalLength) >= 0) {
-						var finalField = A3($elm$core$String$slice, startOffset, endOffset, source);
-						return ((finalField === '') && _Utils_eq(row, _List_Nil)) ? $elm$core$Result$Ok(
-							$elm$core$List$reverse(rows)) : $elm$core$Result$Ok(
-							$elm$core$List$reverse(
-								A2(
-									$elm$core$List$cons,
-									$elm$core$List$reverse(
-										A2($elm$core$List$cons, finalField, row)),
-									rows)));
-					} else {
-						var first = A3($elm$core$String$slice, endOffset, endOffset + 1, source);
-						if (first === ',') {
-							var newPos = endOffset + 1;
-							var $temp$row = A2(
-								$elm$core$List$cons,
-								A3($elm$core$String$slice, startOffset, endOffset, source),
-								row),
-								$temp$rows = rows,
-								$temp$startOffset = newPos,
-								$temp$endOffset = newPos;
-							row = $temp$row;
-							rows = $temp$rows;
-							startOffset = $temp$startOffset;
-							endOffset = $temp$endOffset;
-							continue parseComma;
-						} else {
-							if (first === '\n') {
-								var newPos = endOffset + 1;
-								var $temp$row = _List_Nil,
-									$temp$rows = A2(
-									$elm$core$List$cons,
-									$elm$core$List$reverse(
-										A2(
-											$elm$core$List$cons,
-											A3($elm$core$String$slice, startOffset, endOffset, source),
-											row)),
-									rows),
-									$temp$startOffset = newPos,
-									$temp$endOffset = newPos;
-								row = $temp$row;
-								rows = $temp$rows;
-								startOffset = $temp$startOffset;
-								endOffset = $temp$endOffset;
-								continue parseComma;
-							} else {
-								if ((first === '\u000D') && (A3($elm$core$String$slice, endOffset + 1, endOffset + 2, source) === '\n')) {
-									var newPos = endOffset + 2;
-									var $temp$row = _List_Nil,
-										$temp$rows = A2(
-										$elm$core$List$cons,
-										$elm$core$List$reverse(
-											A2(
-												$elm$core$List$cons,
-												A3($elm$core$String$slice, startOffset, endOffset, source),
-												row)),
-										rows),
-										$temp$startOffset = newPos,
-										$temp$endOffset = newPos;
-									row = $temp$row;
-									rows = $temp$rows;
-									startOffset = $temp$startOffset;
-									endOffset = $temp$endOffset;
-									continue parseComma;
-								} else {
-									if (first === '\"') {
-										var newPos = endOffset + 1;
-										var _v0 = A4(
-											parseQuotedField,
-											function (c) {
-												return c === ',';
-											},
-											'',
-											newPos,
-											newPos);
-										if (_v0.$ === 'Ok') {
-											var _v1 = _v0.a;
-											var value = _v1.a;
-											var afterQuotedField = _v1.b;
-											var rowEnded = _v1.c;
-											if (_Utils_cmp(afterQuotedField, finalLength) > -1) {
-												return $elm$core$Result$Ok(
-													$elm$core$List$reverse(
-														A2(
-															$elm$core$List$cons,
-															$elm$core$List$reverse(
-																A2($elm$core$List$cons, value, row)),
-															rows)));
-											} else {
-												if (rowEnded) {
-													var $temp$row = _List_Nil,
-														$temp$rows = A2(
-														$elm$core$List$cons,
-														$elm$core$List$reverse(
-															A2($elm$core$List$cons, value, row)),
-														rows),
-														$temp$startOffset = afterQuotedField,
-														$temp$endOffset = afterQuotedField;
-													row = $temp$row;
-													rows = $temp$rows;
-													startOffset = $temp$startOffset;
-													endOffset = $temp$endOffset;
-													continue parseComma;
-												} else {
-													var $temp$row = A2($elm$core$List$cons, value, row),
-														$temp$rows = rows,
-														$temp$startOffset = afterQuotedField,
-														$temp$endOffset = afterQuotedField;
-													row = $temp$row;
-													rows = $temp$rows;
-													startOffset = $temp$startOffset;
-													endOffset = $temp$endOffset;
-													continue parseComma;
-												}
-											}
-										} else {
-											var problem = _v0.a;
-											return $elm$core$Result$Err(
-												problem(
-													$elm$core$List$length(rows) + 1));
-										}
-									} else {
-										var $temp$row = row,
-											$temp$rows = rows,
-											$temp$startOffset = startOffset,
-											$temp$endOffset = endOffset + 1;
-										row = $temp$row;
-										rows = $temp$rows;
-										startOffset = $temp$startOffset;
-										endOffset = $temp$endOffset;
-										continue parseComma;
-									}
-								}
-							}
-						}
-					}
-				}
-			});
-		var parseHelp = F5(
-			function (isFieldSeparator, row, rows, startOffset, endOffset) {
-				parseHelp:
-				while (true) {
-					if ((endOffset - finalLength) >= 0) {
-						var finalField = A3($elm$core$String$slice, startOffset, endOffset, source);
-						return ((finalField === '') && _Utils_eq(row, _List_Nil)) ? $elm$core$Result$Ok(
-							$elm$core$List$reverse(rows)) : $elm$core$Result$Ok(
-							$elm$core$List$reverse(
-								A2(
-									$elm$core$List$cons,
-									$elm$core$List$reverse(
-										A2($elm$core$List$cons, finalField, row)),
-									rows)));
-					} else {
-						var first = A3($elm$core$String$slice, endOffset, endOffset + 1, source);
-						if (isFieldSeparator(first)) {
-							var newPos = endOffset + 1;
-							var $temp$isFieldSeparator = isFieldSeparator,
-								$temp$row = A2(
-								$elm$core$List$cons,
-								A3($elm$core$String$slice, startOffset, endOffset, source),
-								row),
-								$temp$rows = rows,
-								$temp$startOffset = newPos,
-								$temp$endOffset = newPos;
-							isFieldSeparator = $temp$isFieldSeparator;
-							row = $temp$row;
-							rows = $temp$rows;
-							startOffset = $temp$startOffset;
-							endOffset = $temp$endOffset;
-							continue parseHelp;
-						} else {
-							if (first === '\n') {
-								var newPos = endOffset + 1;
-								var $temp$isFieldSeparator = isFieldSeparator,
-									$temp$row = _List_Nil,
-									$temp$rows = A2(
-									$elm$core$List$cons,
-									$elm$core$List$reverse(
-										A2(
-											$elm$core$List$cons,
-											A3($elm$core$String$slice, startOffset, endOffset, source),
-											row)),
-									rows),
-									$temp$startOffset = newPos,
-									$temp$endOffset = newPos;
-								isFieldSeparator = $temp$isFieldSeparator;
-								row = $temp$row;
-								rows = $temp$rows;
-								startOffset = $temp$startOffset;
-								endOffset = $temp$endOffset;
-								continue parseHelp;
-							} else {
-								if ((first === '\u000D') && (A3($elm$core$String$slice, endOffset + 1, endOffset + 2, source) === '\n')) {
-									var newPos = endOffset + 2;
-									var $temp$isFieldSeparator = isFieldSeparator,
-										$temp$row = _List_Nil,
-										$temp$rows = A2(
-										$elm$core$List$cons,
-										$elm$core$List$reverse(
-											A2(
-												$elm$core$List$cons,
-												A3($elm$core$String$slice, startOffset, endOffset, source),
-												row)),
-										rows),
-										$temp$startOffset = newPos,
-										$temp$endOffset = newPos;
-									isFieldSeparator = $temp$isFieldSeparator;
-									row = $temp$row;
-									rows = $temp$rows;
-									startOffset = $temp$startOffset;
-									endOffset = $temp$endOffset;
-									continue parseHelp;
-								} else {
-									if (first === '\"') {
-										var newPos = endOffset + 1;
-										var _v2 = A4(parseQuotedField, isFieldSeparator, '', newPos, newPos);
-										if (_v2.$ === 'Ok') {
-											var _v3 = _v2.a;
-											var value = _v3.a;
-											var afterQuotedField = _v3.b;
-											var rowEnded = _v3.c;
-											if (_Utils_cmp(afterQuotedField, finalLength) > -1) {
-												return $elm$core$Result$Ok(
-													$elm$core$List$reverse(
-														A2(
-															$elm$core$List$cons,
-															$elm$core$List$reverse(
-																A2($elm$core$List$cons, value, row)),
-															rows)));
-											} else {
-												if (rowEnded) {
-													var $temp$isFieldSeparator = isFieldSeparator,
-														$temp$row = _List_Nil,
-														$temp$rows = A2(
-														$elm$core$List$cons,
-														$elm$core$List$reverse(
-															A2($elm$core$List$cons, value, row)),
-														rows),
-														$temp$startOffset = afterQuotedField,
-														$temp$endOffset = afterQuotedField;
-													isFieldSeparator = $temp$isFieldSeparator;
-													row = $temp$row;
-													rows = $temp$rows;
-													startOffset = $temp$startOffset;
-													endOffset = $temp$endOffset;
-													continue parseHelp;
-												} else {
-													var $temp$isFieldSeparator = isFieldSeparator,
-														$temp$row = A2($elm$core$List$cons, value, row),
-														$temp$rows = rows,
-														$temp$startOffset = afterQuotedField,
-														$temp$endOffset = afterQuotedField;
-													isFieldSeparator = $temp$isFieldSeparator;
-													row = $temp$row;
-													rows = $temp$rows;
-													startOffset = $temp$startOffset;
-													endOffset = $temp$endOffset;
-													continue parseHelp;
-												}
-											}
-										} else {
-											var problem = _v2.a;
-											return $elm$core$Result$Err(
-												problem(
-													$elm$core$List$length(rows) + 1));
-										}
-									} else {
-										var $temp$isFieldSeparator = isFieldSeparator,
-											$temp$row = row,
-											$temp$rows = rows,
-											$temp$startOffset = startOffset,
-											$temp$endOffset = endOffset + 1;
-										isFieldSeparator = $temp$isFieldSeparator;
-										row = $temp$row;
-										rows = $temp$rows;
-										startOffset = $temp$startOffset;
-										endOffset = $temp$endOffset;
-										continue parseHelp;
-									}
-								}
-							}
-						}
-					}
-				}
-			});
-		var parseSemicolon = F4(
-			function (row, rows, startOffset, endOffset) {
-				parseSemicolon:
-				while (true) {
-					if ((endOffset - finalLength) >= 0) {
-						var finalField = A3($elm$core$String$slice, startOffset, endOffset, source);
-						return ((finalField === '') && _Utils_eq(row, _List_Nil)) ? $elm$core$Result$Ok(
-							$elm$core$List$reverse(rows)) : $elm$core$Result$Ok(
-							$elm$core$List$reverse(
-								A2(
-									$elm$core$List$cons,
-									$elm$core$List$reverse(
-										A2($elm$core$List$cons, finalField, row)),
-									rows)));
-					} else {
-						var first = A3($elm$core$String$slice, endOffset, endOffset + 1, source);
-						if (first === ';') {
-							var newPos = endOffset + 1;
-							var $temp$row = A2(
-								$elm$core$List$cons,
-								A3($elm$core$String$slice, startOffset, endOffset, source),
-								row),
-								$temp$rows = rows,
-								$temp$startOffset = newPos,
-								$temp$endOffset = newPos;
-							row = $temp$row;
-							rows = $temp$rows;
-							startOffset = $temp$startOffset;
-							endOffset = $temp$endOffset;
-							continue parseSemicolon;
-						} else {
-							if (first === '\n') {
-								var newPos = endOffset + 1;
-								var $temp$row = _List_Nil,
-									$temp$rows = A2(
-									$elm$core$List$cons,
-									$elm$core$List$reverse(
-										A2(
-											$elm$core$List$cons,
-											A3($elm$core$String$slice, startOffset, endOffset, source),
-											row)),
-									rows),
-									$temp$startOffset = newPos,
-									$temp$endOffset = newPos;
-								row = $temp$row;
-								rows = $temp$rows;
-								startOffset = $temp$startOffset;
-								endOffset = $temp$endOffset;
-								continue parseSemicolon;
-							} else {
-								if ((first === '\u000D') && (A3($elm$core$String$slice, endOffset + 1, endOffset + 2, source) === '\n')) {
-									var newPos = endOffset + 2;
-									var $temp$row = _List_Nil,
-										$temp$rows = A2(
-										$elm$core$List$cons,
-										$elm$core$List$reverse(
-											A2(
-												$elm$core$List$cons,
-												A3($elm$core$String$slice, startOffset, endOffset, source),
-												row)),
-										rows),
-										$temp$startOffset = newPos,
-										$temp$endOffset = newPos;
-									row = $temp$row;
-									rows = $temp$rows;
-									startOffset = $temp$startOffset;
-									endOffset = $temp$endOffset;
-									continue parseSemicolon;
-								} else {
-									if (first === '\"') {
-										var newPos = endOffset + 1;
-										var _v4 = A4(
-											parseQuotedField,
-											function (c) {
-												return c === ';';
-											},
-											'',
-											newPos,
-											newPos);
-										if (_v4.$ === 'Ok') {
-											var _v5 = _v4.a;
-											var value = _v5.a;
-											var afterQuotedField = _v5.b;
-											var rowEnded = _v5.c;
-											if (_Utils_cmp(afterQuotedField, finalLength) > -1) {
-												return $elm$core$Result$Ok(
-													$elm$core$List$reverse(
-														A2(
-															$elm$core$List$cons,
-															$elm$core$List$reverse(
-																A2($elm$core$List$cons, value, row)),
-															rows)));
-											} else {
-												if (rowEnded) {
-													var $temp$row = _List_Nil,
-														$temp$rows = A2(
-														$elm$core$List$cons,
-														$elm$core$List$reverse(
-															A2($elm$core$List$cons, value, row)),
-														rows),
-														$temp$startOffset = afterQuotedField,
-														$temp$endOffset = afterQuotedField;
-													row = $temp$row;
-													rows = $temp$rows;
-													startOffset = $temp$startOffset;
-													endOffset = $temp$endOffset;
-													continue parseSemicolon;
-												} else {
-													var $temp$row = A2($elm$core$List$cons, value, row),
-														$temp$rows = rows,
-														$temp$startOffset = afterQuotedField,
-														$temp$endOffset = afterQuotedField;
-													row = $temp$row;
-													rows = $temp$rows;
-													startOffset = $temp$startOffset;
-													endOffset = $temp$endOffset;
-													continue parseSemicolon;
-												}
-											}
-										} else {
-											var problem = _v4.a;
-											return $elm$core$Result$Err(
-												problem(
-													$elm$core$List$length(rows) + 1));
-										}
-									} else {
-										var $temp$row = row,
-											$temp$rows = rows,
-											$temp$startOffset = startOffset,
-											$temp$endOffset = endOffset + 1;
-										row = $temp$row;
-										rows = $temp$rows;
-										startOffset = $temp$startOffset;
-										endOffset = $temp$endOffset;
-										continue parseSemicolon;
-									}
-								}
-							}
-						}
-					}
-				}
-			});
-		var fieldSeparator = $elm$core$String$fromChar(config.fieldSeparator);
-		return $elm$core$String$isEmpty(source) ? $elm$core$Result$Ok(_List_Nil) : (_Utils_eq(
-			config.fieldSeparator,
-			_Utils_chr(',')) ? A4(parseComma, _List_Nil, _List_Nil, 0, 0) : (_Utils_eq(
-			config.fieldSeparator,
-			_Utils_chr(';')) ? A4(parseSemicolon, _List_Nil, _List_Nil, 0, 0) : A5(
-			parseHelp,
-			function (s) {
-				return _Utils_eq(s, fieldSeparator);
-			},
-			_List_Nil,
-			_List_Nil,
-			0,
-			0)));
-	});
-var $elm$core$String$toFloat = _String_toFloat;
+var $elm$core$String$trim = _String_trim;
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
 		if (maybe.$ === 'Just') {
@@ -6692,420 +6142,295 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Main$rowToPerson = function (row) {
-	if (((((((((((((row.b && row.b.b) && row.b.b.b) && row.b.b.b.b) && row.b.b.b.b.b) && row.b.b.b.b.b.b) && row.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b.b) && (!row.b.b.b.b.b.b.b.b.b.b.b.b.b.b)) {
-		var idStr = row.a;
-		var _v1 = row.b;
-		var genderStr = _v1.a;
+var $author$project$Mehrdimensionale$parseBp = function (s) {
+	var _v0 = A2(
+		$elm$core$String$split,
+		'/',
+		$elm$core$String$trim(s));
+	if (_v0.b && _v0.b.b) {
+		var a = _v0.a;
+		var _v1 = _v0.b;
+		var b = _v1.a;
+		return _Utils_Tuple2(
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				$elm$core$String$toInt(a)),
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				$elm$core$String$toInt(b)));
+	} else {
+		return _Utils_Tuple2(0, 0);
+	}
+};
+var $elm$core$String$toFloat = _String_toFloat;
+var $elm$core$String$toLower = _String_toLower;
+var $author$project$Mehrdimensionale$parseRow = function (row) {
+	var _v0 = A2(
+		$elm$core$List$map,
+		$elm$core$String$trim,
+		A2($elm$core$String$split, ',', row));
+	if (((((((((((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && _v0.b.b.b.b.b) && _v0.b.b.b.b.b.b) && _v0.b.b.b.b.b.b.b) && _v0.b.b.b.b.b.b.b.b) && _v0.b.b.b.b.b.b.b.b.b) && _v0.b.b.b.b.b.b.b.b.b.b) && _v0.b.b.b.b.b.b.b.b.b.b.b) && _v0.b.b.b.b.b.b.b.b.b.b.b.b) && _v0.b.b.b.b.b.b.b.b.b.b.b.b.b) && (!_v0.b.b.b.b.b.b.b.b.b.b.b.b.b.b)) {
+		var idStr = _v0.a;
+		var _v1 = _v0.b;
+		var gender = _v1.a;
 		var _v2 = _v1.b;
 		var ageStr = _v2.a;
 		var _v3 = _v2.b;
-		var occupationStr = _v3.a;
+		var occ = _v3.a;
 		var _v4 = _v3.b;
-		var sleepDurationStr = _v4.a;
+		var sleepDurStr = _v4.a;
 		var _v5 = _v4.b;
-		var sleepQualityStr = _v5.a;
+		var qSleep = _v5.a;
 		var _v6 = _v5.b;
-		var physicalActivityLevelStr = _v6.a;
+		var physAct = _v6.a;
 		var _v7 = _v6.b;
-		var stressLevelStr = _v7.a;
+		var stressStr = _v7.a;
 		var _v8 = _v7.b;
-		var bmiStr = _v8.a;
+		var bmi = _v8.a;
 		var _v9 = _v8.b;
-		var bloodPressureStr = _v9.a;
+		var bp = _v9.a;
 		var _v10 = _v9.b;
-		var heartRateStr = _v10.a;
+		var hrStr = _v10.a;
 		var _v11 = _v10.b;
-		var dailyStepsStr = _v11.a;
+		var steps = _v11.a;
 		var _v12 = _v11.b;
-		var sleepDisorderStr = _v12.a;
+		var sleepDis = _v12.a;
+		var stress = function () {
+			var _v16 = $elm$core$String$toInt(stressStr);
+			if (_v16.$ === 'Just') {
+				var v = _v16.a;
+				return v;
+			} else {
+				return 0;
+			}
+		}();
+		var sleepDur = function () {
+			var _v15 = $elm$core$String$toFloat(sleepDurStr);
+			if (_v15.$ === 'Just') {
+				var v = _v15.a;
+				return v;
+			} else {
+				return 0;
+			}
+		}();
+		var bmiNum = function () {
+			var _v14 = $elm$core$String$toLower(bmi);
+			switch (_v14) {
+				case 'normal':
+					return 1;
+				case 'overweight':
+					return 2;
+				case 'obese':
+					return 3;
+				default:
+					return 0;
+			}
+		}();
+		var _v13 = $author$project$Mehrdimensionale$parseBp(bp);
+		var sys = _v13.a;
 		return $elm$core$Maybe$Just(
 			{
 				age: A2(
 					$elm$core$Maybe$withDefault,
 					0,
 					$elm$core$String$toInt(ageStr)),
-				bloodPressure: bloodPressureStr,
-				bmi: bmiStr,
-				dailySteps: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(dailyStepsStr)),
-				gender: genderStr,
+				bmiCat: bmiNum,
 				heartRate: A2(
 					$elm$core$Maybe$withDefault,
 					0,
-					$elm$core$String$toInt(heartRateStr)),
+					$elm$core$String$toInt(hrStr)),
 				id: A2(
 					$elm$core$Maybe$withDefault,
-					0,
+					-1,
 					$elm$core$String$toInt(idStr)),
-				occupation: occupationStr,
-				physicalActivityLevel: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(physicalActivityLevelStr)),
-				sleepDisorder: sleepDisorderStr,
-				sleepDuration: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toFloat(sleepDurationStr)),
-				sleepQuality: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(sleepQualityStr)),
-				stressLevel: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(stressLevelStr))
+				occupation: occ,
+				sleepDisorder: sleepDis,
+				sleepDuration: sleepDur,
+				stress: stress,
+				systolic: sys
 			});
 	} else {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $author$project$Main$update = F2(
+var $author$project$Mehrdimensionale$parseCsv = function (raw) {
+	var lines = A2(
+		$elm$core$List$map,
+		$elm$core$String$trim,
+		A2(
+			$elm$core$String$split,
+			'\n',
+			$elm$core$String$trim(raw)));
+	if (!lines.b) {
+		return _List_Nil;
+	} else {
+		var header = lines.a;
+		var rows = lines.b;
+		return A2($elm$core$List$filterMap, $author$project$Mehrdimensionale$parseRow, rows);
+	}
+};
+var $elm$core$Debug$toString = _Debug_toString;
+var $author$project$Mehrdimensionale$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'ChangeX':
-				var newX = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{selectedX: newX}),
-					$elm$core$Platform$Cmd$none);
-			case 'ChangeY':
-				var newY = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{selectedY: newY}),
-					$elm$core$Platform$Cmd$none);
-			case 'TogglePlot':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{showPlot: !model.showPlot}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleMale':
-				var val = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{showMale: val}),
-					$elm$core$Platform$Cmd$none);
-			case 'ToggleFemale':
-				var val = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{showFemale: val}),
-					$elm$core$Platform$Cmd$none);
-			default:
-				if (msg.a.$ === 'Ok') {
-					var csvString = msg.a.a;
-					var _v1 = A2(
-						$BrianHicks$elm_csv$Csv$Parser$parse,
-						{
-							fieldSeparator: _Utils_chr(',')
-						},
-						csvString);
-					if (_v1.$ === 'Ok') {
-						var rows = _v1.a;
-						var dataRows = A2($elm$core$List$drop, 1, rows);
-						var persons = A2($elm$core$List$filterMap, $author$project$Main$rowToPerson, dataRows);
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{data: persons}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					}
-				} else {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				}
+		if (msg.a.$ === 'Ok') {
+			var raw = msg.a.a;
+			var parsed = $author$project$Mehrdimensionale$parseCsv(raw);
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{
+						error: $elm$core$Maybe$Just(
+							'Parsed rows: ' + $elm$core$String$fromInt(
+								$elm$core$List$length(parsed))),
+						people: parsed
+					}),
+				$elm$core$Platform$Cmd$none);
+		} else {
+			var e = msg.a.a;
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{
+						error: $elm$core$Maybe$Just(
+							'HTTP Error: ' + $elm$core$Debug$toString(e))
+					}),
+				$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$ToggleFemale = function (a) {
-	return {$: 'ToggleFemale', a: a};
-};
-var $author$project$Main$ToggleMale = function (a) {
-	return {$: 'ToggleMale', a: a};
-};
-var $author$project$Main$TogglePlot = {$: 'TogglePlot'};
-var $author$project$Main$ChangeX = function (a) {
-	return {$: 'ChangeX', a: a};
-};
-var $elm$html$Html$Events$alwaysStop = function (x) {
-	return _Utils_Tuple2(x, true);
-};
-var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$stopPropagationOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
-	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$at = F2(
-	function (fields, decoder) {
-		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
-	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
-var $elm$html$Html$Events$targetValue = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'value']),
-	$elm$json$Json$Decode$string);
-var $elm$html$Html$Events$onInput = function (tagger) {
-	return A2(
-		$elm$html$Html$Events$stopPropagationOn,
-		'input',
-		A2(
-			$elm$json$Json$Decode$map,
-			$elm$html$Html$Events$alwaysStop,
-			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
-};
-var $elm$html$Html$option = _VirtualDom_node('option');
-var $elm$html$Html$select = _VirtualDom_node('select');
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
-var $elm$html$Html$Attributes$selected = $elm$html$Html$Attributes$boolProperty('selected');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Main$axisSelectX = function (selected) {
-	return A2(
-		$elm$html$Html$select,
-		_List_fromArray(
-			[
-				$elm$html$Html$Events$onInput($author$project$Main$ChangeX)
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$option,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$value('Schlafdauer'),
-						$elm$html$Html$Attributes$selected(selected === 'Schlafdauer')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Schlafdauer')
-					])),
-				A2(
-				$elm$html$Html$option,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$value('Schritte'),
-						$elm$html$Html$Attributes$selected(selected === 'Schritte')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Schritte')
-					]))
-			]));
-};
-var $author$project$Main$ChangeY = function (a) {
-	return {$: 'ChangeY', a: a};
-};
-var $author$project$Main$axisSelectY = function (selected) {
-	return A2(
-		$elm$html$Html$select,
-		_List_fromArray(
-			[
-				$elm$html$Html$Events$onInput($author$project$Main$ChangeY)
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$option,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$value('Stresslevel'),
-						$elm$html$Html$Attributes$selected(selected === 'Stresslevel')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Stresslevel')
-					])),
-				A2(
-				$elm$html$Html$option,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$value('Herzfrequenz'),
-						$elm$html$Html$Attributes$selected(selected === 'Herzfrequenz')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Herzfrequenz')
-					]))
-			]));
-};
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
-var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$html$Html$label = _VirtualDom_node('label');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
-var $elm$html$Html$Events$targetChecked = A2(
-	$elm$json$Json$Decode$at,
-	_List_fromArray(
-		['target', 'checked']),
-	$elm$json$Json$Decode$bool);
-var $elm$html$Html$Events$onCheck = function (tagger) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'change',
-		A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetChecked));
-};
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Main$labelCheckbox = F3(
-	function (labelText, checked, toMsg) {
-		return A2(
-			$elm$html$Html$label,
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'margin-right', '15px')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$input,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$type_('checkbox'),
-							$elm$html$Html$Attributes$checked(checked),
-							$elm$html$Html$Events$onCheck(toMsg)
-						]),
-					_List_Nil),
-					$elm$html$Html$text(' ' + labelText)
-				]));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
-var $elm$svg$Svg$Attributes$fontWeight = _VirtualDom_attribute('font-weight');
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $author$project$Main$getValueForAxis = F2(
-	function (dp, axis) {
-		switch (axis) {
-			case 'Schlafdauer':
-				return dp.sleepDuration;
-			case 'Stresslevel':
-				return dp.stressLevel;
-			case 'Schritte':
-				return dp.dailySteps;
-			case 'Herzfrequenz':
-				return dp.heartRate;
-			default:
-				return 0;
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
 	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm_community$list_extra$List$Extra$findIndexHelp = F3(
+	function (index, predicate, list) {
+		findIndexHelp:
+		while (true) {
+			if (!list.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (predicate(x)) {
+					return $elm$core$Maybe$Just(index);
+				} else {
+					var $temp$index = index + 1,
+						$temp$predicate = predicate,
+						$temp$list = xs;
+					index = $temp$index;
+					predicate = $temp$predicate;
+					list = $temp$list;
+					continue findIndexHelp;
+				}
+			}
+		}
+	});
+var $elm_community$list_extra$List$Extra$findIndex = $elm_community$list_extra$List$Extra$findIndexHelp(0);
+var $elm_community$list_extra$List$Extra$elemIndex = function (x) {
+	return $elm_community$list_extra$List$Extra$findIndex(
+		$elm$core$Basics$eq(x));
+};
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
-var $elm$core$List$maximum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
+var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
+var $elm$svg$Svg$polyline = $elm$svg$Svg$trustedNode('polyline');
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeOpacity = _VirtualDom_attribute('stroke-opacity');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$textAnchor = _VirtualDom_attribute('text-anchor');
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $author$project$Main$ticksForAxis = function (axis) {
-	switch (axis) {
-		case 'Stresslevel':
-			return _List_fromArray(
-				[0, 2, 4, 6, 8, 10]);
-		case 'Schritte':
-			return _List_fromArray(
-				[0, 5000, 10000, 15000, 20000]);
-		case 'Alkoholkonsum (pro Woche)':
-			return _List_fromArray(
-				[0, 2, 4, 6, 8, 10]);
-		case 'Trainingsstunden (pro Woche)':
-			return _List_fromArray(
-				[0, 2, 4, 6, 8, 10]);
-		case 'Kalorienaufnahme':
-			return _List_fromArray(
-				[0, 1000, 1500, 2000, 2500, 3000, 3500]);
-		case 'Schlafdauer':
-			return _List_fromArray(
-				[0, 2, 4, 6, 8, 10]);
-		case 'BMI':
-			return _List_fromArray(
-				[0, 15, 20, 25, 30]);
-		case 'Herzfrequenz':
-			return _List_fromArray(
-				[0, 40, 80, 100, 140]);
-		case 'Alter':
-			return _List_fromArray(
-				[0, 20, 40, 60, 80, 100]);
-		default:
-			return _List_Nil;
-	}
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $elm_community$list_extra$List$Extra$uniqueHelp = F4(
+	function (f, existing, remaining, accumulator) {
+		uniqueHelp:
+		while (true) {
+			if (!remaining.b) {
+				return $elm$core$List$reverse(accumulator);
+			} else {
+				var first = remaining.a;
+				var rest = remaining.b;
+				var computedFirst = f(first);
+				if (A2($elm$core$List$member, computedFirst, existing)) {
+					var $temp$f = f,
+						$temp$existing = existing,
+						$temp$remaining = rest,
+						$temp$accumulator = accumulator;
+					f = $temp$f;
+					existing = $temp$existing;
+					remaining = $temp$remaining;
+					accumulator = $temp$accumulator;
+					continue uniqueHelp;
+				} else {
+					var $temp$f = f,
+						$temp$existing = A2($elm$core$List$cons, computedFirst, existing),
+						$temp$remaining = rest,
+						$temp$accumulator = A2($elm$core$List$cons, first, accumulator);
+					f = $temp$f;
+					existing = $temp$existing;
+					remaining = $temp$remaining;
+					accumulator = $temp$accumulator;
+					continue uniqueHelp;
+				}
+			}
+		}
+	});
+var $elm_community$list_extra$List$Extra$unique = function (list) {
+	return A4($elm_community$list_extra$List$Extra$uniqueHelp, $elm$core$Basics$identity, _List_Nil, list, _List_Nil);
 };
-var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
@@ -7113,313 +6438,302 @@ var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
 var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
-var $author$project$Main$scatterPlotView = function (model) {
-	var yTicks = $author$project$Main$ticksForAxis(model.selectedY);
-	var xTicks = $author$project$Main$ticksForAxis(model.selectedX);
-	var plotWidth = 800;
-	var plotPaddingLeft = 80;
-	var plotPadding = 40;
-	var plotHeight = 500;
-	var xAxis = A2(
-		$elm$svg$Svg$line,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x1(
-				$elm$core$String$fromFloat(plotPaddingLeft)),
-				$elm$svg$Svg$Attributes$y1(
-				$elm$core$String$fromFloat(plotHeight - plotPadding)),
-				$elm$svg$Svg$Attributes$x2(
-				$elm$core$String$fromFloat(plotWidth - plotPadding)),
-				$elm$svg$Svg$Attributes$y2(
-				$elm$core$String$fromFloat(plotHeight - plotPadding)),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$strokeWidth('2')
-			]),
-		_List_Nil);
-	var xLabel = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x(
-				$elm$core$String$fromFloat(plotWidth / 2)),
-				$elm$svg$Svg$Attributes$y(
-				$elm$core$String$fromFloat(plotHeight)),
-				$elm$svg$Svg$Attributes$textAnchor('middle'),
-				$elm$svg$Svg$Attributes$fontSize('16'),
-				$elm$svg$Svg$Attributes$fontWeight('bold')
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(model.selectedX)
-			]));
-	var yAxis = A2(
-		$elm$svg$Svg$line,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x1(
-				$elm$core$String$fromFloat(plotPaddingLeft)),
-				$elm$svg$Svg$Attributes$y1(
-				$elm$core$String$fromFloat(plotHeight - plotPadding)),
-				$elm$svg$Svg$Attributes$x2(
-				$elm$core$String$fromFloat(plotPaddingLeft)),
-				$elm$svg$Svg$Attributes$y2(
-				$elm$core$String$fromFloat(plotPadding)),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$strokeWidth('2')
-			]),
-		_List_Nil);
-	var yLabel = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('20'),
-				$elm$svg$Svg$Attributes$y(
-				$elm$core$String$fromFloat(plotHeight / 2)),
-				$elm$svg$Svg$Attributes$transform(
-				'rotate(-90 20 ' + ($elm$core$String$fromFloat(plotHeight / 2) + ')')),
-				$elm$svg$Svg$Attributes$textAnchor('middle'),
-				$elm$svg$Svg$Attributes$fontSize('16'),
-				$elm$svg$Svg$Attributes$fontWeight('bold')
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(model.selectedY)
-			]));
-	var minY = 0;
-	var minX = 0;
-	var filteredData = A2(
-		$elm$core$List$filter,
-		function (dp) {
-			return (model.showMale && (dp.gender === 'Male')) || (model.showFemale && (dp.gender === 'Female'));
+var $author$project$Mehrdimensionale$svgParallel = function (people) {
+	var sleepDisorders = $elm_community$list_extra$List$Extra$unique(
+		A2(
+			$elm$core$List$map,
+			function ($) {
+				return $.sleepDisorder;
+			},
+			people));
+	var occupations = $elm_community$list_extra$List$Extra$unique(
+		A2(
+			$elm$core$List$map,
+			function ($) {
+				return $.occupation;
+			},
+			people));
+	var h = 500;
+	var scaleY = F3(
+		function (minV, maxV, val) {
+			return h - (((val - minV) / (maxV - minV)) * h);
+		});
+	var color = function (occ) {
+		switch (occ) {
+			case 'Doctor':
+				return 'blue';
+			case 'Software Engineer':
+				return 'green';
+			case 'Sales Representative':
+				return 'red';
+			default:
+				return 'gray';
+		}
+	};
+	var axisX = function (idx) {
+		return 50 + (idx * 150);
+	};
+	var axisIndex = F2(
+		function (str, list) {
+			return A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A2($elm_community$list_extra$List$Extra$elemIndex, str, list));
+		});
+	var axes = _List_fromArray(
+		[
+			{
+			getValue: function (p) {
+				return A2(axisIndex, p.occupation, occupations);
+			},
+			max: $elm$core$List$length(occupations) - 1,
+			min: 0,
+			name: 'Occupation',
+			tickLabels: occupations
 		},
-		model.data);
-	var xs = A2(
-		$elm$core$List$map,
-		function (dp) {
-			return A2($author$project$Main$getValueForAxis, dp, model.selectedX);
+			{
+			getValue: function (p) {
+				return A2(axisIndex, p.sleepDisorder, sleepDisorders);
+			},
+			max: $elm$core$List$length(sleepDisorders) - 1,
+			min: 0,
+			name: 'Sleep Disorder',
+			tickLabels: sleepDisorders
 		},
-		filteredData);
-	var maxX = A2(
-		$elm$core$Maybe$withDefault,
-		1,
-		$elm$core$List$maximum(xs));
-	var scaleX = function (x) {
-		return plotPaddingLeft + (((x - minX) / (maxX - minX)) * ((plotWidth - plotPaddingLeft) - plotPadding));
-	};
-	var tickLabelX = function (v) {
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(
-						scaleX(v))),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat((plotHeight - plotPadding) + 20)),
-					$elm$svg$Svg$Attributes$textAnchor('middle')
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(
-					$elm$core$String$fromFloat(v))
-				]));
-	};
-	var tickLineX = function (v) {
-		return A2(
-			$elm$svg$Svg$line,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x1(
-					$elm$core$String$fromFloat(
-						scaleX(v))),
-					$elm$svg$Svg$Attributes$y1(
-					$elm$core$String$fromFloat(plotHeight - plotPadding)),
-					$elm$svg$Svg$Attributes$x2(
-					$elm$core$String$fromFloat(
-						scaleX(v))),
-					$elm$svg$Svg$Attributes$y2(
-					$elm$core$String$fromFloat((plotHeight - plotPadding) + 5)),
-					$elm$svg$Svg$Attributes$stroke('black')
-				]),
-			_List_Nil);
-	};
-	var ys = A2(
-		$elm$core$List$map,
-		function (dp) {
-			return A2($author$project$Main$getValueForAxis, dp, model.selectedY);
+			{
+			getValue: function (p) {
+				return p.stress;
+			},
+			max: 10,
+			min: 0,
+			name: 'Stress',
+			tickLabels: A2(
+				$elm$core$List$map,
+				$elm$core$String$fromInt,
+				A2($elm$core$List$range, 0, 10))
 		},
-		filteredData);
-	var maxY = A2(
-		$elm$core$Maybe$withDefault,
-		1,
-		$elm$core$List$maximum(ys));
-	var scaleY = function (y) {
-		return (plotHeight - plotPadding) - (((y - minY) / (maxY - minY)) * (plotHeight - (2 * plotPadding)));
-	};
-	var tickLabelY = function (v) {
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(plotPaddingLeft - 10)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat(
-						scaleY(v) + 5)),
-					$elm$svg$Svg$Attributes$textAnchor('end')
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(
-					$elm$core$String$fromFloat(v))
-				]));
-	};
-	var tickLineY = function (v) {
-		return A2(
-			$elm$svg$Svg$line,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x1(
-					$elm$core$String$fromFloat(plotPaddingLeft - 5)),
-					$elm$svg$Svg$Attributes$y1(
-					$elm$core$String$fromFloat(
-						scaleY(v))),
-					$elm$svg$Svg$Attributes$x2(
-					$elm$core$String$fromFloat(plotPaddingLeft)),
-					$elm$svg$Svg$Attributes$y2(
-					$elm$core$String$fromFloat(
-						scaleY(v))),
-					$elm$svg$Svg$Attributes$stroke('black')
-				]),
-			_List_Nil);
-	};
-	var color = function (dp) {
-		return (dp.gender === 'Male') ? '#2D68C4' : ((dp.gender === 'Female') ? '#DE5D83' : 'gray');
-	};
-	return A2(
-		$elm$html$Html$div,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$svg,
+			{
+			getValue: function (p) {
+				return p.systolic;
+			},
+			max: 160,
+			min: 90,
+			name: 'Blood Pressure',
+			tickLabels: A2(
+				$elm$core$List$map,
+				$elm$core$String$fromInt,
 				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$width(
-						$elm$core$String$fromFloat(plotWidth)),
-						$elm$svg$Svg$Attributes$height(
-						$elm$core$String$fromFloat(plotHeight))
-					]),
-				_Utils_ap(
-					A2(
-						$elm$core$List$map,
-						function (dp) {
-							return A2(
-								$elm$svg$Svg$circle,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$cx(
-										$elm$core$String$fromFloat(
-											scaleX(
-												A2($author$project$Main$getValueForAxis, dp, model.selectedX)))),
-										$elm$svg$Svg$Attributes$cy(
-										$elm$core$String$fromFloat(
-											scaleY(
-												A2($author$project$Main$getValueForAxis, dp, model.selectedY)))),
-										$elm$svg$Svg$Attributes$r('5'),
-										$elm$svg$Svg$Attributes$fill(
-										color(dp))
-									]),
-								_List_Nil);
-						},
-						filteredData),
-					_Utils_ap(
-						_List_fromArray(
-							[xAxis, yAxis, xLabel, yLabel]),
-						_Utils_ap(
-							A2($elm$core$List$map, tickLineX, xTicks),
-							_Utils_ap(
-								A2($elm$core$List$map, tickLineY, yTicks),
-								_Utils_ap(
-									A2($elm$core$List$map, tickLabelX, xTicks),
-									A2($elm$core$List$map, tickLabelY, yTicks)))))))
-			]));
-};
-var $author$project$Main$view = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'font-family', 'Arial, sans-serif'),
-				A2($elm$html$Html$Attributes$style, 'margin', '20px')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('X-ACHSE: '),
-						$author$project$Main$axisSelectX(model.selectedX)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Y-ACHSE: '),
-						$author$project$Main$axisSelectY(model.selectedY)
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin', '10px 0')
-					]),
-				_List_fromArray(
-					[
+					[90, 100, 110, 120, 130, 140, 150, 160]))
+		}
+		]);
+	var axisLabels = A2(
+		$elm$core$List$indexedMap,
+		F2(
+			function (i, axis) {
+				return A2(
+					$elm$svg$Svg$text_,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x(
+							$elm$core$String$fromInt(
+								axisX(i))),
+							$elm$svg$Svg$Attributes$y(
+							$elm$core$String$fromInt(h + 30)),
+							$elm$svg$Svg$Attributes$fontSize('14'),
+							$elm$svg$Svg$Attributes$textAnchor('middle')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(axis.name)
+						]));
+			}),
+		axes);
+	var axisLines = A2(
+		$elm$core$List$indexedMap,
+		F2(
+			function (i, _v1) {
+				return A2(
+					$elm$svg$Svg$line,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x1(
+							$elm$core$String$fromInt(
+								axisX(i))),
+							$elm$svg$Svg$Attributes$y1('0'),
+							$elm$svg$Svg$Attributes$x2(
+							$elm$core$String$fromInt(
+								axisX(i))),
+							$elm$svg$Svg$Attributes$y2(
+							$elm$core$String$fromInt(h)),
+							$elm$svg$Svg$Attributes$stroke('black'),
+							$elm$svg$Svg$Attributes$strokeWidth('1')
+						]),
+					_List_Nil);
+			}),
+		axes);
+	var axisTicks = $elm$core$List$concat(
+		A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (i, axis) {
+					return $elm$core$List$concat(
 						A2(
-						$elm$html$Html$button,
+							$elm$core$List$indexedMap,
+							F2(
+								function (j, label) {
+									var val = axis.min + ((j / ($elm$core$List$length(axis.tickLabels) - 1)) * (axis.max - axis.min));
+									var y = A3(scaleY, axis.min, axis.max, val);
+									var tickLine = A2(
+										$elm$svg$Svg$line,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$x1(
+												$elm$core$String$fromInt(
+													axisX(i) - 5)),
+												$elm$svg$Svg$Attributes$y1(
+												$elm$core$String$fromFloat(y)),
+												$elm$svg$Svg$Attributes$x2(
+												$elm$core$String$fromInt(
+													axisX(i) + 5)),
+												$elm$svg$Svg$Attributes$y2(
+												$elm$core$String$fromFloat(y)),
+												$elm$svg$Svg$Attributes$stroke('black'),
+												$elm$svg$Svg$Attributes$strokeWidth('1')
+											]),
+										_List_Nil);
+									var tickLabel = A2(
+										$elm$svg$Svg$text_,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$x(
+												$elm$core$String$fromInt(
+													axisX(i) - 10)),
+												$elm$svg$Svg$Attributes$y(
+												$elm$core$String$fromFloat(y + 4)),
+												$elm$svg$Svg$Attributes$fontSize('12'),
+												$elm$svg$Svg$Attributes$textAnchor('end')
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(label)
+											]));
+									return _List_fromArray(
+										[tickLine, tickLabel]);
+								}),
+							axis.tickLabels));
+				}),
+			axes));
+	var personLine = function (p) {
+		var points = A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (i, axis) {
+					var val = axis.getValue(p);
+					return _Utils_Tuple2(
+						axisX(i),
+						A3(scaleY, axis.min, axis.max, val));
+				}),
+			axes);
+		return A2(
+			$elm$svg$Svg$polyline,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points(
+					A2(
+						$elm$core$String$join,
+						' ',
+						A2(
+							$elm$core$List$map,
+							function (_v0) {
+								var x = _v0.a;
+								var y = _v0.b;
+								return $elm$core$String$fromInt(x) + (',' + $elm$core$String$fromFloat(y));
+							},
+							points))),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$stroke(
+					color(p.occupation)),
+					$elm$svg$Svg$Attributes$strokeWidth('1.5'),
+					$elm$svg$Svg$Attributes$strokeOpacity('0.6')
+				]),
+			_List_Nil);
+	};
+	var personPoints = function (p) {
+		return A2(
+			$elm$core$List$indexedMap,
+			F2(
+				function (i, axis) {
+					var val = axis.getValue(p);
+					return A2(
+						$elm$svg$Svg$circle,
 						_List_fromArray(
 							[
-								$elm$html$Html$Events$onClick($author$project$Main$TogglePlot)
+								$elm$svg$Svg$Attributes$cx(
+								$elm$core$String$fromInt(
+									axisX(i))),
+								$elm$svg$Svg$Attributes$cy(
+								$elm$core$String$fromFloat(
+									A3(scaleY, axis.min, axis.max, val))),
+								$elm$svg$Svg$Attributes$r('4'),
+								$elm$svg$Svg$Attributes$fill(
+								color(p.occupation)),
+								$elm$svg$Svg$Attributes$stroke('black'),
+								$elm$svg$Svg$Attributes$strokeWidth('0.5')
 							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								model.showPlot ? 'PLOT VERBERGEN' : 'PLOT ANZEIGEN')
-							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px'),
-						A2($elm$html$Html$Attributes$style, 'padding-left', '20px')
-					]),
-				_List_fromArray(
-					[
-						A3($author$project$Main$labelCheckbox, 'MÄNNER', model.showMale, $author$project$Main$ToggleMale),
-						A3($author$project$Main$labelCheckbox, 'FRAUEN', model.showFemale, $author$project$Main$ToggleFemale)
-					])),
-				model.showPlot ? $author$project$Main$scatterPlotView(model) : $elm$html$Html$text('')
-			]));
+						_List_Nil);
+				}),
+			axes);
+	};
+	var w = $elm$core$List$length(axes) * 150;
+	return A2(
+		$elm$svg$Svg$svg,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$width(
+				$elm$core$String$fromInt(w)),
+				$elm$svg$Svg$Attributes$height(
+				$elm$core$String$fromInt(h + 50))
+			]),
+		_Utils_ap(
+			axisLines,
+			_Utils_ap(
+				axisTicks,
+				_Utils_ap(
+					A2($elm$core$List$concatMap, personPoints, people),
+					_Utils_ap(
+						A2($elm$core$List$map, personLine, people),
+						axisLabels)))));
 };
-var $author$project$Main$main = $elm$browser$Browser$element(
+var $author$project$Mehrdimensionale$view = function (model) {
+	var _v0 = model.error;
+	if (_v0.$ === 'Just') {
+		var err = _v0.a;
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Status: ' + err),
+					$author$project$Mehrdimensionale$svgParallel(model.people)
+				]));
+	} else {
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Loading...')
+				]));
+	}
+};
+var $author$project$Mehrdimensionale$main = $elm$browser$Browser$element(
 	{
-		init: $author$project$Main$init,
+		init: $author$project$Mehrdimensionale$init,
 		subscriptions: function (_v0) {
 			return $elm$core$Platform$Sub$none;
 		},
-		update: $author$project$Main$update,
-		view: $author$project$Main$view
+		update: $author$project$Mehrdimensionale$update,
+		view: $author$project$Mehrdimensionale$view
 	});
-_Platform_export({'Main':{'init':$author$project$Main$main(
+_Platform_export({'Mehrdimensionale':{'init':$author$project$Mehrdimensionale$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
