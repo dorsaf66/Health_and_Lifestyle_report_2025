@@ -8,7 +8,10 @@ import Html.Attributes as HtmlAttr
 import Html.Events as HtmlEvents
 import Svg exposing (..)
 import Svg.Attributes as SvgAttr
+import Svg.Events as SvgEvents
 import String
+import Maybe exposing (withDefault)
+import Debug
 
 
 -- MODEL
@@ -37,32 +40,33 @@ type alias Model =
     , showPlot : Bool
     , showMale : Bool
     , showFemale : Bool
+    , hoveredPoint : Maybe Person
     }
 
 
 -- CSV PARSING
 
-rowToPerson : List String -> Maybe Person
+rowToPerson : List String -> Person
 rowToPerson row =
-    case row of
-        idStr :: genderStr :: ageStr :: occupationStr :: sleepDurationStr :: sleepQualityStr :: physicalActivityLevelStr :: stressLevelStr :: bmiStr :: bloodPressureStr :: heartRateStr  :: dailyStepsStr :: sleepDisorderStr :: [] ->
-            Just
-                { id = String.toInt idStr |> Maybe.withDefault 0
-                , gender = genderStr
-                , age = String.toInt ageStr |> Maybe.withDefault 0
-                , occupation = occupationStr
-                , sleepDuration = String.toFloat sleepDurationStr |> Maybe.withDefault 0
-                , sleepQuality = String.toInt sleepQualityStr |> Maybe.withDefault 0
-                , physicalActivityLevel = String.toInt physicalActivityLevelStr |> Maybe.withDefault 0
-                , stressLevel = String.toInt stressLevelStr |> Maybe.withDefault 0
-                , bmi = bmiStr
-                , bloodPressure = bloodPressureStr
-                , heartRate = String.toInt heartRateStr |> Maybe.withDefault 0
-                , dailySteps = String.toInt dailyStepsStr |> Maybe.withDefault 0
-                , sleepDisorder = sleepDisorderStr
-                }
-        _ ->
-            Nothing
+    let
+        get i = List.head (List.drop i row) |> withDefault ""
+        toInt s = String.toInt s |> withDefault 0
+        toFloatSafe s = String.toFloat s |> withDefault 0
+    in
+    { id = toInt (get 0)
+    , gender = get 1
+    , age = toInt (get 2)
+    , occupation = get 3
+    , sleepDuration = toFloatSafe (get 4)
+    , sleepQuality = toInt (get 5)
+    , physicalActivityLevel = toInt (get 6)
+    , stressLevel = toInt (get 7)
+    , bmi = get 8
+    , bloodPressure = get 9
+    , heartRate = toInt (get 10)
+    , dailySteps = toInt (get 11)
+    , sleepDisorder = get 12
+    }
 
 
 -- INIT
@@ -70,11 +74,12 @@ rowToPerson row =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { data = []
-      , selectedX = "Stresslevel"
-      , selectedY = "Schlafdauer"
+      , selectedX = "Physical Activity"
+      , selectedY = "Sleep Duration"
       , showPlot = True
       , showMale = True
       , showFemale = True
+      , hoveredPoint = Nothing
       }
     , loadCsv
     )
@@ -88,7 +93,6 @@ loadCsv =
         }
 
 
-
 -- UPDATE
 
 type Msg
@@ -98,6 +102,7 @@ type Msg
     | CsvLoaded (Result Http.Error String)
     | ToggleMale Bool
     | ToggleFemale Bool
+    | ClickPoint Person
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -123,7 +128,8 @@ update msg model =
                 Ok rows ->
                     let
                         dataRows = List.drop 1 rows
-                        persons = List.filterMap rowToPerson dataRows
+                        persons = List.map rowToPerson dataRows
+                        _ = Debug.log ("Loaded persons: " ++ String.fromInt (List.length persons)) persons
                     in
                     ( { model | data = persons }, Cmd.none )
 
@@ -133,6 +139,9 @@ update msg model =
         CsvLoaded (Err _) ->
             ( model, Cmd.none )
 
+        ClickPoint dp ->
+            ( { model | hoveredPoint = Just dp }, Cmd.none )
+
 
 -- VIEW
 
@@ -140,20 +149,20 @@ view : Model -> Html Msg
 view model =
     div [ HtmlAttr.style "font-family" "Arial, sans-serif", HtmlAttr.style "margin" "20px" ]
         [ div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ Html.text "X-ACHSE: "
+            [ Html.text "X-AXIS: "
             , axisSelectX model.selectedX
             ]
         , div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ Html.text "Y-ACHSE: "
+            [ Html.text "Y-AXIS: "
             , axisSelectY model.selectedY
             ]
         , div [ HtmlAttr.style "margin" "10px 0" ]
             [ button [ HtmlEvents.onClick TogglePlot ]
-                [ Html.text (if model.showPlot then "PLOT VERBERGEN" else "PLOT ANZEIGEN") ]
+                [ Html.text (if model.showPlot then "HIDE PLOT" else "SHOW PLOT") ]
             ]
         , div [ HtmlAttr.style "margin-bottom" "10px", HtmlAttr.style "padding-left" "20px" ]
-            [ labelCheckbox "MÄNNER" model.showMale ToggleMale
-            , labelCheckbox "FRAUEN" model.showFemale ToggleFemale
+            [ labelCheckbox "MALE" model.showMale ToggleMale
+            , labelCheckbox "FEMALE" model.showFemale ToggleFemale
             ]
         , if model.showPlot then
             scatterPlotView model
@@ -173,118 +182,132 @@ labelCheckbox labelText checked toMsg =
 axisSelectX : String -> Html Msg
 axisSelectX selected =
     select [ HtmlEvents.onInput ChangeX ]
-        [ option [ HtmlAttr.value "Schlafdauer", HtmlAttr.selected (selected == "Schlafdauer") ] [ Html.text "Schlafdauer" ]
-        , option [ HtmlAttr.value "Schritte", HtmlAttr.selected (selected == "Schritte") ] [ Html.text "Schritte" ]
-        -- , option [ HtmlAttr.value "Trainingsstunden (pro Woche)", HtmlAttr.selected (selected == "Trainingsstunden (pro Woche)") ] [ Html.text "Trainingsstunden (pro Woche)" ]
-        -- , option [ HtmlAttr.value "Kalorienaufnahme", HtmlAttr.selected (selected == "Kalorienaufnahme") ] [ Html.text "Kalorienaufnahme" ]
-        -- , option [ HtmlAttr.value "Alter", HtmlAttr.selected (selected == "Alter") ] [ Html.text "Alter" ]
+        [ option [ HtmlAttr.value "Physical Activity", HtmlAttr.selected (selected == "Physical Activity") ] [ Html.text "Physical Activity" ]
+        , option [ HtmlAttr.value "Daily Steps", HtmlAttr.selected (selected == "Daily Steps") ] [ Html.text "Daily Steps" ]
         ]
 
 
 axisSelectY : String -> Html Msg
 axisSelectY selected =
     select [ HtmlEvents.onInput ChangeY ]
-        [ option [ HtmlAttr.value "Stresslevel", HtmlAttr.selected (selected == "Stresslevel") ] [ Html.text "Stresslevel" ]
-        , option [ HtmlAttr.value "Herzfrequenz", HtmlAttr.selected (selected == "Herzfrequenz") ] [ Html.text "Herzfrequenz" ]
-        -- , option [ HtmlAttr.value "Herzfrequenz", HtmlAttr.selected (selected == "Herzfrequenz") ] [ Html.text "Herzfrequenz" ]
+        [ option [ HtmlAttr.value "Sleep Duration", HtmlAttr.selected (selected == "Sleep Duration") ] [ Html.text "Sleep Duration" ]
+        , option [ HtmlAttr.value "Heart Rate", HtmlAttr.selected (selected == "Heart Rate") ] [ Html.text "Heart Rate" ]
+        , option [ HtmlAttr.value "BMI Category", HtmlAttr.selected (selected == "BMI Category") ] [ Html.text "BMI Category" ]
         ]
 
 
--- HILFSFUNKTION
+-- HILFSFUNKTIONEN
 
 getValueForAxis : Person -> String -> Float
 getValueForAxis dp axis =
     case axis of
-        "Schlafdauer" -> dp.sleepDuration
-        "Stresslevel" -> toFloat dp.stressLevel
-        "Schritte" -> toFloat dp.dailySteps
-        -- "BMI" -> dp.bmi
-        -- "Trainingsstunden (pro Woche)" -> dp.exerciseHours
-        "Herzfrequenz" -> toFloat dp.heartRate
-        -- "Alter" -> toFloat dp.age
+        "Sleep Duration" -> dp.sleepDuration
+        "Daily Steps" -> toFloat dp.dailySteps
+        "Physical Activity" -> toFloat dp.physicalActivityLevel
+        "Heart Rate" -> toFloat dp.heartRate
+        "BMI Category" ->
+            case String.toLower dp.bmi of
+                "underweight" -> 1
+                "normal" -> 2
+                "overweight" -> 3
+                "obese" -> 4
+                _ -> 0
         _ -> 0
+
+
+ticksForAxis : String -> List Float -> List Float
+ticksForAxis axis values =
+    let
+        minVal = List.minimum values |> withDefault 0
+        maxVal = List.maximum values |> withDefault (minVal + 10)
+        step = (maxVal - minVal) / 4
+    in
+    List.map (\i -> minVal + step * toFloat i) [0,1,2,3,4]
 
 
 -- SCATTERPLOT
 
-width : Float
-width = 800
-
-height : Float
-height = 600
-
-padding : Float
-padding = 65
-
-
-ticksForAxis : String -> List Float
-ticksForAxis axis =
-    case axis of
-        "Stresslevel" -> [ 0, 2, 4, 6, 8, 10 ]
-        "Schritte" -> [ 0, 5000, 10000, 15000, 20000 ]
-        "Alkoholkonsum (pro Woche)" -> [ 0, 2, 4, 6, 8, 10 ]
-        "Trainingsstunden (pro Woche)" -> [ 0, 2, 4, 6, 8, 10 ]
-        "Kalorienaufnahme" -> [ 0, 1000, 1500, 2000, 2500, 3000, 3500 ]
-        "Schlafdauer" -> [ 0, 2, 4, 6, 8, 10 ]
-        "BMI" -> [ 0, 15, 20, 25, 30 ]
-        "Herzfrequenz" -> [ 0, 40, 80, 100, 140 ]
-        "Alter" -> [ 0, 20, 40, 60, 80, 100 ]
-        _ -> []
-
-
 scatterPlotView : Model -> Html Msg
 scatterPlotView model =
     let
+        genderMatches dp =
+            let g = String.toLower dp.gender in
+            ((model.showMale && (g == "male" || g == "m")) ||
+             (model.showFemale && (g == "female" || g == "f")))
+
         filteredData =
-            List.filter
-                (\dp ->
-                    ((model.showMale && dp.gender == "Male") || (model.showFemale && dp.gender == "Female"))
-                )
-                model.data
+            List.filter genderMatches model.data
 
         xs = List.map (\dp -> getValueForAxis dp model.selectedX) filteredData
         ys = List.map (\dp -> getValueForAxis dp model.selectedY) filteredData
 
-        minX = 0
-        maxX = List.maximum xs |> Maybe.withDefault 1
-        minY = 0
-        maxY = List.maximum ys |> Maybe.withDefault 1
+        minX = List.minimum xs |> withDefault 0
+        maxX = List.maximum xs |> withDefault (minX + 1)
+        minY = List.minimum ys |> withDefault 0
+        maxY = List.maximum ys |> withDefault (minY + 1)
 
-        -- Umbenannte Variablen, um Shadowing zu vermeiden
-        plotPaddingLeft = 80
-        plotPadding = 40
-        plotWidth = 800
+        plotPaddingLeft = 120
+        plotPaddingRight = 40
+        plotPaddingTop = 40
+        plotPaddingBottom = 50
+        plotWidth = 1100
         plotHeight = 500
 
-        scaleX x = plotPaddingLeft + ((x - minX) / (maxX - minX)) * (plotWidth - plotPaddingLeft - plotPadding)
-        scaleY y = plotHeight - plotPadding - ((y - minY) / (maxY - minY)) * (plotHeight - 2 * plotPadding)
+        scaleX x =
+            if maxX == minX then
+                plotPaddingLeft + (plotWidth - plotPaddingLeft - plotPaddingRight)/2
+            else
+                plotPaddingLeft + ((x - minX) / (maxX - minX)) * (plotWidth - plotPaddingLeft - plotPaddingRight)
+
+        scaleY y =
+            if maxY == minY then
+                plotHeight / 2
+            else
+                plotHeight - plotPaddingBottom - ((y - minY) / (maxY - minY)) * (plotHeight - plotPaddingTop - plotPaddingBottom)
 
         color dp =
-            if dp.gender == "Male" then "#2D68C4"
-            else if dp.gender == "Female" then "#DE5D83"
+            let g = String.toLower dp.gender in
+            if g == "male" then "#2D68C4"
+            else if g == "female" then "#DE5D83"
             else "gray"
 
-        xTicks = ticksForAxis model.selectedX
-        yTicks = ticksForAxis model.selectedY
+        xTicks = ticksForAxis model.selectedX xs
+        yTicks = ticksForAxis model.selectedY ys
 
-        tickLineX v =
-            Svg.line [ SvgAttr.x1 (String.fromFloat (scaleX v)), SvgAttr.y1 (String.fromFloat (plotHeight - plotPadding)), SvgAttr.x2 (String.fromFloat (scaleX v)), SvgAttr.y2 (String.fromFloat (plotHeight - plotPadding + 5)), SvgAttr.stroke "black" ] []
-
-        tickLineY v =
-            Svg.line [ SvgAttr.x1 (String.fromFloat (plotPaddingLeft - 5)), SvgAttr.y1 (String.fromFloat (scaleY v)), SvgAttr.x2 (String.fromFloat plotPaddingLeft), SvgAttr.y2 (String.fromFloat (scaleY v)), SvgAttr.stroke "black" ] []
+        tickLabel axis v =
+            let
+                label =
+                    case axis of
+                        "BMI Category" ->
+                            case round v of
+                                1 -> "Underweight"
+                                2 -> "Normal"
+                                3 -> "Overweight"
+                                4 -> "Obese"
+                                _ -> ""
+                        _ -> String.fromFloat ((toFloat (round (v * 10))) / 10)
+            in
+            Svg.text_
+                [ SvgAttr.x (String.fromFloat (plotPaddingLeft - 10))
+                , SvgAttr.y (String.fromFloat (scaleY v))
+                , SvgAttr.textAnchor "end"
+                ]
+                [ Svg.text label ]
 
         tickLabelX v =
-            Svg.text_ [ SvgAttr.x (String.fromFloat (scaleX v)), SvgAttr.y (String.fromFloat (plotHeight - plotPadding + 20)), SvgAttr.textAnchor "middle" ] [ Svg.text (String.fromFloat v) ]
-
-        tickLabelY v =
-            Svg.text_ [ SvgAttr.x (String.fromFloat (plotPaddingLeft - 10)), SvgAttr.y (String.fromFloat (scaleY v + 5)), SvgAttr.textAnchor "end" ] [ Svg.text (String.fromFloat v) ]
+            Svg.text_
+                [ SvgAttr.x (String.fromFloat (scaleX v))
+                , SvgAttr.y (String.fromFloat (plotHeight - plotPaddingBottom + 20))
+                , SvgAttr.textAnchor "middle"
+                ]
+                [ Svg.text (String.fromFloat ((toFloat (round (v * 10))) / 10)) ]
 
         xAxis =
             Svg.line
                 [ SvgAttr.x1 (String.fromFloat plotPaddingLeft)
-                , SvgAttr.y1 (String.fromFloat (plotHeight - plotPadding))
-                , SvgAttr.x2 (String.fromFloat (plotWidth - plotPadding))
-                , SvgAttr.y2 (String.fromFloat (plotHeight - plotPadding))
+                , SvgAttr.y1 (String.fromFloat (plotHeight - plotPaddingBottom))
+                , SvgAttr.x2 (String.fromFloat (plotWidth - plotPaddingRight))
+                , SvgAttr.y2 (String.fromFloat (plotHeight - plotPaddingBottom))
                 , SvgAttr.stroke "black"
                 , SvgAttr.strokeWidth "2"
                 ]
@@ -293,9 +316,9 @@ scatterPlotView model =
         yAxis =
             Svg.line
                 [ SvgAttr.x1 (String.fromFloat plotPaddingLeft)
-                , SvgAttr.y1 (String.fromFloat (plotHeight - plotPadding))
+                , SvgAttr.y1 (String.fromFloat (plotHeight - plotPaddingBottom))
                 , SvgAttr.x2 (String.fromFloat plotPaddingLeft)
-                , SvgAttr.y2 (String.fromFloat plotPadding)
+                , SvgAttr.y2 (String.fromFloat plotPaddingTop)
                 , SvgAttr.stroke "black"
                 , SvgAttr.strokeWidth "2"
                 ]
@@ -313,26 +336,73 @@ scatterPlotView model =
 
         yLabel =
             Svg.text_
-                [ SvgAttr.x "20"
+                [ SvgAttr.x "30"
                 , SvgAttr.y (String.fromFloat (plotHeight / 2))
-                , SvgAttr.transform ("rotate(-90 20 " ++ String.fromFloat (plotHeight / 2) ++ ")")
+                , SvgAttr.transform ("rotate(-90 30 " ++ String.fromFloat (plotHeight / 2) ++ ")")
                 , SvgAttr.textAnchor "middle"
                 , SvgAttr.fontSize "16"
                 , SvgAttr.fontWeight "bold"
                 ]
                 [ Svg.text model.selectedY ]
-    in
-    Html.div []
-        [ Svg.svg [ SvgAttr.width (String.fromFloat plotWidth), SvgAttr.height (String.fromFloat plotHeight) ]
-            (List.map (\dp -> Svg.circle [ SvgAttr.cx (String.fromFloat (scaleX (getValueForAxis dp model.selectedX))), SvgAttr.cy (String.fromFloat (scaleY (getValueForAxis dp model.selectedY))), SvgAttr.r "5", SvgAttr.fill (color dp) ] []) filteredData
-                ++ [ xAxis, yAxis, xLabel, yLabel ]
-                ++ List.map tickLineX xTicks
-                ++ List.map tickLineY yTicks
-                ++ List.map tickLabelX xTicks
-                ++ List.map tickLabelY yTicks
-            )
-        ]
 
+        points =
+            List.map
+                (\dp ->
+                    let
+                        cx = scaleX (getValueForAxis dp model.selectedX)
+                        cy = scaleY (getValueForAxis dp model.selectedY)
+                    in
+                    Svg.circle
+                        [ SvgAttr.cx (String.fromFloat cx)
+                        , SvgAttr.cy (String.fromFloat cy)
+                        , SvgAttr.r "5"
+                        , SvgAttr.fill (color dp)
+                        , SvgAttr.stroke "black"
+                        , SvgAttr.strokeWidth "1"
+                        , SvgEvents.onClick (ClickPoint dp)
+                        ]
+                        []
+                )
+                filteredData
+
+        tooltipBox =
+            case model.hoveredPoint of
+                Just dp ->
+                    div [ HtmlAttr.style "margin-left" "20px"
+                        , HtmlAttr.style "padding" "10px"
+                        , HtmlAttr.style "border" "1px solid black"
+                        , HtmlAttr.style "background" "#f9f9f9"
+                        , HtmlAttr.style "width" "220px"
+                        , HtmlAttr.style "max-height" "120px"
+                        , HtmlAttr.style "overflow-y" "auto"
+                        ]
+                        [ Html.text ("ID: " ++ String.fromInt dp.id)
+                        , Html.br [] []
+                        , Html.text ("Gender: " ++ dp.gender)
+                        , Html.br [] []
+                        , Html.text ("Age: " ++ String.fromInt dp.age)
+                        , Html.br [] []
+                        , Html.text (model.selectedX ++ ": " ++ (if model.selectedX == "BMI Category" then dp.bmi else String.fromFloat (getValueForAxis dp model.selectedX)))
+                        , Html.br [] []
+                        , Html.text (model.selectedY ++ ": " ++ (if model.selectedY == "BMI Category" then dp.bmi else String.fromFloat (getValueForAxis dp model.selectedY)))
+                        ]
+
+                Nothing ->
+                    div [ HtmlAttr.style "margin-left" "20px"
+                        , HtmlAttr.style "color" "gray"
+                        ]
+                        [ Html.text "Klicke auf einen Punkt" ]
+    in
+    div [ HtmlAttr.style "display" "flex" ]
+        [ Svg.svg [ SvgAttr.width (String.fromFloat plotWidth), SvgAttr.height (String.fromFloat plotHeight) ]
+            (points ++ [ xAxis, yAxis, xLabel, yLabel ]
+                ++ List.map (\v -> Svg.line [ SvgAttr.x1 (String.fromFloat (scaleX v)), SvgAttr.y1 (String.fromFloat (plotHeight - plotPaddingBottom)), SvgAttr.x2 (String.fromFloat (scaleX v)), SvgAttr.y2 (String.fromFloat (plotHeight - plotPaddingBottom + 5)), SvgAttr.stroke "black" ] []) xTicks
+                ++ List.map (\v -> Svg.line [ SvgAttr.x1 (String.fromFloat (plotPaddingLeft - 5)), SvgAttr.y1 (String.fromFloat (scaleY v)), SvgAttr.x2 (String.fromFloat plotPaddingLeft), SvgAttr.y2 (String.fromFloat (scaleY v)), SvgAttr.stroke "black" ] []) yTicks
+                ++ List.map tickLabelX xTicks
+                ++ List.map (tickLabel model.selectedY) yTicks
+            )
+        , tooltipBox
+        ]
 
 
 -- MAIN

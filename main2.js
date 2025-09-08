@@ -6123,7 +6123,7 @@ var $author$project$Main$loadCsv = $elm$http$Http$get(
 	});
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{data: _List_Nil, selectedX: 'Stresslevel', selectedY: 'Schlafdauer', showFemale: true, showMale: true, showPlot: true},
+		{data: _List_Nil, hoveredPoint: $elm$core$Maybe$Nothing, selectedX: 'Physical Activity', selectedY: 'Sleep Duration', showFemale: true, showMale: true, showPlot: true},
 		$author$project$Main$loadCsv);
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -6149,6 +6149,7 @@ var $elm$core$List$drop = F2(
 			}
 		}
 	});
+var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Basics$not = _Basics_not;
@@ -6682,6 +6683,15 @@ var $BrianHicks$elm_csv$Csv$Parser$parse = F2(
 			0,
 			0)));
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $elm$core$String$toFloat = _String_toFloat;
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
@@ -6693,75 +6703,48 @@ var $elm$core$Maybe$withDefault = F2(
 		}
 	});
 var $author$project$Main$rowToPerson = function (row) {
-	if (((((((((((((row.b && row.b.b) && row.b.b.b) && row.b.b.b.b) && row.b.b.b.b.b) && row.b.b.b.b.b.b) && row.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b) && row.b.b.b.b.b.b.b.b.b.b.b.b.b) && (!row.b.b.b.b.b.b.b.b.b.b.b.b.b.b)) {
-		var idStr = row.a;
-		var _v1 = row.b;
-		var genderStr = _v1.a;
-		var _v2 = _v1.b;
-		var ageStr = _v2.a;
-		var _v3 = _v2.b;
-		var occupationStr = _v3.a;
-		var _v4 = _v3.b;
-		var sleepDurationStr = _v4.a;
-		var _v5 = _v4.b;
-		var sleepQualityStr = _v5.a;
-		var _v6 = _v5.b;
-		var physicalActivityLevelStr = _v6.a;
-		var _v7 = _v6.b;
-		var stressLevelStr = _v7.a;
-		var _v8 = _v7.b;
-		var bmiStr = _v8.a;
-		var _v9 = _v8.b;
-		var bloodPressureStr = _v9.a;
-		var _v10 = _v9.b;
-		var heartRateStr = _v10.a;
-		var _v11 = _v10.b;
-		var dailyStepsStr = _v11.a;
-		var _v12 = _v11.b;
-		var sleepDisorderStr = _v12.a;
-		return $elm$core$Maybe$Just(
-			{
-				age: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(ageStr)),
-				bloodPressure: bloodPressureStr,
-				bmi: bmiStr,
-				dailySteps: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(dailyStepsStr)),
-				gender: genderStr,
-				heartRate: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(heartRateStr)),
-				id: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(idStr)),
-				occupation: occupationStr,
-				physicalActivityLevel: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(physicalActivityLevelStr)),
-				sleepDisorder: sleepDisorderStr,
-				sleepDuration: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toFloat(sleepDurationStr)),
-				sleepQuality: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(sleepQualityStr)),
-				stressLevel: A2(
-					$elm$core$Maybe$withDefault,
-					0,
-					$elm$core$String$toInt(stressLevelStr))
-			});
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
+	var toInt = function (s) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$String$toInt(s));
+	};
+	var toFloatSafe = function (s) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$String$toFloat(s));
+	};
+	var get = function (i) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			'',
+			$elm$core$List$head(
+				A2($elm$core$List$drop, i, row)));
+	};
+	return {
+		age: toInt(
+			get(2)),
+		bloodPressure: get(9),
+		bmi: get(8),
+		dailySteps: toInt(
+			get(11)),
+		gender: get(1),
+		heartRate: toInt(
+			get(10)),
+		id: toInt(
+			get(0)),
+		occupation: get(3),
+		physicalActivityLevel: toInt(
+			get(6)),
+		sleepDisorder: get(12),
+		sleepDuration: toFloatSafe(
+			get(4)),
+		sleepQuality: toInt(
+			get(5)),
+		stressLevel: toInt(
+			get(7))
+	};
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -6800,7 +6783,7 @@ var $author$project$Main$update = F2(
 						model,
 						{showFemale: val}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'CsvLoaded':
 				if (msg.a.$ === 'Ok') {
 					var csvString = msg.a.a;
 					var _v1 = A2(
@@ -6812,7 +6795,12 @@ var $author$project$Main$update = F2(
 					if (_v1.$ === 'Ok') {
 						var rows = _v1.a;
 						var dataRows = A2($elm$core$List$drop, 1, rows);
-						var persons = A2($elm$core$List$filterMap, $author$project$Main$rowToPerson, dataRows);
+						var persons = A2($elm$core$List$map, $author$project$Main$rowToPerson, dataRows);
+						var _v2 = A2(
+							$elm$core$Debug$log,
+							'Loaded persons: ' + $elm$core$String$fromInt(
+								$elm$core$List$length(persons)),
+							persons);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -6824,6 +6812,15 @@ var $author$project$Main$update = F2(
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
+			default:
+				var dp = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							hoveredPoint: $elm$core$Maybe$Just(dp)
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$ToggleFemale = function (a) {
@@ -6905,23 +6902,23 @@ var $author$project$Main$axisSelectX = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Schlafdauer'),
-						$elm$html$Html$Attributes$selected(selected === 'Schlafdauer')
+						$elm$html$Html$Attributes$value('Physical Activity'),
+						$elm$html$Html$Attributes$selected(selected === 'Physical Activity')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Schlafdauer')
+						$elm$html$Html$text('Physical Activity')
 					])),
 				A2(
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Schritte'),
-						$elm$html$Html$Attributes$selected(selected === 'Schritte')
+						$elm$html$Html$Attributes$value('Daily Steps'),
+						$elm$html$Html$Attributes$selected(selected === 'Daily Steps')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Schritte')
+						$elm$html$Html$text('Daily Steps')
 					]))
 			]));
 };
@@ -6941,23 +6938,34 @@ var $author$project$Main$axisSelectY = function (selected) {
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Stresslevel'),
-						$elm$html$Html$Attributes$selected(selected === 'Stresslevel')
+						$elm$html$Html$Attributes$value('Sleep Duration'),
+						$elm$html$Html$Attributes$selected(selected === 'Sleep Duration')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Stresslevel')
+						$elm$html$Html$text('Sleep Duration')
 					])),
 				A2(
 				$elm$html$Html$option,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$value('Herzfrequenz'),
-						$elm$html$Html$Attributes$selected(selected === 'Herzfrequenz')
+						$elm$html$Html$Attributes$value('Heart Rate'),
+						$elm$html$Html$Attributes$selected(selected === 'Heart Rate')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Herzfrequenz')
+						$elm$html$Html$text('Heart Rate')
+					])),
+				A2(
+				$elm$html$Html$option,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$value('BMI Category'),
+						$elm$html$Html$Attributes$selected(selected === 'BMI Category')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('BMI Category')
 					]))
 			]));
 };
@@ -7019,6 +7027,10 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $author$project$Main$ClickPoint = function (a) {
+	return {$: 'ClickPoint', a: a};
+};
+var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
@@ -7038,17 +7050,32 @@ var $elm$core$List$filter = F2(
 var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
 var $elm$svg$Svg$Attributes$fontWeight = _VirtualDom_attribute('font-weight');
 var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$core$String$toLower = _String_toLower;
 var $author$project$Main$getValueForAxis = F2(
 	function (dp, axis) {
 		switch (axis) {
-			case 'Schlafdauer':
+			case 'Sleep Duration':
 				return dp.sleepDuration;
-			case 'Stresslevel':
-				return dp.stressLevel;
-			case 'Schritte':
+			case 'Daily Steps':
 				return dp.dailySteps;
-			case 'Herzfrequenz':
+			case 'Physical Activity':
+				return dp.physicalActivityLevel;
+			case 'Heart Rate':
 				return dp.heartRate;
+			case 'BMI Category':
+				var _v1 = $elm$core$String$toLower(dp.bmi);
+				switch (_v1) {
+					case 'underweight':
+						return 1;
+					case 'normal':
+						return 2;
+					case 'overweight':
+						return 3;
+					case 'obese':
+						return 4;
+					default:
+						return 0;
+				}
 			default:
 				return 0;
 		}
@@ -7065,46 +7092,53 @@ var $elm$core$List$maximum = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$svg$Svg$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $elm$core$Basics$round = _Basics_round;
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$textAnchor = _VirtualDom_attribute('text-anchor');
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $author$project$Main$ticksForAxis = function (axis) {
-	switch (axis) {
-		case 'Stresslevel':
-			return _List_fromArray(
-				[0, 2, 4, 6, 8, 10]);
-		case 'Schritte':
-			return _List_fromArray(
-				[0, 5000, 10000, 15000, 20000]);
-		case 'Alkoholkonsum (pro Woche)':
-			return _List_fromArray(
-				[0, 2, 4, 6, 8, 10]);
-		case 'Trainingsstunden (pro Woche)':
-			return _List_fromArray(
-				[0, 2, 4, 6, 8, 10]);
-		case 'Kalorienaufnahme':
-			return _List_fromArray(
-				[0, 1000, 1500, 2000, 2500, 3000, 3500]);
-		case 'Schlafdauer':
-			return _List_fromArray(
-				[0, 2, 4, 6, 8, 10]);
-		case 'BMI':
-			return _List_fromArray(
-				[0, 15, 20, 25, 30]);
-		case 'Herzfrequenz':
-			return _List_fromArray(
-				[0, 40, 80, 100, 140]);
-		case 'Alter':
-			return _List_fromArray(
-				[0, 20, 40, 60, 80, 100]);
-		default:
-			return _List_Nil;
-	}
-};
+var $author$project$Main$ticksForAxis = F2(
+	function (axis, values) {
+		var minVal = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$List$minimum(values));
+		var maxVal = A2(
+			$elm$core$Maybe$withDefault,
+			minVal + 10,
+			$elm$core$List$maximum(values));
+		var step = (maxVal - minVal) / 4;
+		return A2(
+			$elm$core$List$map,
+			function (i) {
+				return minVal + (step * i);
+			},
+			_List_fromArray(
+				[0, 1, 2, 3, 4]));
+	});
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
@@ -7114,11 +7148,59 @@ var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
 var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
 var $author$project$Main$scatterPlotView = function (model) {
-	var yTicks = $author$project$Main$ticksForAxis(model.selectedY);
-	var xTicks = $author$project$Main$ticksForAxis(model.selectedX);
-	var plotWidth = 800;
-	var plotPaddingLeft = 80;
-	var plotPadding = 40;
+	var tooltipBox = function () {
+		var _v2 = model.hoveredPoint;
+		if (_v2.$ === 'Just') {
+			var dp = _v2.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin-left', '20px'),
+						A2($elm$html$Html$Attributes$style, 'padding', '10px'),
+						A2($elm$html$Html$Attributes$style, 'border', '1px solid black'),
+						A2($elm$html$Html$Attributes$style, 'background', '#f9f9f9'),
+						A2($elm$html$Html$Attributes$style, 'width', '220px'),
+						A2($elm$html$Html$Attributes$style, 'max-height', '120px'),
+						A2($elm$html$Html$Attributes$style, 'overflow-y', 'auto')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						'ID: ' + $elm$core$String$fromInt(dp.id)),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						$elm$html$Html$text('Gender: ' + dp.gender),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						$elm$html$Html$text(
+						'Age: ' + $elm$core$String$fromInt(dp.age)),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						$elm$html$Html$text(
+						model.selectedX + (': ' + ((model.selectedX === 'BMI Category') ? dp.bmi : $elm$core$String$fromFloat(
+							A2($author$project$Main$getValueForAxis, dp, model.selectedX))))),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						$elm$html$Html$text(
+						model.selectedY + (': ' + ((model.selectedY === 'BMI Category') ? dp.bmi : $elm$core$String$fromFloat(
+							A2($author$project$Main$getValueForAxis, dp, model.selectedY)))))
+					]));
+		} else {
+			return A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'margin-left', '20px'),
+						A2($elm$html$Html$Attributes$style, 'color', 'gray')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Klicke auf einen Punkt')
+					]));
+		}
+	}();
+	var plotWidth = 1100;
+	var plotPaddingTop = 40;
+	var plotPaddingRight = 40;
+	var plotPaddingLeft = 120;
+	var plotPaddingBottom = 50;
 	var plotHeight = 500;
 	var xAxis = A2(
 		$elm$svg$Svg$line,
@@ -7127,11 +7209,11 @@ var $author$project$Main$scatterPlotView = function (model) {
 				$elm$svg$Svg$Attributes$x1(
 				$elm$core$String$fromFloat(plotPaddingLeft)),
 				$elm$svg$Svg$Attributes$y1(
-				$elm$core$String$fromFloat(plotHeight - plotPadding)),
+				$elm$core$String$fromFloat(plotHeight - plotPaddingBottom)),
 				$elm$svg$Svg$Attributes$x2(
-				$elm$core$String$fromFloat(plotWidth - plotPadding)),
+				$elm$core$String$fromFloat(plotWidth - plotPaddingRight)),
 				$elm$svg$Svg$Attributes$y2(
-				$elm$core$String$fromFloat(plotHeight - plotPadding)),
+				$elm$core$String$fromFloat(plotHeight - plotPaddingBottom)),
 				$elm$svg$Svg$Attributes$stroke('black'),
 				$elm$svg$Svg$Attributes$strokeWidth('2')
 			]),
@@ -7159,11 +7241,11 @@ var $author$project$Main$scatterPlotView = function (model) {
 				$elm$svg$Svg$Attributes$x1(
 				$elm$core$String$fromFloat(plotPaddingLeft)),
 				$elm$svg$Svg$Attributes$y1(
-				$elm$core$String$fromFloat(plotHeight - plotPadding)),
+				$elm$core$String$fromFloat(plotHeight - plotPaddingBottom)),
 				$elm$svg$Svg$Attributes$x2(
 				$elm$core$String$fromFloat(plotPaddingLeft)),
 				$elm$svg$Svg$Attributes$y2(
-				$elm$core$String$fromFloat(plotPadding)),
+				$elm$core$String$fromFloat(plotPaddingTop)),
 				$elm$svg$Svg$Attributes$stroke('black'),
 				$elm$svg$Svg$Attributes$strokeWidth('2')
 			]),
@@ -7172,11 +7254,11 @@ var $author$project$Main$scatterPlotView = function (model) {
 		$elm$svg$Svg$text_,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$x('20'),
+				$elm$svg$Svg$Attributes$x('30'),
 				$elm$svg$Svg$Attributes$y(
 				$elm$core$String$fromFloat(plotHeight / 2)),
 				$elm$svg$Svg$Attributes$transform(
-				'rotate(-90 20 ' + ($elm$core$String$fromFloat(plotHeight / 2) + ')')),
+				'rotate(-90 30 ' + ($elm$core$String$fromFloat(plotHeight / 2) + ')')),
 				$elm$svg$Svg$Attributes$textAnchor('middle'),
 				$elm$svg$Svg$Attributes$fontSize('16'),
 				$elm$svg$Svg$Attributes$fontWeight('bold')
@@ -7185,26 +7267,27 @@ var $author$project$Main$scatterPlotView = function (model) {
 			[
 				$elm$svg$Svg$text(model.selectedY)
 			]));
-	var minY = 0;
-	var minX = 0;
-	var filteredData = A2(
-		$elm$core$List$filter,
-		function (dp) {
-			return (model.showMale && (dp.gender === 'Male')) || (model.showFemale && (dp.gender === 'Female'));
-		},
-		model.data);
+	var genderMatches = function (dp) {
+		var g = $elm$core$String$toLower(dp.gender);
+		return (model.showMale && ((g === 'male') || (g === 'm'))) || (model.showFemale && ((g === 'female') || (g === 'f')));
+	};
+	var filteredData = A2($elm$core$List$filter, genderMatches, model.data);
 	var xs = A2(
 		$elm$core$List$map,
 		function (dp) {
 			return A2($author$project$Main$getValueForAxis, dp, model.selectedX);
 		},
 		filteredData);
+	var minX = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$minimum(xs));
 	var maxX = A2(
 		$elm$core$Maybe$withDefault,
-		1,
+		minX + 1,
 		$elm$core$List$maximum(xs));
 	var scaleX = function (x) {
-		return plotPaddingLeft + (((x - minX) / (maxX - minX)) * ((plotWidth - plotPaddingLeft) - plotPadding));
+		return _Utils_eq(maxX, minX) ? (plotPaddingLeft + (((plotWidth - plotPaddingLeft) - plotPaddingRight) / 2)) : (plotPaddingLeft + (((x - minX) / (maxX - minX)) * ((plotWidth - plotPaddingLeft) - plotPaddingRight)));
 	};
 	var tickLabelX = function (v) {
 		return A2(
@@ -7215,90 +7298,109 @@ var $author$project$Main$scatterPlotView = function (model) {
 					$elm$core$String$fromFloat(
 						scaleX(v))),
 					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat((plotHeight - plotPadding) + 20)),
+					$elm$core$String$fromFloat((plotHeight - plotPaddingBottom) + 20)),
 					$elm$svg$Svg$Attributes$textAnchor('middle')
 				]),
 			_List_fromArray(
 				[
 					$elm$svg$Svg$text(
-					$elm$core$String$fromFloat(v))
+					$elm$core$String$fromFloat(
+						$elm$core$Basics$round(v * 10) / 10))
 				]));
 	};
-	var tickLineX = function (v) {
-		return A2(
-			$elm$svg$Svg$line,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x1(
-					$elm$core$String$fromFloat(
-						scaleX(v))),
-					$elm$svg$Svg$Attributes$y1(
-					$elm$core$String$fromFloat(plotHeight - plotPadding)),
-					$elm$svg$Svg$Attributes$x2(
-					$elm$core$String$fromFloat(
-						scaleX(v))),
-					$elm$svg$Svg$Attributes$y2(
-					$elm$core$String$fromFloat((plotHeight - plotPadding) + 5)),
-					$elm$svg$Svg$Attributes$stroke('black')
-				]),
-			_List_Nil);
-	};
+	var xTicks = A2($author$project$Main$ticksForAxis, model.selectedX, xs);
 	var ys = A2(
 		$elm$core$List$map,
 		function (dp) {
 			return A2($author$project$Main$getValueForAxis, dp, model.selectedY);
 		},
 		filteredData);
+	var minY = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$minimum(ys));
 	var maxY = A2(
 		$elm$core$Maybe$withDefault,
-		1,
+		minY + 1,
 		$elm$core$List$maximum(ys));
 	var scaleY = function (y) {
-		return (plotHeight - plotPadding) - (((y - minY) / (maxY - minY)) * (plotHeight - (2 * plotPadding)));
+		return _Utils_eq(maxY, minY) ? (plotHeight / 2) : ((plotHeight - plotPaddingBottom) - (((y - minY) / (maxY - minY)) * ((plotHeight - plotPaddingTop) - plotPaddingBottom)));
 	};
-	var tickLabelY = function (v) {
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(plotPaddingLeft - 10)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat(
-						scaleY(v) + 5)),
-					$elm$svg$Svg$Attributes$textAnchor('end')
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(
-					$elm$core$String$fromFloat(v))
-				]));
-	};
-	var tickLineY = function (v) {
-		return A2(
-			$elm$svg$Svg$line,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x1(
-					$elm$core$String$fromFloat(plotPaddingLeft - 5)),
-					$elm$svg$Svg$Attributes$y1(
-					$elm$core$String$fromFloat(
-						scaleY(v))),
-					$elm$svg$Svg$Attributes$x2(
-					$elm$core$String$fromFloat(plotPaddingLeft)),
-					$elm$svg$Svg$Attributes$y2(
-					$elm$core$String$fromFloat(
-						scaleY(v))),
-					$elm$svg$Svg$Attributes$stroke('black')
-				]),
-			_List_Nil);
-	};
+	var tickLabel = F2(
+		function (axis, v) {
+			var label = function () {
+				if (axis === 'BMI Category') {
+					var _v1 = $elm$core$Basics$round(v);
+					switch (_v1) {
+						case 1:
+							return 'Underweight';
+						case 2:
+							return 'Normal';
+						case 3:
+							return 'Overweight';
+						case 4:
+							return 'Obese';
+						default:
+							return '';
+					}
+				} else {
+					return $elm$core$String$fromFloat(
+						$elm$core$Basics$round(v * 10) / 10);
+				}
+			}();
+			return A2(
+				$elm$svg$Svg$text_,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$x(
+						$elm$core$String$fromFloat(plotPaddingLeft - 10)),
+						$elm$svg$Svg$Attributes$y(
+						$elm$core$String$fromFloat(
+							scaleY(v))),
+						$elm$svg$Svg$Attributes$textAnchor('end')
+					]),
+				_List_fromArray(
+					[
+						$elm$svg$Svg$text(label)
+					]));
+		});
+	var yTicks = A2($author$project$Main$ticksForAxis, model.selectedY, ys);
 	var color = function (dp) {
-		return (dp.gender === 'Male') ? '#2D68C4' : ((dp.gender === 'Female') ? '#DE5D83' : 'gray');
+		var g = $elm$core$String$toLower(dp.gender);
+		return (g === 'male') ? '#2D68C4' : ((g === 'female') ? '#DE5D83' : 'gray');
 	};
+	var points = A2(
+		$elm$core$List$map,
+		function (dp) {
+			var cy = scaleY(
+				A2($author$project$Main$getValueForAxis, dp, model.selectedY));
+			var cx = scaleX(
+				A2($author$project$Main$getValueForAxis, dp, model.selectedX));
+			return A2(
+				$elm$svg$Svg$circle,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$cx(
+						$elm$core$String$fromFloat(cx)),
+						$elm$svg$Svg$Attributes$cy(
+						$elm$core$String$fromFloat(cy)),
+						$elm$svg$Svg$Attributes$r('5'),
+						$elm$svg$Svg$Attributes$fill(
+						color(dp)),
+						$elm$svg$Svg$Attributes$stroke('black'),
+						$elm$svg$Svg$Attributes$strokeWidth('1'),
+						$elm$svg$Svg$Events$onClick(
+						$author$project$Main$ClickPoint(dp))
+					]),
+				_List_Nil);
+		},
+		filteredData);
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'display', 'flex')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -7311,38 +7413,63 @@ var $author$project$Main$scatterPlotView = function (model) {
 						$elm$core$String$fromFloat(plotHeight))
 					]),
 				_Utils_ap(
-					A2(
-						$elm$core$List$map,
-						function (dp) {
-							return A2(
-								$elm$svg$Svg$circle,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$cx(
-										$elm$core$String$fromFloat(
-											scaleX(
-												A2($author$project$Main$getValueForAxis, dp, model.selectedX)))),
-										$elm$svg$Svg$Attributes$cy(
-										$elm$core$String$fromFloat(
-											scaleY(
-												A2($author$project$Main$getValueForAxis, dp, model.selectedY)))),
-										$elm$svg$Svg$Attributes$r('5'),
-										$elm$svg$Svg$Attributes$fill(
-										color(dp))
-									]),
-								_List_Nil);
-						},
-						filteredData),
+					points,
 					_Utils_ap(
 						_List_fromArray(
 							[xAxis, yAxis, xLabel, yLabel]),
 						_Utils_ap(
-							A2($elm$core$List$map, tickLineX, xTicks),
+							A2(
+								$elm$core$List$map,
+								function (v) {
+									return A2(
+										$elm$svg$Svg$line,
+										_List_fromArray(
+											[
+												$elm$svg$Svg$Attributes$x1(
+												$elm$core$String$fromFloat(
+													scaleX(v))),
+												$elm$svg$Svg$Attributes$y1(
+												$elm$core$String$fromFloat(plotHeight - plotPaddingBottom)),
+												$elm$svg$Svg$Attributes$x2(
+												$elm$core$String$fromFloat(
+													scaleX(v))),
+												$elm$svg$Svg$Attributes$y2(
+												$elm$core$String$fromFloat((plotHeight - plotPaddingBottom) + 5)),
+												$elm$svg$Svg$Attributes$stroke('black')
+											]),
+										_List_Nil);
+								},
+								xTicks),
 							_Utils_ap(
-								A2($elm$core$List$map, tickLineY, yTicks),
+								A2(
+									$elm$core$List$map,
+									function (v) {
+										return A2(
+											$elm$svg$Svg$line,
+											_List_fromArray(
+												[
+													$elm$svg$Svg$Attributes$x1(
+													$elm$core$String$fromFloat(plotPaddingLeft - 5)),
+													$elm$svg$Svg$Attributes$y1(
+													$elm$core$String$fromFloat(
+														scaleY(v))),
+													$elm$svg$Svg$Attributes$x2(
+													$elm$core$String$fromFloat(plotPaddingLeft)),
+													$elm$svg$Svg$Attributes$y2(
+													$elm$core$String$fromFloat(
+														scaleY(v))),
+													$elm$svg$Svg$Attributes$stroke('black')
+												]),
+											_List_Nil);
+									},
+									yTicks),
 								_Utils_ap(
 									A2($elm$core$List$map, tickLabelX, xTicks),
-									A2($elm$core$List$map, tickLabelY, yTicks)))))))
+									A2(
+										$elm$core$List$map,
+										tickLabel(model.selectedY),
+										yTicks))))))),
+				tooltipBox
 			]));
 };
 var $author$project$Main$view = function (model) {
@@ -7363,7 +7490,7 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('X-ACHSE: '),
+						$elm$html$Html$text('X-AXIS: '),
 						$author$project$Main$axisSelectX(model.selectedX)
 					])),
 				A2(
@@ -7374,7 +7501,7 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Y-ACHSE: '),
+						$elm$html$Html$text('Y-AXIS: '),
 						$author$project$Main$axisSelectY(model.selectedY)
 					])),
 				A2(
@@ -7394,7 +7521,7 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								model.showPlot ? 'PLOT VERBERGEN' : 'PLOT ANZEIGEN')
+								model.showPlot ? 'HIDE PLOT' : 'SHOW PLOT')
 							]))
 					])),
 				A2(
@@ -7406,8 +7533,8 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A3($author$project$Main$labelCheckbox, 'MÄNNER', model.showMale, $author$project$Main$ToggleMale),
-						A3($author$project$Main$labelCheckbox, 'FRAUEN', model.showFemale, $author$project$Main$ToggleFemale)
+						A3($author$project$Main$labelCheckbox, 'MALE', model.showMale, $author$project$Main$ToggleMale),
+						A3($author$project$Main$labelCheckbox, 'FEMALE', model.showFemale, $author$project$Main$ToggleFemale)
 					])),
 				model.showPlot ? $author$project$Main$scatterPlotView(model) : $elm$html$Html$text('')
 			]));

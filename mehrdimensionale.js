@@ -6197,24 +6197,14 @@ var $author$project$Mehrdimensionale$parseRow = function (row) {
 		var steps = _v11.a;
 		var _v12 = _v11.b;
 		var sleepDis = _v12.a;
-		var stress = function () {
-			var _v16 = $elm$core$String$toInt(stressStr);
-			if (_v16.$ === 'Just') {
-				var v = _v16.a;
-				return v;
-			} else {
-				return 0;
-			}
-		}();
-		var sleepDur = function () {
-			var _v15 = $elm$core$String$toFloat(sleepDurStr);
-			if (_v15.$ === 'Just') {
-				var v = _v15.a;
-				return v;
-			} else {
-				return 0;
-			}
-		}();
+		var stress = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$String$toInt(stressStr));
+		var sleepDur = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$String$toFloat(sleepDurStr));
 		var bmiNum = function () {
 			var _v14 = $elm$core$String$toLower(bmi);
 			switch (_v14) {
@@ -6228,6 +6218,10 @@ var $author$project$Mehrdimensionale$parseRow = function (row) {
 					return 0;
 			}
 		}();
+		var age = A2(
+			$elm$core$Maybe$withDefault,
+			0,
+			$elm$core$String$toInt(ageStr));
 		var _v13 = $author$project$Mehrdimensionale$parseBp(bp);
 		var sys = _v13.a;
 		return $elm$core$Maybe$Just(
@@ -6313,11 +6307,6 @@ var $elm$core$List$append = F2(
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
 var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
 var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm_community$list_extra$List$Extra$findIndexHelp = F3(
@@ -6351,6 +6340,7 @@ var $elm_community$list_extra$List$Extra$elemIndex = function (x) {
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
 var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$core$Basics$ge = _Utils_ge;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
 var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
@@ -6446,6 +6436,8 @@ var $author$project$Mehrdimensionale$svgParallel = function (people) {
 				return $.sleepDisorder;
 			},
 			people));
+	var paddingTop = 50;
+	var paddingLeft = 150;
 	var occupations = $elm_community$list_extra$List$Extra$unique(
 		A2(
 			$elm$core$List$map,
@@ -6454,24 +6446,50 @@ var $author$project$Mehrdimensionale$svgParallel = function (people) {
 			},
 			people));
 	var h = 500;
-	var scaleY = F3(
-		function (minV, maxV, val) {
-			return h - (((val - minV) / (maxV - minV)) * h);
-		});
+	var extraBetween23 = 40;
+	var extraBetween12 = 70;
+	var extraBetween01 = 70;
 	var color = function (occ) {
 		switch (occ) {
 			case 'Doctor':
-				return 'blue';
+				return 'Navy';
 			case 'Software Engineer':
-				return 'green';
+				return 'Teal';
 			case 'Sales Representative':
-				return 'red';
+				return 'Salmon';
+			case 'Accountant':
+				return 'Yellow';
+			case 'Nurse':
+				return 'Violet';
+			case 'Lawyer':
+				return 'Brown';
+			case 'Teacher':
+				return 'Tomato';
+			case 'Engineer':
+				return 'Peru';
+			case 'Scientist':
+				return 'Peru';
+			case 'Salesperson':
+				return 'SlateBlue';
+			case 'Manager':
+				return 'Orange';
 			default:
-				return 'gray';
+				return 'Gray';
 		}
 	};
+	var clamp = F3(
+		function (low, high, v) {
+			return (_Utils_cmp(v, low) < 0) ? low : ((_Utils_cmp(v, high) > 0) ? high : v);
+		});
+	var scaleY = F3(
+		function (minV, maxV, val) {
+			var ratio = A3(clamp, 0, 1, (val - minV) / (maxV - minV));
+			return paddingTop + (h - (ratio * h));
+		});
+	var baseSpacing = 120;
 	var axisX = function (idx) {
-		return 50 + (idx * 150);
+		var extras = (((idx >= 1) ? extraBetween01 : 0) + ((idx >= 2) ? extraBetween12 : 0)) + ((idx >= 3) ? extraBetween23 : 0);
+		return (paddingLeft + (idx * baseSpacing)) + extras;
 	};
 	var axisIndex = F2(
 		function (str, list) {
@@ -6493,6 +6511,18 @@ var $author$project$Mehrdimensionale$svgParallel = function (people) {
 		},
 			{
 			getValue: function (p) {
+				return p.age;
+			},
+			max: 60,
+			min: 27,
+			name: 'Age',
+			tickLabels: A2(
+				$elm$core$List$map,
+				$elm$core$String$fromInt,
+				A2($elm$core$List$range, 27, 60))
+		},
+			{
+			getValue: function (p) {
 				return A2(axisIndex, p.sleepDisorder, sleepDisorders);
 			},
 			max: $elm$core$List$length(sleepDisorders) - 1,
@@ -6511,127 +6541,20 @@ var $author$project$Mehrdimensionale$svgParallel = function (people) {
 				$elm$core$List$map,
 				$elm$core$String$fromInt,
 				A2($elm$core$List$range, 0, 10))
-		},
-			{
-			getValue: function (p) {
-				return p.systolic;
-			},
-			max: 160,
-			min: 90,
-			name: 'Blood Pressure',
-			tickLabels: A2(
-				$elm$core$List$map,
-				$elm$core$String$fromInt,
-				_List_fromArray(
-					[90, 100, 110, 120, 130, 140, 150, 160]))
 		}
 		]);
-	var axisLabels = A2(
-		$elm$core$List$indexedMap,
-		F2(
-			function (i, axis) {
-				return A2(
-					$elm$svg$Svg$text_,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$x(
-							$elm$core$String$fromInt(
-								axisX(i))),
-							$elm$svg$Svg$Attributes$y(
-							$elm$core$String$fromInt(h + 30)),
-							$elm$svg$Svg$Attributes$fontSize('14'),
-							$elm$svg$Svg$Attributes$textAnchor('middle')
-						]),
-					_List_fromArray(
-						[
-							$elm$html$Html$text(axis.name)
-						]));
-			}),
-		axes);
-	var axisLines = A2(
-		$elm$core$List$indexedMap,
-		F2(
-			function (i, _v1) {
-				return A2(
-					$elm$svg$Svg$line,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$x1(
-							$elm$core$String$fromInt(
-								axisX(i))),
-							$elm$svg$Svg$Attributes$y1('0'),
-							$elm$svg$Svg$Attributes$x2(
-							$elm$core$String$fromInt(
-								axisX(i))),
-							$elm$svg$Svg$Attributes$y2(
-							$elm$core$String$fromInt(h)),
-							$elm$svg$Svg$Attributes$stroke('black'),
-							$elm$svg$Svg$Attributes$strokeWidth('1')
-						]),
-					_List_Nil);
-			}),
-		axes);
-	var axisTicks = $elm$core$List$concat(
-		A2(
-			$elm$core$List$indexedMap,
-			F2(
-				function (i, axis) {
-					return $elm$core$List$concat(
-						A2(
-							$elm$core$List$indexedMap,
-							F2(
-								function (j, label) {
-									var val = axis.min + ((j / ($elm$core$List$length(axis.tickLabels) - 1)) * (axis.max - axis.min));
-									var y = A3(scaleY, axis.min, axis.max, val);
-									var tickLine = A2(
-										$elm$svg$Svg$line,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$x1(
-												$elm$core$String$fromInt(
-													axisX(i) - 5)),
-												$elm$svg$Svg$Attributes$y1(
-												$elm$core$String$fromFloat(y)),
-												$elm$svg$Svg$Attributes$x2(
-												$elm$core$String$fromInt(
-													axisX(i) + 5)),
-												$elm$svg$Svg$Attributes$y2(
-												$elm$core$String$fromFloat(y)),
-												$elm$svg$Svg$Attributes$stroke('black'),
-												$elm$svg$Svg$Attributes$strokeWidth('1')
-											]),
-										_List_Nil);
-									var tickLabel = A2(
-										$elm$svg$Svg$text_,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$x(
-												$elm$core$String$fromInt(
-													axisX(i) - 10)),
-												$elm$svg$Svg$Attributes$y(
-												$elm$core$String$fromFloat(y + 4)),
-												$elm$svg$Svg$Attributes$fontSize('12'),
-												$elm$svg$Svg$Attributes$textAnchor('end')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text(label)
-											]));
-									return _List_fromArray(
-										[tickLine, tickLabel]);
-								}),
-							axis.tickLabels));
-				}),
-			axes));
 	var personLine = function (p) {
 		var points = A2(
 			$elm$core$List$indexedMap,
 			F2(
 				function (i, axis) {
-					var val = axis.getValue(p);
 					return _Utils_Tuple2(
 						axisX(i),
-						A3(scaleY, axis.min, axis.max, val));
+						A3(
+							scaleY,
+							axis.min,
+							axis.max,
+							axis.getValue(p)));
 				}),
 			axes);
 		return A2(
@@ -6644,10 +6567,10 @@ var $author$project$Mehrdimensionale$svgParallel = function (people) {
 						' ',
 						A2(
 							$elm$core$List$map,
-							function (_v0) {
-								var x = _v0.a;
-								var y = _v0.b;
-								return $elm$core$String$fromInt(x) + (',' + $elm$core$String$fromFloat(y));
+							function (_v1) {
+								var x = _v1.a;
+								var y = _v1.b;
+								return $elm$core$String$fromFloat(x) + (',' + $elm$core$String$fromFloat(y));
 							},
 							points))),
 					$elm$svg$Svg$Attributes$fill('none'),
@@ -6663,7 +6586,6 @@ var $author$project$Mehrdimensionale$svgParallel = function (people) {
 			$elm$core$List$indexedMap,
 			F2(
 				function (i, axis) {
-					var val = axis.getValue(p);
 					return A2(
 						$elm$svg$Svg$circle,
 						_List_fromArray(
@@ -6673,7 +6595,11 @@ var $author$project$Mehrdimensionale$svgParallel = function (people) {
 									axisX(i))),
 								$elm$svg$Svg$Attributes$cy(
 								$elm$core$String$fromFloat(
-									A3(scaleY, axis.min, axis.max, val))),
+									A3(
+										scaleY,
+										axis.min,
+										axis.max,
+										axis.getValue(p)))),
 								$elm$svg$Svg$Attributes$r('4'),
 								$elm$svg$Svg$Attributes$fill(
 								color(p.occupation)),
@@ -6684,7 +6610,7 @@ var $author$project$Mehrdimensionale$svgParallel = function (people) {
 				}),
 			axes);
 	};
-	var w = $elm$core$List$length(axes) * 150;
+	var w = ($elm$core$List$length(axes) * 150) + paddingLeft;
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
@@ -6692,17 +6618,117 @@ var $author$project$Mehrdimensionale$svgParallel = function (people) {
 				$elm$svg$Svg$Attributes$width(
 				$elm$core$String$fromInt(w)),
 				$elm$svg$Svg$Attributes$height(
-				$elm$core$String$fromInt(h + 50))
+				$elm$core$String$fromInt((paddingTop + h) + 50))
 			]),
-		_Utils_ap(
-			axisLines,
-			_Utils_ap(
-				axisTicks,
-				_Utils_ap(
-					A2($elm$core$List$concatMap, personPoints, people),
-					_Utils_ap(
-						A2($elm$core$List$map, personLine, people),
-						axisLabels)))));
+		$elm$core$List$concat(
+			_List_fromArray(
+				[
+					A2(
+					$elm$core$List$indexedMap,
+					F2(
+						function (i, _v0) {
+							return A2(
+								$elm$svg$Svg$line,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$x1(
+										$elm$core$String$fromInt(
+											axisX(i))),
+										$elm$svg$Svg$Attributes$y1(
+										$elm$core$String$fromInt(paddingTop)),
+										$elm$svg$Svg$Attributes$x2(
+										$elm$core$String$fromInt(
+											axisX(i))),
+										$elm$svg$Svg$Attributes$y2(
+										$elm$core$String$fromInt(paddingTop + h)),
+										$elm$svg$Svg$Attributes$stroke('black'),
+										$elm$svg$Svg$Attributes$strokeWidth('1')
+									]),
+								_List_Nil);
+						}),
+					axes),
+					$elm$core$List$concat(
+					A2(
+						$elm$core$List$indexedMap,
+						F2(
+							function (i, axis) {
+								return $elm$core$List$concat(
+									A2(
+										$elm$core$List$indexedMap,
+										F2(
+											function (j, label) {
+												var y = A3(
+													scaleY,
+													axis.min,
+													axis.max,
+													axis.min + ((axis.max - axis.min) * (j / ($elm$core$List$length(axis.tickLabels) - 1))));
+												return _List_fromArray(
+													[
+														A2(
+														$elm$svg$Svg$line,
+														_List_fromArray(
+															[
+																$elm$svg$Svg$Attributes$x1(
+																$elm$core$String$fromInt(
+																	axisX(i) - 5)),
+																$elm$svg$Svg$Attributes$y1(
+																$elm$core$String$fromFloat(y)),
+																$elm$svg$Svg$Attributes$x2(
+																$elm$core$String$fromInt(
+																	axisX(i) + 5)),
+																$elm$svg$Svg$Attributes$y2(
+																$elm$core$String$fromFloat(y)),
+																$elm$svg$Svg$Attributes$stroke('black'),
+																$elm$svg$Svg$Attributes$strokeWidth('1')
+															]),
+														_List_Nil),
+														A2(
+														$elm$svg$Svg$text_,
+														_List_fromArray(
+															[
+																$elm$svg$Svg$Attributes$x(
+																$elm$core$String$fromInt(
+																	axisX(i) - 10)),
+																$elm$svg$Svg$Attributes$y(
+																$elm$core$String$fromFloat(y + 4)),
+																$elm$svg$Svg$Attributes$fontSize('12'),
+																$elm$svg$Svg$Attributes$textAnchor('end')
+															]),
+														_List_fromArray(
+															[
+																$elm$html$Html$text(label)
+															]))
+													]);
+											}),
+										axis.tickLabels));
+							}),
+						axes)),
+					A2($elm$core$List$map, personLine, people),
+					$elm$core$List$concat(
+					A2($elm$core$List$map, personPoints, people)),
+					A2(
+					$elm$core$List$indexedMap,
+					F2(
+						function (i, axis) {
+							return A2(
+								$elm$svg$Svg$text_,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$x(
+										$elm$core$String$fromInt(
+											axisX(i))),
+										$elm$svg$Svg$Attributes$y(
+										$elm$core$String$fromInt((paddingTop + h) + 30)),
+										$elm$svg$Svg$Attributes$fontSize('14'),
+										$elm$svg$Svg$Attributes$textAnchor('middle')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(axis.name)
+									]));
+						}),
+					axes)
+				])));
 };
 var $author$project$Mehrdimensionale$view = function (model) {
 	var _v0 = model.error;
@@ -6713,7 +6739,8 @@ var $author$project$Mehrdimensionale$view = function (model) {
 			_List_Nil,
 			_List_fromArray(
 				[
-					$elm$html$Html$text('Status: ' + err),
+					$elm$html$Html$text(' ' + err),
+					$elm$html$Html$text('TITLE HIER'),
 					$author$project$Mehrdimensionale$svgParallel(model.people)
 				]));
 	} else {
