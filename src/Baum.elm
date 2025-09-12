@@ -2,6 +2,8 @@ port module Baum exposing (..)
 
 import Browser
 import Csv.Parser exposing (parse)
+import Force
+import Graph exposing (NodeId, Graph)
 import Http
 import Html exposing (Html, button, div, option, select, text, input, label)
 import Html.Attributes as HtmlAttr
@@ -9,6 +11,8 @@ import Html.Events as HtmlEvents
 import Svg exposing (..)
 import Svg.Attributes as SvgAttr
 import String
+import Time
+--import Uebung exposing (Entity)
 
 
 -- PORTS
@@ -42,8 +46,19 @@ type alias Model =
     , showPlot : Bool
     , showMale : Bool
     , showFemale : Bool
+    , drag : Maybe Drag
+    , graph : Graph Entity ()
+    , simulation : Force.State NodeId
     }
 
+type alias Drag =
+    { start : ( Float, Float )
+    , current : ( Float, Float )
+    , index : NodeId
+    }
+
+type alias Entity =
+    Force.Entity NodeId { value : String }
 
 type alias Node = { id: Int, label : String }
 type alias Edge = { from: Int, to: Int, weight: Float }      
@@ -109,6 +124,10 @@ type Msg
     | ToggleMale Bool
     | ToggleFemale Bool
     | MatrixReceived (List (List Float ))
+    | DragStart NodeId ( Float, Float )
+    | DragAt ( Float, Float )
+    | DragEnd ( Float, Float )
+    | Tick Time.Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -370,7 +389,7 @@ buildGraph keys matrix =
                 (\(row, i) ->
                     List.concatMap
                         (\(value, j) ->
-                            if abs value > 0.3 && i /= j then
+                            if abs value > 0.2 && i /= j  then
                                 [ { from = i, to = j, weight = value } ]
                             else
                                 []

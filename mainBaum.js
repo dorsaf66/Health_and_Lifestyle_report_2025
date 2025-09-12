@@ -7033,7 +7033,7 @@ var $author$project$Baum$buildGraph = F2(
 					function (_v1) {
 						var value = _v1.a;
 						var j = _v1.b;
-						return (($elm$core$Basics$abs(value) > 0.3) && (!_Utils_eq(i, j))) ? _List_fromArray(
+						return (($elm$core$Basics$abs(value) > 0.2) && (!_Utils_eq(i, j))) ? _List_fromArray(
 							[
 								{from: i, to: j, weight: value}
 							]) : _List_Nil;
