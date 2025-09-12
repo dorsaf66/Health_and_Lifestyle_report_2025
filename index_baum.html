@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Elm Baum</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+  <div id="elm"></div>
+  <div id="correlation-matrix"></div>
+
+  <script src="mainBaum.js"></script>
+  <script src="korrelationsmatrix.js"></script>
+  <script>
+    var app = Elm.Baum.init({
+      node: document.getElementById('elm')
+    });
+    window.app = app; // Damit ist sie global verfügbar. Port-Zugriff ermöglichen.
+  </script>
+</body>
+</html>
