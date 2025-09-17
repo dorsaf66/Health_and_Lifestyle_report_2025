@@ -1,81 +1,93 @@
-module Baum exposing (main)
+port module Baum exposing (..)
 
 import Browser
+import Csv.Parser exposing (parse)
 import Html exposing (Html, div)
+import Html.Attributes as HtmlAttr
+import Svg exposing (..)
+import Svg.Attributes as SvgAttr
+import Svg.Events
+import Json.Decode as Decode
 import Http
 import String
-import Svg exposing (Svg, svg, circle, line, text_, g, defs, marker, path)
-import Svg.Attributes as SA
+import Basics
 
-
--- MAIN
-
-main : Program () Model Msg
-main =
-    Browser.element
-        { init = init
-        , update = update
-        , subscriptions = \_ -> Sub.none
-        , view = view
-        }
-
+-- PORTS
+port receiveMatrix : (List (List Float) -> msg) -> Sub msg
 
 -- MODEL
-
 type alias Person =
     { id : Int
     , gender : String
     , age : Int
     , occupation : String
     , sleepDuration : Float
-    , qualitySleep : Int
-    , physicalActivity : Int
+    , sleepQuality : Int
+    , physicalActivityLevel : Int
     , stressLevel : Int
-    , bmiCategory : String
-    , systolic : Int
-    , diastolic : Int
+    , bmi : String
+    , bloodPressure : String
     , heartRate : Int
     , dailySteps : Int
     , sleepDisorder : String
     }
 
-
-type alias Model =
-    { people : List Person
-    , error : Maybe String
+type alias Node =
+    { id : Int
+    , label : String
+    , x : Float
+    , y : Float
+    , fx : Maybe Float
+    , fy : Maybe Float
     }
 
+type alias Edge =
+    { from : Int
+    , to : Int
+    , weight : Float
+    }
 
-initModel : Model
-initModel =
-    { people = []
-    , error = Nothing }
+type alias Model =
+    { data : List Person
+    , correlationMatrix : List (List Float)
+    , nodes : List Node
+    , edges : List Edge
+    }
 
+-- CSV PARSING
+rowToPerson : List String -> Maybe Person
+rowToPerson row =
+    case row of
+        idStr :: genderStr :: ageStr :: occupationStr :: sleepDurationStr :: sleepQualityStr :: physicalActivityLevelStr :: stressLevelStr :: bmiStr :: bloodPressureStr :: heartRateStr :: dailyStepsStr :: sleepDisorderStr :: [] ->
+            Just
+                { id = String.toInt idStr |> Maybe.withDefault 0
+                , gender = genderStr
+                , age = String.toInt ageStr |> Maybe.withDefault 0
+                , occupation = occupationStr
+                , sleepDuration = String.toFloat sleepDurationStr |> Maybe.withDefault 0
+                , sleepQuality = String.toInt sleepQualityStr |> Maybe.withDefault 0
+                , physicalActivityLevel = String.toInt physicalActivityLevelStr |> Maybe.withDefault 0
+                , stressLevel = String.toInt stressLevelStr |> Maybe.withDefault 0
+                , bmi = bmiStr
+                , bloodPressure = bloodPressureStr
+                , heartRate = String.toInt heartRateStr |> Maybe.withDefault 0
+                , dailySteps = String.toInt dailyStepsStr |> Maybe.withDefault 0
+                , sleepDisorder = sleepDisorderStr
+                }
+
+        _ ->
+            Nothing
 
 -- INIT
-
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( initModel, loadCsv )
-
-
--- UPDATE
-
-type Msg
-    = CsvLoaded (Result Http.Error String)
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        CsvLoaded (Ok raw) ->
-            ( { model | people = parseCsv raw, error = Just "CSV geladen" }, Cmd.none )
-
-        CsvLoaded (Err e) ->
-            ( { model | error = Just ("HTTP Error: " ++ Debug.toString e) }, Cmd.none )
-
-
--- HTTP
+    ( { data = []
+      , correlationMatrix = []
+      , nodes = []
+      , edges = []
+      }
+    , loadCsv
+    )
 
 loadCsv : Cmd Msg
 loadCsv =
@@ -84,248 +96,189 @@ loadCsv =
         , expect = Http.expectString CsvLoaded
         }
 
+-- UPDATE
+type Msg
+    = CsvLoaded (Result Http.Error String)
+    | MatrixReceived (List (List Float))
+    | DragNode Int Float Float
+    | ReleaseNode Int
 
--- CSV PARSER
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        CsvLoaded (Ok csvString) ->
+            case parse { fieldSeparator = ',' } csvString of
+                Ok rows ->
+                    let
+                        dataRows = List.drop 1 rows
+                        persons = List.filterMap rowToPerson dataRows
+                    in
+                    ( { model | data = persons }, Cmd.none )
 
-parseCsv : String -> List Person
-parseCsv raw =
-    raw
-        |> String.trim
-        |> String.split "\n"
-        |> List.drop 1
-        |> List.filterMap parseRow
+                Err _ ->
+                    ( model, Cmd.none )
 
+        CsvLoaded (Err _) ->
+            ( model, Cmd.none )
 
-parseRow : String -> Maybe Person
-parseRow row =
-    case String.split "," row |> List.map String.trim of
-        idStr :: gender :: ageStr :: occ :: sleepDurStr :: qSleepStr :: physActStr :: stressStr :: bmi :: bp :: hrStr :: stepsStr :: sleepDis :: [] ->
+        MatrixReceived matrix ->
             let
-                ( sys, dia ) = parseBp bp
+                (nodes, edges) = buildGraph matrix
             in
-            Just
-                { id = String.toInt idStr |> Maybe.withDefault -1
-                , gender = gender
-                , age = String.toInt ageStr |> Maybe.withDefault 0
-                , occupation = occ
-                , sleepDuration = String.toFloat sleepDurStr |> Maybe.withDefault 0
-                , qualitySleep = String.toInt qSleepStr |> Maybe.withDefault 0
-                , physicalActivity = String.toInt physActStr |> Maybe.withDefault 0
-                , stressLevel = String.toInt stressStr |> Maybe.withDefault 0
-                , bmiCategory = bmi
-                , systolic = sys
-                , diastolic = dia
-                , heartRate = String.toInt hrStr |> Maybe.withDefault 0
-                , dailySteps = String.toInt stepsStr |> Maybe.withDefault 0
-                , sleepDisorder = sleepDis
-                }
+            ( { model | correlationMatrix = matrix, nodes = nodes, edges = edges }, Cmd.none )
 
-        _ ->
-            Nothing
+        DragNode nodeId x y ->
+            let
+                nodesUpdated =
+                    List.map (\n -> if n.id == nodeId then { n | fx = Just x, fy = Just y, x = x, y = y } else n) model.nodes
+            in
+            ( { model | nodes = nodesUpdated }, Cmd.none )
 
+        ReleaseNode nodeId ->
+            let
+                nodesUpdated =
+                    List.map (\n -> if n.id == nodeId then { n | fx = Nothing, fy = Nothing } else n) model.nodes
+            in
+            ( { model | nodes = nodesUpdated }, Cmd.none )
 
-parseBp : String -> ( Int, Int )
-parseBp s =
-    case String.split "/" (String.trim s) of
-        a :: b :: _ ->
-            ( String.toInt a |> Maybe.withDefault 0
-            , String.toInt b |> Maybe.withDefault 0
-            )
+-- SUBSCRIPTIONS
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    receiveMatrix MatrixReceived
 
-        _ ->
-            ( 0, 0 )
-
-
--- STATISTICS
-
-type alias Metrics =
-    { sleepPct : Float
-    , qualityPct : Float
-    , physPct : Float
-    , stepsPct : Float
-    , sleepDisorderPct : Float
-    }
-
-
-computeMetricsForGender : String -> List Person -> Metrics
-computeMetricsForGender gender people =
+-- GRAPH CREATION
+buildGraph : List (List Float) -> (List Node, List Edge)
+buildGraph matrix =
     let
-        group = List.filter (\p -> String.toLower p.gender == String.toLower gender) people
-        count = max 1 (List.length group)
-
-        avgInt f =
-            group |> List.map f |> List.foldl (+) 0 |> (\s -> toFloat s / toFloat count)
-
-        avgFloat f =
-            group |> List.map f |> List.foldl (+) 0.0 |> (\s -> s / toFloat count)
-
-        avgSleep = avgFloat .sleepDuration
-        avgQuality = avgInt .qualitySleep
-        avgPhys = avgInt .physicalActivity
-        avgSteps = avgInt .dailySteps
-
-        countDisordered =
-            group
-                |> List.filter (\p -> String.toLower p.sleepDisorder /= "none" && p.sleepDisorder /= "")
-                |> List.length
-
-        sleepDisorderPct = (toFloat countDisordered / toFloat count) * 100
-    in
-    { sleepPct = clamp 0 100 (avgSleep / 10 * 100)
-    , qualityPct = clamp 0 100 (avgQuality / 10 * 100)
-    , physPct = clamp 0 100 avgPhys
-    , stepsPct = clamp 0 100 (avgSteps / 20000 * 100)
-    , sleepDisorderPct = sleepDisorderPct
-    }
-
-
-clamp : Float -> Float -> Float -> Float
-clamp lo hi v =
-    if v < lo then lo else if v > hi then hi else v
-
-
--- VIEW
-
-type alias MetricNode =
-    { x : Float, y : Float, title : String, pct : Float }
-
-
-view : Model -> Html Msg
-view model =
-    case model.error of
-        Nothing -> div [] [ Html.text "Loading..." ]
-        Just _ -> svgTree model.people
-
-
-svgTree : List Person -> Html Msg
-svgTree people =
-    let
-        width = 1200
-        height = 700
-
-        rootX = toFloat (width // 2)
-        rootY = 60
-        leftX = 300
-        rightX = 900
-        genderY = 200
-        metricY = 420
-        metricSpacing = 90
-        nodeRadius = 36
-
-        metrics =
-            [ ("Sleep<br>Duration", .sleepPct)
-            , ("Quality<br>of Sleep", .qualityPct)
-            , ("Physical<br>Activity", .physPct)
-            , ("Daily<br>Steps", .stepsPct)
-            , ("Sleep<br>Disorder", .sleepDisorderPct)
+        keys =
+            [ "Gender", "Age", "Sleep Duration", "Quality of Sleep"
+            , "Physical Activity Level", "Stress Level", "BMI Category"
+            , "Heart Rate", "Daily Steps", "Sleep Disorder"
             ]
 
-        leftMetrics = computeMetricsForGender "Male" people
-        rightMetrics = computeMetricsForGender "Female" people
+        svgWidth = 1200
+        svgHeight = 600
+        n = List.length keys
+        spacing = 150
+        rowHeight = 150
 
-        totalPeople = List.length people
-        maleCount = List.length (List.filter (\p -> String.toLower p.gender == "male") people)
-        femaleCount = List.length (List.filter (\p -> String.toLower p.gender == "female") people)
+        labelOverride label =
+            case label of
+                "Physical Activity Level" -> "Good"
+                "Quality of Sleep" -> "Poor"
+                "Stress Level" -> "High"
+                _ -> label
 
-        malePct = (toFloat maleCount / toFloat totalPeople) * 100
-        femalePct = (toFloat femaleCount / toFloat totalPeople) * 100
-
-        metricNodes side baseX =
+        nodes =
             List.indexedMap
-                (\i (title, getter) ->
-                    { x = toFloat baseX + toFloat i * toFloat metricSpacing - (toFloat (List.length metrics - 1) * toFloat metricSpacing / 2)
-                    , y = toFloat metricY
-                    , title = title
-                    , pct = getter (if side == "left" then leftMetrics else rightMetrics)
+                (\i label ->
+                    let
+                        x = svgWidth / 2 + (toFloat ((Basics.modBy 5 i) - 2) * spacing)
+                        y = svgHeight / 2 + (toFloat (i // 5) * rowHeight)
+                    in
+                    { id = i
+                    , label = labelOverride label
+                    , x = x
+                    , y = y
+                    , fx = Nothing
+                    , fy = Nothing
                     }
                 )
-                metrics
+                keys
 
-        leftMetricNodes = metricNodes "left" leftX
-        rightMetricNodes = metricNodes "right" rightX
-
-        round1 v = ((v * 10 |> round |> toFloat) / 10)
-
-        drawNode n =
-            g []
-                [ circle
-                    [ SA.cx (String.fromFloat n.x)
-                    , SA.cy (String.fromFloat n.y)
-                    , SA.r (String.fromInt nodeRadius)
-                    , SA.fill "DeepSkyBlue"
-                    ] []
-                , text_
-                    [ SA.x (String.fromFloat n.x)
-                    , SA.y (String.fromFloat (n.y - 8))
-                    , SA.textAnchor "middle"
-                    , SA.fontSize "10"
-                    , SA.fill "white"
-                    ]
-                    [ Html.text (String.join "\n" (String.split "<br>" n.title)) ]
-                , text_
-                    [ SA.x (String.fromFloat n.x)
-                    , SA.y (String.fromFloat (n.y + 18))
-                    , SA.textAnchor "middle"
-                    , SA.fontSize "10"
-                    , SA.fill "DarkRed"
-                    , SA.fontWeight "bold"
-                    ]
-                    [ Html.text (String.fromFloat (round1 n.pct) ++ "%") ]
-                ]
-
-        lineAttrs x1 y1 x2 y2 =
-            [ SA.x1 (String.fromFloat x1)
-            , SA.y1 (String.fromFloat y1)
-            , SA.x2 (String.fromFloat x2)
-            , SA.y2 (String.fromFloat y2)
-            , SA.stroke "DarkRed"
-            , SA.strokeWidth "2"
-            , SA.markerEnd "url(#arrow)"
-            ]
-
-        rootNode = drawNode { x = rootX, y = rootY, title = "People", pct = 100 }
-
-        maleNode =
-            drawNode
-                { x = toFloat leftX
-                , y = toFloat genderY
-                , title = "Male"
-                , pct = round1 malePct
-                }
-
-        femaleNode =
-            drawNode
-                { x = toFloat rightX
-                , y = toFloat genderY
-                , title = "Female"
-                , pct = round1 femalePct
-                }
-
-        lines =
-            [ line (lineAttrs rootX rootY (toFloat leftX) (toFloat genderY)) []
-            , line (lineAttrs rootX rootY (toFloat rightX) (toFloat genderY)) []
-            ]
-                ++ List.map (\n -> line (lineAttrs (toFloat leftX) (toFloat (genderY + nodeRadius)) n.x (n.y - toFloat nodeRadius)) []) leftMetricNodes
-                ++ List.map (\n -> line (lineAttrs (toFloat rightX) (toFloat (genderY + nodeRadius)) n.x (n.y - toFloat nodeRadius)) []) rightMetricNodes
-
-        allNodes = [rootNode, maleNode, femaleNode] ++ List.map drawNode leftMetricNodes ++ List.map drawNode rightMetricNodes
-
-        arrowDef =
-            defs []
-                [ marker
-                    [ SA.id "arrow"
-                    , SA.markerWidth "10"
-                    , SA.markerHeight "10"
-                    , SA.refX "0"
-                    , SA.refY "3"
-                    , SA.orient "auto"
-                    , SA.markerUnits "strokeWidth"
-                    ]
-                    [ path [ SA.d "M0,0 L0,6 L9,3 z", SA.fill "DarkRed" ] [] ]
-                ]
+        edges =
+            List.concatMap
+                (\(row, i) ->
+                    List.concatMap
+                        (\(value, j) ->
+                            if i /= j then
+                                [ { from = i, to = j, weight = value } ]
+                            else
+                                []
+                        )
+                        (List.indexedMap (\j value -> (value, j)) row)
+                )
+                (List.indexedMap (\i row -> (row, i)) matrix)
     in
-    svg
-        [ SA.width (String.fromInt width)
-        , SA.height (String.fromInt height)
+    (nodes, edges)
+
+-- VIEW
+graphView : Model -> Html Msg
+graphView model =
+    let
+        svgWidth = 1200
+        svgHeight = 600
+
+        nodeElements =
+            List.concatMap
+                (\n ->
+                    [ Svg.circle
+                        [ SvgAttr.cx (String.fromFloat n.x)
+                        , SvgAttr.cy (String.fromFloat n.y)
+                        , SvgAttr.r "35"
+                        , SvgAttr.fill "#69b3a2"
+                        , Svg.Events.on "mousedown"
+                            (Decode.map2 (\x y -> DragNode n.id x y)
+                                (Decode.field "clientX" Decode.float)
+                                (Decode.field "clientY" Decode.float)
+                            )
+                        , Svg.Events.on "mouseup" (Decode.succeed (ReleaseNode n.id))
+                        ]
+                        []
+                    , Svg.text_
+                        [ SvgAttr.x (String.fromFloat n.x)
+                        , SvgAttr.y (String.fromFloat (n.y + 5))
+                        , SvgAttr.textAnchor "middle"
+                        , SvgAttr.fontSize "14"
+                        , SvgAttr.fontWeight "bold"
+                        , SvgAttr.fill "white"
+                        ]
+                        [ Svg.text n.label ]
+                    ]
+                )
+                model.nodes
+
+        edgeElements =
+            List.map
+                (\edge ->
+                    let
+                        fromNode = List.head <| List.filter (\n -> n.id == edge.from) model.nodes
+                        toNode = List.head <| List.filter (\n -> n.id == edge.to) model.nodes
+                    in
+                    case (fromNode, toNode) of
+                        (Just fn, Just tn) ->
+                            Svg.line
+                                [ SvgAttr.x1 (String.fromFloat fn.x)
+                                , SvgAttr.y1 (String.fromFloat fn.y)
+                                , SvgAttr.x2 (String.fromFloat tn.x)
+                                , SvgAttr.y2 (String.fromFloat tn.y)
+                                , SvgAttr.stroke "#8a4343ff"
+                                , SvgAttr.strokeWidth (String.fromFloat (abs edge.weight * 8))
+                                ]
+                                []
+
+                        _ -> Svg.line [] []
+                )
+                model.edges
+    in
+    div
+        [ HtmlAttr.style "margin" "0 auto"
+        , HtmlAttr.style "width" "1200px"
+        , HtmlAttr.style "text-align" "center"
         ]
-        (arrowDef :: (lines ++ allNodes))
+        [ Svg.svg
+            [ SvgAttr.width (String.fromFloat svgWidth)
+            , SvgAttr.height (String.fromFloat svgHeight)
+            ]
+            (edgeElements ++ nodeElements)
+        ]
+
+-- MAIN
+main : Program () Model Msg
+main =
+    Browser.element
+        { init = init
+        , update = update
+        , view = graphView
+        , subscriptions = subscriptions
+        }
