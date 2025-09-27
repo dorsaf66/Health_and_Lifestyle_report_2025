@@ -163,11 +163,7 @@ view : Model -> Html Msg
 view model =
     Html.div [ HtmlAttr.style "font-family" "Arial, sans-serif", HtmlAttr.style "margin" "20px" ]
         [ Html.div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ Html.text "PLOT TYPE: "
-            , Html.select [ HtmlEvents.onInput ChangePlot ]
-                [ Html.option [ HtmlAttr.value "scatter", HtmlAttr.selected (model.currentPlot == Scatter) ] [ Html.text "Scatterplot" ]
-                , Html.option [ HtmlAttr.value "parallel", HtmlAttr.selected (model.currentPlot == Parallel) ] [ Html.text "Parallel Coordinates" ]
-                ]
+            [ Html.text " "
             ]
         , if model.currentPlot == Scatter then
             scatterControls model
@@ -225,7 +221,6 @@ axisSelectY selected =
     Html.select [ HtmlEvents.onInput ChangeY ]
         [ Html.option [ HtmlAttr.value "Sleep Duration", HtmlAttr.selected (selected == "Sleep Duration") ] [ Html.text "Sleep Duration" ]
         , Html.option [ HtmlAttr.value "Heart Rate", HtmlAttr.selected (selected == "Heart Rate") ] [ Html.text "Heart Rate" ]
-        , Html.option [ HtmlAttr.value "BMI Category", HtmlAttr.selected (selected == "BMI Category") ] [ Html.text "BMI Category" ]
         ]
 
 
@@ -236,13 +231,6 @@ getValueForAxis dp axis =
         "Daily Steps" -> toFloat dp.dailySteps
         "Physical Activity" -> toFloat dp.physicalActivityLevel
         "Heart Rate" -> toFloat dp.heartRate
-        "BMI Category" ->
-            case String.toLower dp.bmi of
-                "underweight" -> 1
-                "normal" -> 2
-                "overweight" -> 3
-                "obese" -> 4
-                _ -> 0
         _ -> 0
 
 
@@ -304,24 +292,12 @@ scatterPlotView model =
         yTicks = ticksForAxis model.selectedY ys
 
         tickLabel axis v =
-            let
-                label =
-                    case axis of
-                        "BMI Category" ->
-                            case round v of
-                                1 -> "Underweight"
-                                2 -> "Normal"
-                                3 -> "Overweight"
-                                4 -> "Obese"
-                                _ -> ""
-                        _ -> String.fromFloat ((toFloat (round (v * 10))) / 10)
-            in
             Svg.text_
                 [ SvgAttr.x (String.fromFloat (plotPaddingLeft - 10))
                 , SvgAttr.y (String.fromFloat (scaleY v))
                 , SvgAttr.textAnchor "end"
                 ]
-                [ Svg.text label ]
+                [ Svg.text (String.fromFloat ((toFloat (round (v * 10))) / 10)) ]
 
         tickLabelX v =
             Svg.text_
@@ -411,9 +387,9 @@ scatterPlotView model =
                         , Html.br [] []
                         , Html.text ("Age: " ++ String.fromInt dp.age)
                         , Html.br [] []
-                        , Html.text (model.selectedX ++ ": " ++ (if model.selectedX == "BMI Category" then dp.bmi else String.fromFloat (getValueForAxis dp model.selectedX)))
+                        , Html.text (model.selectedX ++ ": " ++ String.fromFloat (getValueForAxis dp model.selectedX))
                         , Html.br [] []
-                        , Html.text (model.selectedY ++ ": " ++ (if model.selectedY == "BMI Category" then dp.bmi else String.fromFloat (getValueForAxis dp model.selectedY)))
+                        , Html.text (model.selectedY ++ ": " ++ String.fromFloat (getValueForAxis dp model.selectedY))
                         ]
 
                 Nothing ->
