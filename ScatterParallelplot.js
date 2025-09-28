@@ -5334,22 +5334,8 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Projekt$BaumMsg = function (a) {
-	return {$: 'BaumMsg', a: a};
-};
-var $author$project$Projekt$ShowBaum = {$: 'ShowBaum'};
-var $author$project$Projekt$TestMsg = function (a) {
-	return {$: 'TestMsg', a: a};
-};
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Baum$init = function (_v0) {
-	return _Utils_Tuple2(
-		{edges: _List_Nil, nodes: _List_Nil},
-		$elm$core$Platform$Cmd$none);
-};
-var $author$project$Test$Scatter = {$: 'Scatter'};
-var $author$project$Test$CsvLoaded = function (a) {
+var $author$project$ScatterParallelplot$Scatter = {$: 'Scatter'};
+var $author$project$ScatterParallelplot$CsvLoaded = function (a) {
 	return {$: 'CsvLoaded', a: a};
 };
 var $elm$http$Http$BadStatus_ = F2(
@@ -6131,179 +6117,19 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
-var $author$project$Test$loadCsv = $elm$http$Http$get(
+var $author$project$ScatterParallelplot$loadCsv = $elm$http$Http$get(
 	{
-		expect: $elm$http$Http$expectString($author$project$Test$CsvLoaded),
+		expect: $elm$http$Http$expectString($author$project$ScatterParallelplot$CsvLoaded),
 		url: 'data/Sleep_health_and_lifestyle_dataset.csv'
 	});
-var $author$project$Test$init = function (_v0) {
+var $author$project$ScatterParallelplot$init = function (_v0) {
 	return _Utils_Tuple2(
-		{currentPlot: $author$project$Test$Scatter, data: _List_Nil, hoveredPoint: $elm$core$Maybe$Nothing, selectedX: 'Physical Activity', selectedY: 'Sleep Duration', showFemale: true, showMale: true, showPlot: true},
-		$author$project$Test$loadCsv);
+		{currentPlot: $author$project$ScatterParallelplot$Scatter, data: _List_Nil, hoveredPoint: $elm$core$Maybe$Nothing, selectedX: 'Physical Activity', selectedY: 'Sleep Duration', showFemale: true, showMale: true, showPlot: true},
+		$author$project$ScatterParallelplot$loadCsv);
 };
-var $elm$core$Platform$Cmd$map = _Platform_map;
-var $author$project$Projekt$init = function (_v0) {
-	var _v1 = $author$project$Test$init(_Utils_Tuple0);
-	var testInit = _v1.a;
-	var testCmd = _v1.b;
-	var _v2 = $author$project$Baum$init(_Utils_Tuple0);
-	var baumInit = _v2.a;
-	var baumCmd = _v2.b;
-	return _Utils_Tuple2(
-		{baumModel: baumInit, currentPlot: $author$project$Projekt$ShowBaum, testModel: testInit},
-		$elm$core$Platform$Cmd$batch(
-			_List_fromArray(
-				[
-					A2($elm$core$Platform$Cmd$map, $author$project$Projekt$BaumMsg, baumCmd),
-					A2($elm$core$Platform$Cmd$map, $author$project$Projekt$TestMsg, testCmd)
-				])));
-};
-var $elm$core$Platform$Sub$map = _Platform_map;
-var $author$project$Baum$MatrixReceived = function (a) {
-	return {$: 'MatrixReceived', a: a};
-};
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
-var $elm$json$Json$Decode$list = _Json_decodeList;
-var $author$project$Baum$receiveMatrix = _Platform_incomingPort(
-	'receiveMatrix',
-	$elm$json$Json$Decode$list(
-		$elm$json$Json$Decode$list($elm$json$Json$Decode$float)));
-var $author$project$Baum$subscriptions = function (_v0) {
-	return $author$project$Baum$receiveMatrix($author$project$Baum$MatrixReceived);
-};
-var $author$project$Projekt$subscriptions = function (model) {
-	return A2(
-		$elm$core$Platform$Sub$map,
-		$author$project$Projekt$BaumMsg,
-		$author$project$Baum$subscriptions(model.baumModel));
-};
-var $author$project$Test$ChangePlot = function (a) {
-	return {$: 'ChangePlot', a: a};
-};
-var $author$project$Projekt$ShowParallel = {$: 'ShowParallel'};
-var $author$project$Projekt$ShowScatter = {$: 'ShowScatter'};
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
-var $elm$core$Basics$modBy = _Basics_modBy;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Baum$buildGraph = function (matrix) {
-	var svgWidth = 1200;
-	var levelHeight = 100;
-	var keys = _List_fromArray(
-		['Gender', 'Age', 'Sleep Duration', 'Quality of Sleep', 'Physical Activity Level', 'Stress Level', 'BMI Category', 'Heart Rate', 'Daily Steps', 'Sleep Disorder']);
-	var nodes = A2(
-		$elm$core$List$indexedMap,
-		F2(
-			function (i, label) {
-				var xOffset = (!A2($elm$core$Basics$modBy, 2, i)) ? (-150) : 150;
-				var x = (svgWidth / 2) + xOffset;
-				var level = (i / 2) | 0;
-				var y = (level * levelHeight) + 50;
-				return {fx: $elm$core$Maybe$Nothing, fy: $elm$core$Maybe$Nothing, id: i, label: label, x: x, y: y};
-			}),
-		keys);
-	var edges = A2(
-		$elm$core$List$concatMap,
-		function (_v0) {
-			var row = _v0.a;
-			var i = _v0.b;
-			return A2(
-				$elm$core$List$concatMap,
-				function (_v1) {
-					var value = _v1.a;
-					var j = _v1.b;
-					return (!_Utils_eq(i, j)) ? _List_fromArray(
-						[
-							{from: i, to: j, weight: value}
-						]) : _List_Nil;
-				},
-				A2(
-					$elm$core$List$indexedMap,
-					F2(
-						function (j, value) {
-							return _Utils_Tuple2(value, j);
-						}),
-					row));
-		},
-		A2(
-			$elm$core$List$indexedMap,
-			F2(
-				function (i, row) {
-					return _Utils_Tuple2(row, i);
-				}),
-			matrix));
-	return _Utils_Tuple2(nodes, edges);
-};
-var $author$project$Baum$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'MatrixReceived':
-				var matrix = msg.a;
-				var _v1 = $author$project$Baum$buildGraph(matrix);
-				var nodes = _v1.a;
-				var edges = _v1.b;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{edges: edges, nodes: nodes}),
-					$elm$core$Platform$Cmd$none);
-			case 'DragNode':
-				var nodeId = msg.a;
-				var x = msg.b;
-				var y = msg.c;
-				var nodesUpdated = A2(
-					$elm$core$List$map,
-					function (n) {
-						return _Utils_eq(n.id, nodeId) ? _Utils_update(
-							n,
-							{
-								fx: $elm$core$Maybe$Just(x),
-								fy: $elm$core$Maybe$Just(y),
-								x: x,
-								y: y
-							}) : n;
-					},
-					model.nodes);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{nodes: nodesUpdated}),
-					$elm$core$Platform$Cmd$none);
-			default:
-				var nodeId = msg.a;
-				var nodesUpdated = A2(
-					$elm$core$List$map,
-					function (n) {
-						return _Utils_eq(n.id, nodeId) ? _Utils_update(
-							n,
-							{fx: $elm$core$Maybe$Nothing, fy: $elm$core$Maybe$Nothing}) : n;
-					},
-					model.nodes);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{nodes: nodesUpdated}),
-					$elm$core$Platform$Cmd$none);
-		}
-	});
-var $author$project$Test$Parallel = {$: 'Parallel'};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$ScatterParallelplot$Parallel = {$: 'Parallel'};
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -6326,6 +6152,8 @@ var $elm$core$List$drop = F2(
 		}
 	});
 var $elm$core$Debug$log = _Debug_log;
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Basics$not = _Basics_not;
 var $BrianHicks$elm_csv$Csv$Parser$AdditionalCharactersAfterClosingQuote = function (a) {
 	return {$: 'AdditionalCharactersAfterClosingQuote', a: a};
@@ -6876,7 +6704,7 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
-var $author$project$Test$rowToPerson = function (row) {
+var $author$project$ScatterParallelplot$rowToPerson = function (row) {
 	var toInt = function (s) {
 		return A2(
 			$elm$core$Maybe$withDefault,
@@ -6920,7 +6748,7 @@ var $author$project$Test$rowToPerson = function (row) {
 			get(7))
 	};
 };
-var $author$project$Test$update = F2(
+var $author$project$ScatterParallelplot$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'ChangeX':
@@ -6969,7 +6797,7 @@ var $author$project$Test$update = F2(
 					if (_v1.$ === 'Ok') {
 						var rows = _v1.a;
 						var dataRows = A2($elm$core$List$drop, 1, rows);
-						var persons = A2($elm$core$List$map, $author$project$Test$rowToPerson, dataRows);
+						var persons = A2($elm$core$List$map, $author$project$ScatterParallelplot$rowToPerson, dataRows);
 						var _v2 = A2(
 							$elm$core$Debug$log,
 							'Loaded persons: ' + $elm$core$String$fromInt(
@@ -7000,11 +6828,11 @@ var $author$project$Test$update = F2(
 				var plotType = function () {
 					switch (pStr) {
 						case 'scatter':
-							return $author$project$Test$Scatter;
+							return $author$project$ScatterParallelplot$Scatter;
 						case 'parallel':
-							return $author$project$Test$Parallel;
+							return $author$project$ScatterParallelplot$Parallel;
 						default:
-							return $author$project$Test$Scatter;
+							return $author$project$ScatterParallelplot$Scatter;
 					}
 				}();
 				return _Utils_Tuple2(
@@ -7014,282 +6842,7 @@ var $author$project$Test$update = F2(
 					$elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Projekt$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'ShowBaumMsg':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{currentPlot: $author$project$Projekt$ShowBaum}),
-					$elm$core$Platform$Cmd$none);
-			case 'ShowScatterMsg':
-				var _v1 = A2(
-					$author$project$Test$update,
-					$author$project$Test$ChangePlot('scatter'),
-					model.testModel);
-				var newTestModel = _v1.a;
-				var cmd = _v1.b;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{currentPlot: $author$project$Projekt$ShowScatter, testModel: newTestModel}),
-					A2($elm$core$Platform$Cmd$map, $author$project$Projekt$TestMsg, cmd));
-			case 'ShowParallelMsg':
-				var _v2 = A2(
-					$author$project$Test$update,
-					$author$project$Test$ChangePlot('parallel'),
-					model.testModel);
-				var newTestModel = _v2.a;
-				var cmd = _v2.b;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{currentPlot: $author$project$Projekt$ShowParallel, testModel: newTestModel}),
-					A2($elm$core$Platform$Cmd$map, $author$project$Projekt$TestMsg, cmd));
-			case 'BaumMsg':
-				var bMsg = msg.a;
-				var _v3 = A2($author$project$Baum$update, bMsg, model.baumModel);
-				var newBaumModel = _v3.a;
-				var bCmd = _v3.b;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{baumModel: newBaumModel}),
-					A2($elm$core$Platform$Cmd$map, $author$project$Projekt$BaumMsg, bCmd));
-			default:
-				var tMsg = msg.a;
-				var _v4 = A2($author$project$Test$update, tMsg, model.testModel);
-				var newTestModel = _v4.a;
-				var tCmd = _v4.b;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{testModel: newTestModel}),
-					A2($elm$core$Platform$Cmd$map, $author$project$Projekt$TestMsg, tCmd));
-		}
-	});
-var $author$project$Projekt$ShowBaumMsg = {$: 'ShowBaumMsg'};
-var $author$project$Projekt$ShowParallelMsg = {$: 'ShowParallelMsg'};
-var $author$project$Projekt$ShowScatterMsg = {$: 'ShowScatterMsg'};
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $author$project$Baum$DragNode = F3(
-	function (a, b, c) {
-		return {$: 'DragNode', a: a, b: b, c: c};
-	});
-var $author$project$Baum$ReleaseNode = function (a) {
-	return {$: 'ReleaseNode', a: a};
-};
-var $elm$core$Basics$abs = function (n) {
-	return (n < 0) ? (-n) : n;
-};
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$dy = _VirtualDom_attribute('dy');
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
-var $elm$svg$Svg$Attributes$fontWeight = _VirtualDom_attribute('font-weight');
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$svg$Svg$Events$on = $elm$html$Html$Events$on;
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $author$project$Baum$splitLabel = function (label) {
-	return A2($elm$core$String$split, ' ', label);
-};
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$svg$Svg$Attributes$textAnchor = _VirtualDom_attribute('text-anchor');
-var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $elm$svg$Svg$tspan = $elm$svg$Svg$trustedNode('tspan');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
-var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
-var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
-var $author$project$Baum$graphView = function (model) {
-	var svgWidth = 1200;
-	var svgHeight = 600;
-	var marginTop = 2;
-	var nodeElements = A2(
-		$elm$core$List$concatMap,
-		function (n) {
-			return _List_fromArray(
-				[
-					A2(
-					$elm$svg$Svg$circle,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$cx(
-							$elm$core$String$fromFloat(n.x)),
-							$elm$svg$Svg$Attributes$cy(
-							$elm$core$String$fromFloat(n.y + marginTop)),
-							$elm$svg$Svg$Attributes$r('40'),
-							$elm$svg$Svg$Attributes$fill('#69b3a2'),
-							A2(
-							$elm$svg$Svg$Events$on,
-							'mousedown',
-							A3(
-								$elm$json$Json$Decode$map2,
-								F2(
-									function (x, y) {
-										return A3($author$project$Baum$DragNode, n.id, x, y);
-									}),
-								A2($elm$json$Json$Decode$field, 'clientX', $elm$json$Json$Decode$float),
-								A2($elm$json$Json$Decode$field, 'clientY', $elm$json$Json$Decode$float))),
-							A2(
-							$elm$svg$Svg$Events$on,
-							'mouseup',
-							$elm$json$Json$Decode$succeed(
-								$author$project$Baum$ReleaseNode(n.id)))
-						]),
-					_List_Nil),
-					A2(
-					$elm$svg$Svg$text_,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$x(
-							$elm$core$String$fromFloat(n.x)),
-							$elm$svg$Svg$Attributes$y(
-							$elm$core$String$fromFloat((n.y + marginTop) - 10)),
-							$elm$svg$Svg$Attributes$textAnchor('middle'),
-							$elm$svg$Svg$Attributes$fontSize('12'),
-							$elm$svg$Svg$Attributes$fontWeight('bold'),
-							$elm$svg$Svg$Attributes$fill('white')
-						]),
-					A2(
-						$elm$core$List$indexedMap,
-						F2(
-							function (i, word) {
-								return A2(
-									$elm$svg$Svg$tspan,
-									_List_fromArray(
-										[
-											$elm$svg$Svg$Attributes$x(
-											$elm$core$String$fromFloat(n.x)),
-											$elm$svg$Svg$Attributes$dy(
-											(!i) ? '0' : '15')
-										]),
-									_List_fromArray(
-										[
-											$elm$svg$Svg$text(word)
-										]));
-							}),
-						$author$project$Baum$splitLabel(n.label)))
-				]);
-		},
-		model.nodes);
-	var edgeElements = A2(
-		$elm$core$List$map,
-		function (edge) {
-			var toNode = $elm$core$List$head(
-				A2(
-					$elm$core$List$filter,
-					function (n) {
-						return _Utils_eq(n.id, edge.to);
-					},
-					model.nodes));
-			var strokeWidth = A2(
-				$elm$core$Basics$max,
-				0.5,
-				$elm$core$Basics$abs(edge.weight) * 8);
-			var fromNode = $elm$core$List$head(
-				A2(
-					$elm$core$List$filter,
-					function (n) {
-						return _Utils_eq(n.id, edge.from);
-					},
-					model.nodes));
-			var _v0 = _Utils_Tuple2(fromNode, toNode);
-			if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
-				var fn = _v0.a.a;
-				var tn = _v0.b.a;
-				return A2(
-					$elm$svg$Svg$line,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$x1(
-							$elm$core$String$fromFloat(fn.x)),
-							$elm$svg$Svg$Attributes$y1(
-							$elm$core$String$fromFloat(fn.y + marginTop)),
-							$elm$svg$Svg$Attributes$x2(
-							$elm$core$String$fromFloat(tn.x)),
-							$elm$svg$Svg$Attributes$y2(
-							$elm$core$String$fromFloat(tn.y + marginTop)),
-							$elm$svg$Svg$Attributes$stroke('#8a4343ff'),
-							$elm$svg$Svg$Attributes$strokeWidth(
-							$elm$core$String$fromFloat(strokeWidth))
-						]),
-					_List_Nil);
-			} else {
-				return A2($elm$svg$Svg$line, _List_Nil, _List_Nil);
-			}
-		},
-		model.edges);
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'margin', '0 auto'),
-				A2($elm$html$Html$Attributes$style, 'width', '1200px'),
-				A2($elm$html$Html$Attributes$style, 'text-align', 'center')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$svg,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$width(
-						$elm$core$String$fromFloat(svgWidth)),
-						$elm$svg$Svg$Attributes$height(
-						$elm$core$String$fromFloat(svgHeight))
-					]),
-				_Utils_ap(edgeElements, nodeElements))
-			]));
-};
-var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
-var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$core$List$isEmpty = function (xs) {
 	if (!xs.b) {
 		return true;
@@ -7297,6 +6850,21 @@ var $elm$core$List$isEmpty = function (xs) {
 		return false;
 	}
 };
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
 var $elm_community$list_extra$List$Extra$findIndexHelp = F3(
 	function (index, predicate, list) {
 		findIndexHelp:
@@ -7325,6 +6893,11 @@ var $elm_community$list_extra$List$Extra$elemIndex = function (x) {
 	return $elm_community$list_extra$List$Extra$findIndex(
 		$elm$core$Basics$eq(x));
 };
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$line = $elm$svg$Svg$trustedNode('line');
 var $elm$virtual_dom$VirtualDom$node = function (tag) {
 	return _VirtualDom_node(
 		_VirtualDom_noScript(tag));
@@ -7332,7 +6905,15 @@ var $elm$virtual_dom$VirtualDom$node = function (tag) {
 var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
 var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
 var $elm$svg$Svg$polyline = $elm$svg$Svg$trustedNode('polyline');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeOpacity = _VirtualDom_attribute('stroke-opacity');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$Attributes$textAnchor = _VirtualDom_attribute('text-anchor');
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -7400,7 +6981,14 @@ var $elm_community$list_extra$List$Extra$uniqueHelp = F4(
 var $elm_community$list_extra$List$Extra$unique = function (list) {
 	return A4($elm_community$list_extra$List$Extra$uniqueHelp, $elm$core$Basics$identity, _List_Nil, list, _List_Nil);
 };
-var $author$project$Test$parallelPlotView = function (people) {
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
+var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
+var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
+var $author$project$ScatterParallelplot$parallelPlotView = function (people) {
 	var sleepDisorders = $elm_community$list_extra$List$Extra$unique(
 		A2(
 			$elm$core$List$map,
@@ -7709,23 +7297,23 @@ var $author$project$Test$parallelPlotView = function (people) {
 						])))
 			]));
 };
-var $author$project$Test$parallelControls = function (model) {
+var $author$project$ScatterParallelplot$parallelControls = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
-				$elm$core$List$isEmpty(model.data) ? $elm$html$Html$text('Loading...') : $author$project$Test$parallelPlotView(model.data)
+				$elm$core$List$isEmpty(model.data) ? $elm$html$Html$text('Loading...') : $author$project$ScatterParallelplot$parallelPlotView(model.data)
 			]));
 };
-var $author$project$Test$ToggleFemale = function (a) {
+var $author$project$ScatterParallelplot$ToggleFemale = function (a) {
 	return {$: 'ToggleFemale', a: a};
 };
-var $author$project$Test$ToggleMale = function (a) {
+var $author$project$ScatterParallelplot$ToggleMale = function (a) {
 	return {$: 'ToggleMale', a: a};
 };
-var $author$project$Test$TogglePlot = {$: 'TogglePlot'};
-var $author$project$Test$ChangeX = function (a) {
+var $author$project$ScatterParallelplot$TogglePlot = {$: 'TogglePlot'};
+var $author$project$ScatterParallelplot$ChangeX = function (a) {
 	return {$: 'ChangeX', a: a};
 };
 var $elm$html$Html$Events$alwaysStop = function (x) {
@@ -7734,6 +7322,7 @@ var $elm$html$Html$Events$alwaysStop = function (x) {
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -7741,6 +7330,7 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
@@ -7780,12 +7370,12 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
-var $author$project$Test$axisSelectX = function (selected) {
+var $author$project$ScatterParallelplot$axisSelectX = function (selected) {
 	return A2(
 		$elm$html$Html$select,
 		_List_fromArray(
 			[
-				$elm$html$Html$Events$onInput($author$project$Test$ChangeX)
+				$elm$html$Html$Events$onInput($author$project$ScatterParallelplot$ChangeX)
 			]),
 		_List_fromArray(
 			[
@@ -7813,15 +7403,15 @@ var $author$project$Test$axisSelectX = function (selected) {
 					]))
 			]));
 };
-var $author$project$Test$ChangeY = function (a) {
+var $author$project$ScatterParallelplot$ChangeY = function (a) {
 	return {$: 'ChangeY', a: a};
 };
-var $author$project$Test$axisSelectY = function (selected) {
+var $author$project$ScatterParallelplot$axisSelectY = function (selected) {
 	return A2(
 		$elm$html$Html$select,
 		_List_fromArray(
 			[
-				$elm$html$Html$Events$onInput($author$project$Test$ChangeY)
+				$elm$html$Html$Events$onInput($author$project$ScatterParallelplot$ChangeY)
 			]),
 		_List_fromArray(
 			[
@@ -7849,9 +7439,20 @@ var $author$project$Test$axisSelectY = function (selected) {
 					]))
 			]));
 };
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$html$Html$Events$targetChecked = A2(
 	$elm$json$Json$Decode$at,
@@ -7864,8 +7465,10 @@ var $elm$html$Html$Events$onCheck = function (tagger) {
 		'change',
 		A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetChecked));
 };
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
-var $author$project$Test$labelCheckbox = F3(
+var $author$project$ScatterParallelplot$labelCheckbox = F3(
 	function (labelText, checked, toMsg) {
 		return A2(
 			$elm$html$Html$label,
@@ -7887,11 +7490,29 @@ var $author$project$Test$labelCheckbox = F3(
 					$elm$html$Html$text(' ' + labelText)
 				]));
 	});
-var $author$project$Test$ClickPoint = function (a) {
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $author$project$ScatterParallelplot$ClickPoint = function (a) {
 	return {$: 'ClickPoint', a: a};
 };
 var $elm$html$Html$br = _VirtualDom_node('br');
-var $author$project$Test$getValueForAxis = F2(
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$svg$Svg$Attributes$fontWeight = _VirtualDom_attribute('font-weight');
+var $author$project$ScatterParallelplot$getValueForAxis = F2(
 	function (dp, axis) {
 		switch (axis) {
 			case 'Sleep Duration':
@@ -7937,7 +7558,8 @@ var $elm$svg$Svg$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$core$Basics$round = _Basics_round;
-var $author$project$Test$ticksForAxis = F2(
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$ScatterParallelplot$ticksForAxis = F2(
 	function (axis, values) {
 		var minVal = A2(
 			$elm$core$Maybe$withDefault,
@@ -7958,7 +7580,7 @@ var $author$project$Test$ticksForAxis = F2(
 	});
 var $elm$core$String$toLower = _String_toLower;
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
-var $author$project$Test$scatterPlotView = function (model) {
+var $author$project$ScatterParallelplot$scatterPlotView = function (model) {
 	var tooltipBox = function () {
 		var _v0 = model.hoveredPoint;
 		if (_v0.$ === 'Just') {
@@ -7987,11 +7609,11 @@ var $author$project$Test$scatterPlotView = function (model) {
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						$elm$html$Html$text(
 						model.selectedX + (': ' + $elm$core$String$fromFloat(
-							A2($author$project$Test$getValueForAxis, dp, model.selectedX)))),
+							A2($author$project$ScatterParallelplot$getValueForAxis, dp, model.selectedX)))),
 						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						$elm$html$Html$text(
 						model.selectedY + (': ' + $elm$core$String$fromFloat(
-							A2($author$project$Test$getValueForAxis, dp, model.selectedY))))
+							A2($author$project$ScatterParallelplot$getValueForAxis, dp, model.selectedY))))
 					]));
 		} else {
 			return A2(
@@ -8086,7 +7708,7 @@ var $author$project$Test$scatterPlotView = function (model) {
 	var xs = A2(
 		$elm$core$List$map,
 		function (dp) {
-			return A2($author$project$Test$getValueForAxis, dp, model.selectedX);
+			return A2($author$project$ScatterParallelplot$getValueForAxis, dp, model.selectedX);
 		},
 		filteredData);
 	var minX = A2(
@@ -8119,11 +7741,11 @@ var $author$project$Test$scatterPlotView = function (model) {
 						$elm$core$Basics$round(v * 10) / 10))
 				]));
 	};
-	var xTicks = A2($author$project$Test$ticksForAxis, model.selectedX, xs);
+	var xTicks = A2($author$project$ScatterParallelplot$ticksForAxis, model.selectedX, xs);
 	var ys = A2(
 		$elm$core$List$map,
 		function (dp) {
-			return A2($author$project$Test$getValueForAxis, dp, model.selectedY);
+			return A2($author$project$ScatterParallelplot$getValueForAxis, dp, model.selectedY);
 		},
 		filteredData);
 	var minY = A2(
@@ -8157,7 +7779,7 @@ var $author$project$Test$scatterPlotView = function (model) {
 							$elm$core$Basics$round(v * 10) / 10))
 					]));
 		});
-	var yTicks = A2($author$project$Test$ticksForAxis, model.selectedY, ys);
+	var yTicks = A2($author$project$ScatterParallelplot$ticksForAxis, model.selectedY, ys);
 	var color = function (dp) {
 		var g = $elm$core$String$toLower(dp.gender);
 		return (g === 'male') ? '#2D68C4' : ((g === 'female') ? '#DE5D83' : 'gray');
@@ -8166,9 +7788,9 @@ var $author$project$Test$scatterPlotView = function (model) {
 		$elm$core$List$map,
 		function (dp) {
 			var cy = scaleY(
-				A2($author$project$Test$getValueForAxis, dp, model.selectedY));
+				A2($author$project$ScatterParallelplot$getValueForAxis, dp, model.selectedY));
 			var cx = scaleX(
-				A2($author$project$Test$getValueForAxis, dp, model.selectedX));
+				A2($author$project$ScatterParallelplot$getValueForAxis, dp, model.selectedX));
 			return A2(
 				$elm$svg$Svg$circle,
 				_List_fromArray(
@@ -8183,7 +7805,7 @@ var $author$project$Test$scatterPlotView = function (model) {
 						$elm$svg$Svg$Attributes$stroke('black'),
 						$elm$svg$Svg$Attributes$strokeWidth('1'),
 						$elm$svg$Svg$Events$onClick(
-						$author$project$Test$ClickPoint(dp))
+						$author$project$ScatterParallelplot$ClickPoint(dp))
 					]),
 				_List_Nil);
 		},
@@ -8265,7 +7887,7 @@ var $author$project$Test$scatterPlotView = function (model) {
 				tooltipBox
 			]));
 };
-var $author$project$Test$scatterControls = function (model) {
+var $author$project$ScatterParallelplot$scatterControls = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -8280,7 +7902,7 @@ var $author$project$Test$scatterControls = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text('X-AXIS: '),
-						$author$project$Test$axisSelectX(model.selectedX)
+						$author$project$ScatterParallelplot$axisSelectX(model.selectedX)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -8291,7 +7913,7 @@ var $author$project$Test$scatterControls = function (model) {
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Y-AXIS: '),
-						$author$project$Test$axisSelectY(model.selectedY)
+						$author$project$ScatterParallelplot$axisSelectY(model.selectedY)
 					])),
 				A2(
 				$elm$html$Html$div,
@@ -8305,7 +7927,7 @@ var $author$project$Test$scatterControls = function (model) {
 						$elm$html$Html$button,
 						_List_fromArray(
 							[
-								$elm$html$Html$Events$onClick($author$project$Test$TogglePlot)
+								$elm$html$Html$Events$onClick($author$project$ScatterParallelplot$TogglePlot)
 							]),
 						_List_fromArray(
 							[
@@ -8322,13 +7944,13 @@ var $author$project$Test$scatterControls = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A3($author$project$Test$labelCheckbox, 'MALE', model.showMale, $author$project$Test$ToggleMale),
-						A3($author$project$Test$labelCheckbox, 'FEMALE', model.showFemale, $author$project$Test$ToggleFemale)
+						A3($author$project$ScatterParallelplot$labelCheckbox, 'MALE', model.showMale, $author$project$ScatterParallelplot$ToggleMale),
+						A3($author$project$ScatterParallelplot$labelCheckbox, 'FEMALE', model.showFemale, $author$project$ScatterParallelplot$ToggleFemale)
 					])),
-				model.showPlot ? $author$project$Test$scatterPlotView(model) : $elm$html$Html$text('')
+				model.showPlot ? $author$project$ScatterParallelplot$scatterPlotView(model) : $elm$html$Html$text('')
 			]));
 };
-var $author$project$Test$view = function (model) {
+var $author$project$ScatterParallelplot$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -8348,79 +7970,17 @@ var $author$project$Test$view = function (model) {
 					[
 						$elm$html$Html$text(' ')
 					])),
-				_Utils_eq(model.currentPlot, $author$project$Test$Scatter) ? $author$project$Test$scatterControls(model) : $author$project$Test$parallelControls(model)
+				_Utils_eq(model.currentPlot, $author$project$ScatterParallelplot$Scatter) ? $author$project$ScatterParallelplot$scatterControls(model) : $author$project$ScatterParallelplot$parallelControls(model)
 			]));
 };
-var $author$project$Projekt$view = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'margin-bottom', '20px')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Projekt$ShowBaumMsg),
-								A2($elm$html$Html$Attributes$style, 'margin-right', '10px')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Baum')
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Projekt$ShowScatterMsg),
-								A2($elm$html$Html$Attributes$style, 'margin-right', '10px')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Scatterplot')
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Projekt$ShowParallelMsg)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Mehrdimensionale')
-							]))
-					])),
-				function () {
-				var _v0 = model.currentPlot;
-				switch (_v0.$) {
-					case 'ShowBaum':
-						return A2(
-							$elm$html$Html$map,
-							$author$project$Projekt$BaumMsg,
-							$author$project$Baum$graphView(model.baumModel));
-					case 'ShowScatter':
-						return A2(
-							$elm$html$Html$map,
-							$author$project$Projekt$TestMsg,
-							$author$project$Test$view(model.testModel));
-					default:
-						return A2(
-							$elm$html$Html$map,
-							$author$project$Projekt$TestMsg,
-							$author$project$Test$view(model.testModel));
-				}
-			}()
-			]));
-};
-var $author$project$Projekt$main = $elm$browser$Browser$element(
-	{init: $author$project$Projekt$init, subscriptions: $author$project$Projekt$subscriptions, update: $author$project$Projekt$update, view: $author$project$Projekt$view});
-_Platform_export({'Projekt':{'init':$author$project$Projekt$main(
+var $author$project$ScatterParallelplot$main = $elm$browser$Browser$element(
+	{
+		init: $author$project$ScatterParallelplot$init,
+		subscriptions: function (_v0) {
+			return $elm$core$Platform$Sub$none;
+		},
+		update: $author$project$ScatterParallelplot$update,
+		view: $author$project$ScatterParallelplot$view
+	});
+_Platform_export({'ScatterParallelplot':{'init':$author$project$ScatterParallelplot$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));

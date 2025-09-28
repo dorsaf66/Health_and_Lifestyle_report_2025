@@ -97,11 +97,11 @@ view model =
         [ div [ HtmlAttr.style "margin-bottom" "20px" ]
             [ button [ HtmlEvents.onClick ShowBaumMsg, HtmlAttr.style "margin-right" "10px" ] [ text "Baum" ]
             , button [ HtmlEvents.onClick ShowScatterMsg, HtmlAttr.style "margin-right" "10px" ] [ text "Scatterplot" ]
-            , button [ HtmlEvents.onClick ShowParallelMsg ] [ text "Parallel" ]
+            , button [ HtmlEvents.onClick ShowParallelMsg ] [ text "Mehrdimensionale" ]
             ]
         , case model.currentPlot of
             ShowBaum ->
-                Html.map BaumMsg (Baum.graphView model.baumModel)
+                 Html.map BaumMsg (Baum.graphView model.baumModel)
 
             ShowScatter ->
                 Html.map TestMsg (Test.view model.testModel)
