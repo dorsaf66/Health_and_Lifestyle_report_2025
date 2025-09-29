@@ -7072,7 +7072,6 @@ var $author$project$Projekt$update = F2(
 var $author$project$Projekt$ShowBaumMsg = {$: 'ShowBaumMsg'};
 var $author$project$Projekt$ShowParallelMsg = {$: 'ShowParallelMsg'};
 var $author$project$Projekt$ShowScatterMsg = {$: 'ShowScatterMsg'};
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$Baum$DragNode = F3(
 	function (a, b, c) {
@@ -7281,8 +7280,10 @@ var $author$project$Baum$graphView = function (model) {
 				_Utils_ap(edgeElements, nodeElements))
 			]));
 };
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$Events$onClick = function (msg) {
 	return A2(
 		$elm$html$Html$Events$on,
@@ -7290,6 +7291,31 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Projekt$styledButton = F3(
+	function (color, label, msg) {
+		return A2(
+			$elm$html$Html$button,
+			_List_fromArray(
+				[
+					$elm$html$Html$Events$onClick(msg),
+					A2($elm$html$Html$Attributes$style, 'padding', '10px 22px'),
+					A2($elm$html$Html$Attributes$style, 'margin-right', '10px'),
+					A2($elm$html$Html$Attributes$style, 'border', 'none'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+					A2($elm$html$Html$Attributes$style, 'cursor', 'pointer'),
+					A2($elm$html$Html$Attributes$style, 'font-weight', '600'),
+					A2($elm$html$Html$Attributes$style, 'font-size', '14px'),
+					A2($elm$html$Html$Attributes$style, 'color', 'white'),
+					A2($elm$html$Html$Attributes$style, 'background-color', color),
+					A2($elm$html$Html$Attributes$style, 'box-shadow', '0 4px 8px rgba(0,0,0,0.1)'),
+					A2($elm$html$Html$Attributes$style, 'transition', 'all 0.2s ease'),
+					A2($elm$html$Html$Attributes$style, 'outline', 'none')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(label)
+				]));
+	});
 var $elm$core$List$isEmpty = function (xs) {
 	if (!xs.b) {
 		return true;
@@ -8354,9 +8380,32 @@ var $author$project$Test$view = function (model) {
 var $author$project$Projekt$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
 		_List_fromArray(
 			[
+				A2($elm$html$Html$Attributes$style, 'font-family', 'Arial, sans-serif'),
+				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+				A2($elm$html$Html$Attributes$style, 'flex-direction', 'column'),
+				A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+				A2($elm$html$Html$Attributes$style, 'margin', '20px'),
+				A2($elm$html$Html$Attributes$style, 'min-height', '100vh'),
+				A2($elm$html$Html$Attributes$style, 'background-color', '#f4f4f9')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h1,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'font-size', '36px'),
+						A2($elm$html$Html$Attributes$style, 'font-weight', 'bold'),
+						A2($elm$html$Html$Attributes$style, 'margin-bottom', '30px'),
+						A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+						A2($elm$html$Html$Attributes$style, 'color', '#333')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Health and Lifestyle')
+					])),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -8365,59 +8414,45 @@ var $author$project$Projekt$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Projekt$ShowBaumMsg),
-								A2($elm$html$Html$Attributes$style, 'margin-right', '10px')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Baum')
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Projekt$ShowScatterMsg),
-								A2($elm$html$Html$Attributes$style, 'margin-right', '10px')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Scatterplot')
-							])),
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Events$onClick($author$project$Projekt$ShowParallelMsg)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Mehrdimensionale')
-							]))
+						A3($author$project$Projekt$styledButton, '#4CAF50', 'Baum', $author$project$Projekt$ShowBaumMsg),
+						A3($author$project$Projekt$styledButton, '#2196F3', 'Scatterplot', $author$project$Projekt$ShowScatterMsg),
+						A3($author$project$Projekt$styledButton, '#FF5722', 'Mehrdimensionale', $author$project$Projekt$ShowParallelMsg)
 					])),
-				function () {
-				var _v0 = model.currentPlot;
-				switch (_v0.$) {
-					case 'ShowBaum':
-						return A2(
-							$elm$html$Html$map,
-							$author$project$Projekt$BaumMsg,
-							$author$project$Baum$graphView(model.baumModel));
-					case 'ShowScatter':
-						return A2(
-							$elm$html$Html$map,
-							$author$project$Projekt$TestMsg,
-							$author$project$Test$view(model.testModel));
-					default:
-						return A2(
-							$elm$html$Html$map,
-							$author$project$Projekt$TestMsg,
-							$author$project$Test$view(model.testModel));
-				}
-			}()
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'width', '90%'),
+						A2($elm$html$Html$Attributes$style, 'max-width', '1200px'),
+						A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
+						A2($elm$html$Html$Attributes$style, 'padding', '20px'),
+						A2($elm$html$Html$Attributes$style, 'border-radius', '12px'),
+						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 4px 10px rgba(0,0,0,0.1)'),
+						A2($elm$html$Html$Attributes$style, 'margin-bottom', '50px')
+					]),
+				_List_fromArray(
+					[
+						function () {
+						var _v0 = model.currentPlot;
+						switch (_v0.$) {
+							case 'ShowBaum':
+								return A2(
+									$elm$html$Html$map,
+									$author$project$Projekt$BaumMsg,
+									$author$project$Baum$graphView(model.baumModel));
+							case 'ShowScatter':
+								return A2(
+									$elm$html$Html$map,
+									$author$project$Projekt$TestMsg,
+									$author$project$Test$view(model.testModel));
+							default:
+								return A2(
+									$elm$html$Html$map,
+									$author$project$Projekt$TestMsg,
+									$author$project$Test$view(model.testModel));
+						}
+					}()
+					]))
 			]));
 };
 var $author$project$Projekt$main = $elm$browser$Browser$element(

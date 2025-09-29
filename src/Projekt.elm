@@ -1,7 +1,7 @@
 module Projekt exposing (..)
 
 import Browser
-import Html exposing (Html, div, button, text)
+import Html exposing (Html, div, button, text, h1)
 import Html.Attributes as HtmlAttr
 import Html.Events as HtmlEvents
 import Baum
@@ -58,7 +58,6 @@ update msg model =
 
         ShowScatterMsg ->
             let
-                -- Trigger Test.ChangePlot "scatter"
                 (newTestModel, cmd) =
                     Test.update (Test.ChangePlot "scatter") model.testModel
             in
@@ -68,7 +67,6 @@ update msg model =
 
         ShowParallelMsg ->
             let
-                -- Trigger Test.ChangePlot "parallel"
                 (newTestModel, cmd) =
                     Test.update (Test.ChangePlot "parallel") model.testModel
             in
@@ -93,22 +91,72 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ div [ HtmlAttr.style "margin-bottom" "20px" ]
-            [ button [ HtmlEvents.onClick ShowBaumMsg, HtmlAttr.style "margin-right" "10px" ] [ text "Baum" ]
-            , button [ HtmlEvents.onClick ShowScatterMsg, HtmlAttr.style "margin-right" "10px" ] [ text "Scatterplot" ]
-            , button [ HtmlEvents.onClick ShowParallelMsg ] [ text "Mehrdimensionale" ]
-            ]
-        , case model.currentPlot of
-            ShowBaum ->
-                 Html.map BaumMsg (Baum.graphView model.baumModel)
-
-            ShowScatter ->
-                Html.map TestMsg (Test.view model.testModel)
-
-            ShowParallel ->
-                Html.map TestMsg (Test.view model.testModel)
+    div [ HtmlAttr.style "font-family" "Arial, sans-serif"
+        , HtmlAttr.style "display" "flex"
+        , HtmlAttr.style "flex-direction" "column"
+        , HtmlAttr.style "align-items" "center"
+        , HtmlAttr.style "margin" "20px"
+        , HtmlAttr.style "min-height" "100vh"
+        , HtmlAttr.style "background-color" "#f4f4f9"
         ]
+        [ -- Title
+          h1 [ HtmlAttr.style "font-size" "36px"
+              , HtmlAttr.style "font-weight" "bold"
+              , HtmlAttr.style "margin-bottom" "30px"
+              , HtmlAttr.style "text-align" "center"
+              , HtmlAttr.style "color" "#333"
+              ]
+              [ text "Health and Lifestyle" ]
+          
+          -- Buttons for plot selection
+        , div [ HtmlAttr.style "margin-bottom" "20px" ]
+            [ styledButton "#4CAF50" "Baum" ShowBaumMsg
+            , styledButton "#2196F3" "Scatterplot" ShowScatterMsg
+            , styledButton "#FF5722" "Mehrdimensionale" ShowParallelMsg
+            ]
+
+          -- Diagram container
+        , div [ HtmlAttr.style "width" "90%"
+              , HtmlAttr.style "max-width" "1200px"
+              , HtmlAttr.style "background-color" "white"
+              , HtmlAttr.style "padding" "20px"
+              , HtmlAttr.style "border-radius" "12px"
+              , HtmlAttr.style "box-shadow" "0 4px 10px rgba(0,0,0,0.1)"
+              , HtmlAttr.style "margin-bottom" "50px"
+              ]
+            [ case model.currentPlot of
+                ShowBaum ->
+                    Html.map BaumMsg (Baum.graphView model.baumModel)
+
+                ShowScatter ->
+                    Html.map TestMsg (Test.view model.testModel)
+
+                ShowParallel ->
+                    Html.map TestMsg (Test.view model.testModel)
+            ]
+        ]
+
+
+-- BUTTON STYLE HELPER
+
+styledButton : String -> String -> Msg -> Html Msg
+styledButton color label msg =
+    button
+        [ HtmlEvents.onClick msg
+        , HtmlAttr.style "padding" "10px 22px"
+        , HtmlAttr.style "margin-right" "10px"
+        , HtmlAttr.style "border" "none"
+        , HtmlAttr.style "border-radius" "8px"
+        , HtmlAttr.style "cursor" "pointer"
+        , HtmlAttr.style "font-weight" "600"
+        , HtmlAttr.style "font-size" "14px"
+        , HtmlAttr.style "color" "white"
+        , HtmlAttr.style "background-color" color
+        , HtmlAttr.style "box-shadow" "0 4px 8px rgba(0,0,0,0.1)"
+        , HtmlAttr.style "transition" "all 0.2s ease"
+        , HtmlAttr.style "outline" "none"
+        ]
+        [ text label ]
 
 
 -- SUBSCRIPTIONS
