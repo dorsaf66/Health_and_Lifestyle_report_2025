@@ -102,12 +102,21 @@ view model =
         [ -- Title
           h1 [ HtmlAttr.style "font-size" "36px"
               , HtmlAttr.style "font-weight" "bold"
-              , HtmlAttr.style "margin-bottom" "30px"
+              , HtmlAttr.style "margin-bottom" "10px"
               , HtmlAttr.style "text-align" "center"
               , HtmlAttr.style "color" "#333"
               ]
-              [ text "Health and Lifestyle" ]
-          
+              [ text "Sleep Health and Lifestyle 2025" ]
+
+          -- Untertitel / Beschreibung
+        , div [ HtmlAttr.style "text-align" "center"
+              , HtmlAttr.style "max-width" "800px"
+              , HtmlAttr.style "margin-bottom" "30px"
+              , HtmlAttr.style "color" "#555"
+              , HtmlAttr.style "line-height" "1.5em"
+              ]
+              [ text "Der Datensatz enthält Informationen von über 350 Personen; für die nicht zeitabhängigen Visualisierungen werden Durchschnittswerte über alle Altersgruppen verwendet. Die interaktiven Plots ermöglichen es, Muster und Zusammenhänge selbst zu entdecken." ]
+
           -- Buttons for plot selection
         , div [ HtmlAttr.style "margin-bottom" "20px" ]
             [ styledButton "#4CAF50" "Baum" ShowBaumMsg

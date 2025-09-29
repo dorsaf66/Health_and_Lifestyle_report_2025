@@ -8398,13 +8398,27 @@ var $author$project$Projekt$view = function (model) {
 					[
 						A2($elm$html$Html$Attributes$style, 'font-size', '36px'),
 						A2($elm$html$Html$Attributes$style, 'font-weight', 'bold'),
-						A2($elm$html$Html$Attributes$style, 'margin-bottom', '30px'),
+						A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px'),
 						A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
 						A2($elm$html$Html$Attributes$style, 'color', '#333')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Health and Lifestyle')
+						$elm$html$Html$text('Sleep Health and Lifestyle 2025')
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+						A2($elm$html$Html$Attributes$style, 'max-width', '800px'),
+						A2($elm$html$Html$Attributes$style, 'margin-bottom', '30px'),
+						A2($elm$html$Html$Attributes$style, 'color', '#555'),
+						A2($elm$html$Html$Attributes$style, 'line-height', '1.5em')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Der Datensatz enthält Informationen von über 350 Personen; für die nicht zeitabhängigen Visualisierungen werden Durchschnittswerte über alle Altersgruppen verwendet. Die interaktiven Plots ermöglichen es, Muster und Zusammenhänge selbst zu entdecken.')
 					])),
 				A2(
 				$elm$html$Html$div,
