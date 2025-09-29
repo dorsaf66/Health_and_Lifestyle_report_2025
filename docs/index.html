@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Health and Lifestyle Report</title>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+  <div id="elm"></div>
+
+  <script src="Projekt.js"></script>
+  <script src="korrelationsmatrix.js"></script>
+  <script>
+    var app = Elm.Projekt.init({
+      node: document.getElementById('elm')
+    });
+    window.app = app;
+  </script>
+</body>
+</html>
