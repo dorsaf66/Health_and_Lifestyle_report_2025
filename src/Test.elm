@@ -407,8 +407,6 @@ scatterPlotView model =
                         , SvgAttr.cy (String.fromFloat cy)
                         , SvgAttr.r "5"
                         , SvgAttr.fill (color dp)
-                        , SvgAttr.stroke "black"
-                        , SvgAttr.strokeWidth "1"
                         , SvgEvents.onClick (ClickPoint dp)
                         ]
                         []
@@ -418,27 +416,26 @@ scatterPlotView model =
         tooltipBox =
             case model.hoveredPoint of
                 Just dp ->
-                    Html.div [ HtmlAttr.style "margin-left" "20px"
+                    Html.div
+                        [ HtmlAttr.style "margin-left" "20px"
                         , HtmlAttr.style "padding" "10px"
-                        , HtmlAttr.style "border" "1px solid black"
-                        , HtmlAttr.style "background" "#f9f9f9"
+                        , HtmlAttr.style "background" "#e0f0ff"
+                        , HtmlAttr.style "border-radius" "8px"
                         , HtmlAttr.style "width" "220px"
-                        , HtmlAttr.style "max-height" "120px"
+                        , HtmlAttr.style "max-height" "180px"
                         , HtmlAttr.style "overflow-y" "auto"
+                        , HtmlAttr.style "box-shadow" "0 2px 5px rgba(0,0,0,0.1)"
                         ]
-                        [ Html.text ("ID: " ++ String.fromInt dp.id)
-                        , Html.br [] []
-                        , Html.text ("Gender: " ++ dp.gender)
-                        , Html.br [] []
-                        , Html.text ("Age: " ++ String.fromInt dp.age)
-                        , Html.br [] []
-                        , Html.text (model.selectedX ++ ": " ++ String.fromFloat (getValueForAxis dp model.selectedX))
-                        , Html.br [] []
-                        , Html.text (model.selectedY ++ ": " ++ String.fromFloat (getValueForAxis dp model.selectedY))
+                        [ Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "ID: " ], Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromInt dp.id) ] ]
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "Gender: " ], Html.span [ HtmlAttr.style "color" "black" ] [ Html.text dp.gender ] ]
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "Age: " ], Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromInt dp.age) ] ]
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text (model.selectedX ++ ": ") ], Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromFloat (getValueForAxis dp model.selectedX)) ] ]
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text (model.selectedY ++ ": ") ], Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromFloat (getValueForAxis dp model.selectedY)) ] ]
                         ]
 
                 Nothing ->
-                    Html.div [ HtmlAttr.style "margin-left" "20px"
+                    Html.div
+                        [ HtmlAttr.style "margin-left" "20px"
                         , HtmlAttr.style "color" "gray"
                         ]
                         [ Html.text "Klicke auf einen Punkt" ]

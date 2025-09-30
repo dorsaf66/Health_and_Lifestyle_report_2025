@@ -7889,6 +7889,7 @@ var $elm$svg$Svg$Events$onClick = function (msg) {
 		$elm$json$Json$Decode$succeed(msg));
 };
 var $elm$core$Basics$round = _Basics_round;
+var $elm$html$Html$span = _VirtualDom_node('span');
 var $author$project$Test$ticksForAxis = F2(
 	function (axis, values) {
 		var minVal = A2(
@@ -7921,29 +7922,156 @@ var $author$project$Test$scatterPlotView = function (model) {
 					[
 						A2($elm$html$Html$Attributes$style, 'margin-left', '20px'),
 						A2($elm$html$Html$Attributes$style, 'padding', '10px'),
-						A2($elm$html$Html$Attributes$style, 'border', '1px solid black'),
-						A2($elm$html$Html$Attributes$style, 'background', '#f9f9f9'),
+						A2($elm$html$Html$Attributes$style, 'background', '#e0f0ff'),
+						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
 						A2($elm$html$Html$Attributes$style, 'width', '220px'),
-						A2($elm$html$Html$Attributes$style, 'max-height', '120px'),
-						A2($elm$html$Html$Attributes$style, 'overflow-y', 'auto')
+						A2($elm$html$Html$Attributes$style, 'max-height', '180px'),
+						A2($elm$html$Html$Attributes$style, 'overflow-y', 'auto'),
+						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 5px rgba(0,0,0,0.1)')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(
-						'ID: ' + $elm$core$String$fromInt(dp.id)),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						$elm$html$Html$text('Gender: ' + dp.gender),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						$elm$html$Html$text(
-						'Age: ' + $elm$core$String$fromInt(dp.age)),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						$elm$html$Html$text(
-						model.selectedX + (': ' + $elm$core$String$fromFloat(
-							A2($author$project$Test$getValueForAxis, dp, model.selectedX)))),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						$elm$html$Html$text(
-						model.selectedY + (': ' + $elm$core$String$fromFloat(
-							A2($author$project$Test$getValueForAxis, dp, model.selectedY))))
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'rgb(0, 122, 204)'),
+										A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('ID: ')
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'black')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(dp.id))
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'rgb(0, 122, 204)'),
+										A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Gender: ')
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'black')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(dp.gender)
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'rgb(0, 122, 204)'),
+										A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Age: ')
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'black')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(dp.age))
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'rgb(0, 122, 204)'),
+										A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(model.selectedX + ': ')
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'black')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$elm$core$String$fromFloat(
+											A2($author$project$Test$getValueForAxis, dp, model.selectedX)))
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'rgb(0, 122, 204)'),
+										A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(model.selectedY + ': ')
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'black')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$elm$core$String$fromFloat(
+											A2($author$project$Test$getValueForAxis, dp, model.selectedY)))
+									]))
+							]))
 					]));
 		} else {
 			return A2(
@@ -8132,8 +8260,6 @@ var $author$project$Test$scatterPlotView = function (model) {
 						$elm$svg$Svg$Attributes$r('5'),
 						$elm$svg$Svg$Attributes$fill(
 						color(dp)),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$strokeWidth('1'),
 						$elm$svg$Svg$Events$onClick(
 						$author$project$Test$ClickPoint(dp))
 					]),
