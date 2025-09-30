@@ -6138,7 +6138,7 @@ var $author$project$Test$loadCsv = $elm$http$Http$get(
 	});
 var $author$project$Test$init = function (_v0) {
 	return _Utils_Tuple2(
-		{currentPlot: $author$project$Test$Scatter, data: _List_Nil, hoveredPoint: $elm$core$Maybe$Nothing, selectedX: 'Daily Steps', selectedY: 'Sleep Duration', showFemale: true, showMale: true, showPlot: true},
+		{currentPlot: $author$project$Test$Scatter, data: _List_Nil, hoveredPoint: $elm$core$Maybe$Nothing, selectedX: 'Daily Steps', selectedY: 'Sleep Duration', showFemale: true, showMale: true, showPlot: false},
 		$author$project$Test$loadCsv);
 };
 var $elm$core$Platform$Cmd$map = _Platform_map;
@@ -7910,7 +7910,6 @@ var $author$project$Test$ticksForAxis = F2(
 				[0, 1, 2, 3, 4]));
 	});
 var $elm$core$String$toLower = _String_toLower;
-var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $author$project$Test$scatterPlotView = function (model) {
 	var tooltipBox = function () {
 		var _v0 = model.hoveredPoint;
@@ -7959,6 +7958,7 @@ var $author$project$Test$scatterPlotView = function (model) {
 										$elm$core$String$fromInt(dp.id))
 									]))
 							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$div,
 						_List_Nil,
@@ -7986,6 +7986,7 @@ var $author$project$Test$scatterPlotView = function (model) {
 										$elm$html$Html$text(dp.gender)
 									]))
 							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$div,
 						_List_Nil,
@@ -8014,6 +8015,7 @@ var $author$project$Test$scatterPlotView = function (model) {
 										$elm$core$String$fromInt(dp.age))
 									]))
 							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$div,
 						_List_Nil,
@@ -8043,6 +8045,7 @@ var $author$project$Test$scatterPlotView = function (model) {
 											A2($author$project$Test$getValueForAxis, dp, model.selectedX)))
 									]))
 							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
 						A2(
 						$elm$html$Html$div,
 						_List_Nil,
@@ -8070,6 +8073,91 @@ var $author$project$Test$scatterPlotView = function (model) {
 										$elm$html$Html$text(
 										$elm$core$String$fromFloat(
 											A2($author$project$Test$getValueForAxis, dp, model.selectedY)))
+									]))
+							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'rgb(0, 122, 204)'),
+										A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('BMI: ')
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'black')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(dp.bmi)
+									]))
+							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'rgb(0, 122, 204)'),
+										A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Blood Pressure: ')
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'black')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(dp.bloodPressure)
+									]))
+							])),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'rgb(0, 122, 204)'),
+										A2($elm$html$Html$Attributes$style, 'font-weight', 'bold')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('Heart Rate: ')
+									])),
+								A2(
+								$elm$html$Html$span,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'color', 'black')
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(
+										$elm$core$String$fromInt(dp.heartRate))
 									]))
 							]))
 					]));
@@ -8109,22 +8197,6 @@ var $author$project$Test$scatterPlotView = function (model) {
 				$elm$svg$Svg$Attributes$strokeWidth('2')
 			]),
 		_List_Nil);
-	var xLabel = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x(
-				$elm$core$String$fromFloat(plotWidth / 2)),
-				$elm$svg$Svg$Attributes$y(
-				$elm$core$String$fromFloat(plotHeight)),
-				$elm$svg$Svg$Attributes$textAnchor('middle'),
-				$elm$svg$Svg$Attributes$fontSize('16'),
-				$elm$svg$Svg$Attributes$fontWeight('bold')
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(model.selectedX)
-			]));
 	var yAxis = A2(
 		$elm$svg$Svg$line,
 		_List_fromArray(
@@ -8141,23 +8213,6 @@ var $author$project$Test$scatterPlotView = function (model) {
 				$elm$svg$Svg$Attributes$strokeWidth('2')
 			]),
 		_List_Nil);
-	var yLabel = A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$x('30'),
-				$elm$svg$Svg$Attributes$y(
-				$elm$core$String$fromFloat(plotHeight / 2)),
-				$elm$svg$Svg$Attributes$transform(
-				'rotate(-90 30 ' + ($elm$core$String$fromFloat(plotHeight / 2) + ')')),
-				$elm$svg$Svg$Attributes$textAnchor('middle'),
-				$elm$svg$Svg$Attributes$fontSize('16'),
-				$elm$svg$Svg$Attributes$fontWeight('bold')
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text(model.selectedY)
-			]));
 	var genderMatches = function (dp) {
 		var g = $elm$core$String$toLower(dp.gender);
 		return (model.showMale && ((g === 'male') || (g === 'm'))) || (model.showFemale && ((g === 'female') || (g === 'f')));
@@ -8287,59 +8342,13 @@ var $author$project$Test$scatterPlotView = function (model) {
 					points,
 					_Utils_ap(
 						_List_fromArray(
-							[xAxis, yAxis, xLabel, yLabel]),
+							[xAxis, yAxis]),
 						_Utils_ap(
+							A2($elm$core$List$map, tickLabelX, xTicks),
 							A2(
 								$elm$core$List$map,
-								function (v) {
-									return A2(
-										$elm$svg$Svg$line,
-										_List_fromArray(
-											[
-												$elm$svg$Svg$Attributes$x1(
-												$elm$core$String$fromFloat(
-													scaleX(v))),
-												$elm$svg$Svg$Attributes$y1(
-												$elm$core$String$fromFloat(plotHeight - plotPaddingBottom)),
-												$elm$svg$Svg$Attributes$x2(
-												$elm$core$String$fromFloat(
-													scaleX(v))),
-												$elm$svg$Svg$Attributes$y2(
-												$elm$core$String$fromFloat((plotHeight - plotPaddingBottom) + 5)),
-												$elm$svg$Svg$Attributes$stroke('black')
-											]),
-										_List_Nil);
-								},
-								xTicks),
-							_Utils_ap(
-								A2(
-									$elm$core$List$map,
-									function (v) {
-										return A2(
-											$elm$svg$Svg$line,
-											_List_fromArray(
-												[
-													$elm$svg$Svg$Attributes$x1(
-													$elm$core$String$fromFloat(plotPaddingLeft - 5)),
-													$elm$svg$Svg$Attributes$y1(
-													$elm$core$String$fromFloat(
-														scaleY(v))),
-													$elm$svg$Svg$Attributes$x2(
-													$elm$core$String$fromFloat(plotPaddingLeft)),
-													$elm$svg$Svg$Attributes$y2(
-													$elm$core$String$fromFloat(
-														scaleY(v))),
-													$elm$svg$Svg$Attributes$stroke('black')
-												]),
-											_List_Nil);
-									},
-									yTicks),
-								_Utils_ap(
-									A2($elm$core$List$map, tickLabelX, xTicks),
-									A2(
-										$elm$core$List$map,
-										tickLabel(model.selectedY),
-										yTicks))))))),
+								tickLabel(model.selectedY),
+								yTicks))))),
 				tooltipBox
 			]));
 };

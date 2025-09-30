@@ -54,7 +54,7 @@ init _ =
     ( { data = []
       , selectedX = "Daily Steps"
       , selectedY = "Sleep Duration"
-      , showPlot = True
+      , showPlot = False
       , showMale = True
       , showFemale = True
       , hoveredPoint = Nothing
@@ -374,27 +374,6 @@ scatterPlotView model =
                 ]
                 []
 
-        xLabel =
-            Svg.text_
-                [ SvgAttr.x (String.fromFloat (plotWidth / 2))
-                , SvgAttr.y (String.fromFloat (plotHeight))
-                , SvgAttr.textAnchor "middle"
-                , SvgAttr.fontSize "16"
-                , SvgAttr.fontWeight "bold"
-                ]
-                [ Svg.text model.selectedX ]
-
-        yLabel =
-            Svg.text_
-                [ SvgAttr.x "30"
-                , SvgAttr.y (String.fromFloat (plotHeight / 2))
-                , SvgAttr.transform ("rotate(-90 30 " ++ String.fromFloat (plotHeight / 2) ++ ")")
-                , SvgAttr.textAnchor "middle"
-                , SvgAttr.fontSize "16"
-                , SvgAttr.fontWeight "bold"
-                ]
-                [ Svg.text model.selectedY ]
-
         points =
             List.map
                 (\dp ->
@@ -426,30 +405,52 @@ scatterPlotView model =
                         , HtmlAttr.style "overflow-y" "auto"
                         , HtmlAttr.style "box-shadow" "0 2px 5px rgba(0,0,0,0.1)"
                         ]
-                        [ Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "ID: " ], Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromInt dp.id) ] ]
-                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "Gender: " ], Html.span [ HtmlAttr.style "color" "black" ] [ Html.text dp.gender ] ]
-                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "Age: " ], Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromInt dp.age) ] ]
-                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text (model.selectedX ++ ": ") ], Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromFloat (getValueForAxis dp model.selectedX)) ] ]
-                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text (model.selectedY ++ ": ") ], Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromFloat (getValueForAxis dp model.selectedY)) ] ]
-                        ]
+                        [ Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "ID: " ]
+                                      , Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromInt dp.id) ] ]
+                        , Html.br [] []
+            
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "Gender: " ]
+                                      , Html.span [ HtmlAttr.style "color" "black" ] [ Html.text dp.gender ] ]
+                        , Html.br [] []
+              
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "Age: " ]
+                                      , Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromInt dp.age) ] ]
+                        , Html.br [] []
 
-                Nothing ->
-                    Html.div
-                        [ HtmlAttr.style "margin-left" "20px"
-                        , HtmlAttr.style "color" "gray"
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text (model.selectedX ++ ": ") ]
+                                      , Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromFloat (getValueForAxis dp model.selectedX)) ] ]
+                        , Html.br [] []
+
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text (model.selectedY ++ ": ") ]
+                                      , Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromFloat (getValueForAxis dp model.selectedY)) ] ]
+                        , Html.br [] []
+
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "BMI: " ]
+                                      , Html.span [ HtmlAttr.style "color" "black" ] [ Html.text dp.bmi ] ]
+                        , Html.br [] []
+
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "Blood Pressure: " ]
+                                      , Html.span [ HtmlAttr.style "color" "black" ] [ Html.text dp.bloodPressure ] ]
+                        , Html.br [] []
+
+                        , Html.div [] [ Html.span [ HtmlAttr.style "color" "rgb(0, 122, 204)", HtmlAttr.style "font-weight" "bold" ] [ Html.text "Heart Rate: " ]
+                                      , Html.span [ HtmlAttr.style "color" "black" ] [ Html.text (String.fromInt dp.heartRate) ] ]
                         ]
+                Nothing ->
+                    Html.div [ HtmlAttr.style "margin-left" "20px"
+                             , HtmlAttr.style "color" "gray"
+                             ]
                         [ Html.text "Klicke auf einen Punkt" ]
     in
     Html.div [ HtmlAttr.style "display" "flex" ]
         [ Svg.svg [ SvgAttr.width (String.fromFloat plotWidth), SvgAttr.height (String.fromFloat plotHeight) ]
-            (points ++ [ xAxis, yAxis, xLabel, yLabel ]
-                ++ List.map (\v -> Svg.line [ SvgAttr.x1 (String.fromFloat (scaleX v)), SvgAttr.y1 (String.fromFloat (plotHeight - plotPaddingBottom)), SvgAttr.x2 (String.fromFloat (scaleX v)), SvgAttr.y2 (String.fromFloat (plotHeight - plotPaddingBottom + 5)), SvgAttr.stroke "black" ] []) xTicks
-                ++ List.map (\v -> Svg.line [ SvgAttr.x1 (String.fromFloat (plotPaddingLeft - 5)), SvgAttr.y1 (String.fromFloat (scaleY v)), SvgAttr.x2 (String.fromFloat plotPaddingLeft), SvgAttr.y2 (String.fromFloat (scaleY v)), SvgAttr.stroke "black" ] []) yTicks
+            (points ++ [ xAxis, yAxis ]
                 ++ List.map tickLabelX xTicks
                 ++ List.map (tickLabel model.selectedY) yTicks
             )
         , tooltipBox
         ]
+
 
 
 -- PARALLEL COORDINATES
