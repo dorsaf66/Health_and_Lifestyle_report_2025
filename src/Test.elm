@@ -52,7 +52,7 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { data = []
-      , selectedX = "Physical Activity"
+      , selectedX = "Daily Steps"
       , selectedY = "Sleep Duration"
       , showPlot = True
       , showMale = True
@@ -134,7 +134,6 @@ update msg model =
                     let
                         dataRows = List.drop 1 rows
                         persons = List.map rowToPerson dataRows
-                        _ = Debug.log ("Loaded persons: " ++ String.fromInt (List.length persons)) persons
                     in
                     ( { model | data = persons }, Cmd.none )
 
@@ -162,10 +161,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Html.div [ HtmlAttr.style "font-family" "Arial, sans-serif", HtmlAttr.style "margin" "20px" ]
-        [ Html.div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ Html.text " "
-            ]
-        , if model.currentPlot == Scatter then
+        [ if model.currentPlot == Scatter then
             scatterControls model
           else
             parallelControls model
@@ -176,22 +172,65 @@ view model =
 
 scatterControls : Model -> Html Msg
 scatterControls model =
-    Html.div []
-        [ Html.div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ Html.text "X-AXIS: "
-            , axisSelectX model.selectedX
+    Html.div [ HtmlAttr.style "display" "flex" ]
+        [ Html.div
+            [ HtmlAttr.style "width" "300px"  -- noch breiter
+            , HtmlAttr.style "margin-right" "20px"
+            , HtmlAttr.style "padding" "25px"
+            , HtmlAttr.style "border" "1px solid #ccc"
+            , HtmlAttr.style "border-radius" "8px"
+            , HtmlAttr.style "background" "#f5f5f5"
+            , HtmlAttr.style "box-sizing" "border-box"
             ]
-        , Html.div [ HtmlAttr.style "margin-bottom" "10px" ]
-            [ Html.text "Y-AXIS: "
-            , axisSelectY model.selectedY
-            ]
-        , Html.div [ HtmlAttr.style "margin" "10px 0" ]
-            [ Html.button [ HtmlEvents.onClick TogglePlot ]
-                [ Html.text (if model.showPlot then "HIDE PLOT" else "SHOW PLOT") ]
-            ]
-        , Html.div [ HtmlAttr.style "margin-bottom" "10px", HtmlAttr.style "padding-left" "20px" ]
-            [ labelCheckbox "MALE" model.showMale ToggleMale
-            , labelCheckbox "FEMALE" model.showFemale ToggleFemale
+            [ Html.div [ HtmlAttr.style "margin-bottom" "25px" ]
+                [ Html.text "X-AXIS:"
+                , Html.br [] []
+                , Html.select 
+                    [ HtmlEvents.onInput ChangeX
+                    , HtmlAttr.style "width" "100%"
+                    , HtmlAttr.style "padding" "12px"
+                    , HtmlAttr.style "font-size" "16px"
+                    , HtmlAttr.style "min-width" "200px"
+                    , HtmlAttr.style "box-sizing" "border-box"
+                    ]
+                    [ Html.option [ HtmlAttr.value "Physical Activity", HtmlAttr.selected (model.selectedX == "Physical Activity") ] [ Html.text "Physical Activity" ]
+                    , Html.option [ HtmlAttr.value "Daily Steps", HtmlAttr.selected (model.selectedX == "Daily Steps") ] [ Html.text "Daily Steps" ]
+                    ]
+                ]
+            , Html.div [ HtmlAttr.style "margin-bottom" "25px" ]
+                [ Html.text "Y-AXIS:"
+                , Html.br [] []
+                , Html.select 
+                    [ HtmlEvents.onInput ChangeY
+                    , HtmlAttr.style "width" "100%"
+                    , HtmlAttr.style "padding" "12px"
+                    , HtmlAttr.style "font-size" "16px"
+                    , HtmlAttr.style "min-width" "200px"
+                    , HtmlAttr.style "box-sizing" "border-box"
+                    ]
+                    [ Html.option [ HtmlAttr.value "Sleep Duration", HtmlAttr.selected (model.selectedY == "Sleep Duration") ] [ Html.text "Sleep Duration" ]
+                    , Html.option [ HtmlAttr.value "Heart Rate", HtmlAttr.selected (model.selectedY == "Heart Rate") ] [ Html.text "Heart Rate" ]
+                    ]
+                ]
+            , Html.div [ HtmlAttr.style "margin-bottom" "25px" ]
+                [ Html.button
+                    [ HtmlEvents.onClick TogglePlot
+                    , HtmlAttr.style "width" "100%"
+                    , HtmlAttr.style "padding" "12px"
+                    , HtmlAttr.style "background-color" "#007acc"
+                    , HtmlAttr.style "color" "white"
+                    , HtmlAttr.style "border" "none"
+                    , HtmlAttr.style "border-radius" "4px"
+                    , HtmlAttr.style "cursor" "pointer"
+                    , HtmlAttr.style "font-size" "16px"
+                    ]
+                    [ Html.text (if model.showPlot then "HIDE PLOT" else "SHOW PLOT") ]
+                ]
+            , Html.div []
+                [ labelCheckbox "MALE" model.showMale ToggleMale
+                , Html.br [] []
+                , labelCheckbox "FEMALE" model.showFemale ToggleFemale
+                ]
             ]
         , if model.showPlot then
             scatterPlotView model
@@ -200,9 +239,11 @@ scatterControls model =
         ]
 
 
+
+
 labelCheckbox : String -> Bool -> (Bool -> Msg) -> Html Msg
 labelCheckbox labelText checked toMsg =
-    Html.label [ HtmlAttr.style "margin-right" "15px" ]
+    Html.label [ HtmlAttr.style "display" "block", HtmlAttr.style "margin-bottom" "8px" ]
         [ Html.input [ HtmlAttr.type_ "checkbox", HtmlAttr.checked checked, HtmlEvents.onCheck toMsg ] []
         , Html.text (" " ++ labelText)
         ]
@@ -210,7 +251,7 @@ labelCheckbox labelText checked toMsg =
 
 axisSelectX : String -> Html Msg
 axisSelectX selected =
-    Html.select [ HtmlEvents.onInput ChangeX ]
+    Html.select [ HtmlEvents.onInput ChangeX, HtmlAttr.style "width" "180%", HtmlAttr.style "padding" "5px", HtmlAttr.style "margin-top" "5px" ]
         [ Html.option [ HtmlAttr.value "Physical Activity", HtmlAttr.selected (selected == "Physical Activity") ] [ Html.text "Physical Activity" ]
         , Html.option [ HtmlAttr.value "Daily Steps", HtmlAttr.selected (selected == "Daily Steps") ] [ Html.text "Daily Steps" ]
         ]
@@ -218,11 +259,13 @@ axisSelectX selected =
 
 axisSelectY : String -> Html Msg
 axisSelectY selected =
-    Html.select [ HtmlEvents.onInput ChangeY ]
+    Html.select [ HtmlEvents.onInput ChangeY, HtmlAttr.style "width" "180%", HtmlAttr.style "padding" "5px", HtmlAttr.style "margin-top" "5px" ]
         [ Html.option [ HtmlAttr.value "Sleep Duration", HtmlAttr.selected (selected == "Sleep Duration") ] [ Html.text "Sleep Duration" ]
         , Html.option [ HtmlAttr.value "Heart Rate", HtmlAttr.selected (selected == "Heart Rate") ] [ Html.text "Heart Rate" ]
         ]
 
+
+-- VALUE FETCH
 
 getValueForAxis : Person -> String -> Float
 getValueForAxis dp axis =
@@ -244,6 +287,8 @@ ticksForAxis axis values =
     List.map (\i -> minVal + step * toFloat i) [0,1,2,3,4]
 
 
+-- SCATTERPLOT
+
 scatterPlotView : Model -> Html Msg
 scatterPlotView model =
     let
@@ -263,7 +308,7 @@ scatterPlotView model =
         minY = List.minimum ys |> withDefault 0
         maxY = List.maximum ys |> withDefault (minY + 1)
 
-        plotPaddingLeft = 120
+        plotPaddingLeft = 100
         plotPaddingRight = 40
         plotPaddingTop = 40
         plotPaddingBottom = 50
@@ -410,7 +455,7 @@ scatterPlotView model =
         ]
 
 
--- PARALLEL COORDINATES CONTROLS AND VIEW
+-- PARALLEL COORDINATES
 
 parallelControls : Model -> Html Msg
 parallelControls model =
@@ -422,8 +467,6 @@ parallelControls model =
         ]
 
 
--- ACHSEN RECORD
-
 type alias Axis =
     { name : String
     , getValue : Person -> Float
@@ -433,13 +476,11 @@ type alias Axis =
     }
 
 
--- PARALLEL KOORDINATENPLOT
-
 parallelPlotView : List Person -> Html Msg
 parallelPlotView people =
     let
         paddingTop = 50
-        paddingLeft = 150
+        paddingLeft = 450
 
         occupations = people |> List.map .occupation |> unique
         sleepDisorders = people |> List.map .sleepDisorder |> unique
@@ -605,7 +646,7 @@ parallelPlotView people =
                                             , SvgAttr.fontSize "12"
                                             , SvgAttr.textAnchor "end"
                                             ]
-                                            [ Html.text label ]
+                                            [ Svg.text label ]
                                         ]
                                     )
                                 |> List.concat
@@ -622,7 +663,7 @@ parallelPlotView people =
                                 , SvgAttr.fontSize "14"
                                 , SvgAttr.textAnchor "middle"
                                 ]
-                                [ Html.text axis.name ]
+                                [ Svg.text axis.name ]
                         )
                 ]
             )

@@ -126,7 +126,7 @@ view model =
 
           -- Diagram container
         , div [ HtmlAttr.style "width" "90%"
-              , HtmlAttr.style "max-width" "1200px"
+              , HtmlAttr.style "max-width" "1500px"
               , HtmlAttr.style "background-color" "white"
               , HtmlAttr.style "padding" "20px"
               , HtmlAttr.style "border-radius" "12px"
